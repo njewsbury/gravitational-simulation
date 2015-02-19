@@ -56,7 +56,7 @@ public class SimulationTest {
         simulation = new SimpleSatelliteModel(container);
     }
     
-    @Test
+    //@Test
     public void testSimpleGravity() {
         double distance;
         logger.info("Starting gravity test.");
