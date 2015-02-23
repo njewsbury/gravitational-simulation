@@ -1,5 +1,5 @@
 #The Stability of n-Body Choreographed Orbits
-###PHYS 4250 Project Proposal by Nathan Jewsbury
+###PHYS 4250 Project Proposal by Nathan Jewsbury and Scott Osadchuk
 
 In an effort to better understand exoctic choreographies of celestial objects, a simulation will be created to find, solve and display various stable orbits with n-bodies.  The proposed project will consist of three parts:
 
