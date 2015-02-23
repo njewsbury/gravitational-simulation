@@ -40,7 +40,7 @@ public class RenderFrame extends ComponentAdapter implements ActionListener {
     public static final Font DISPLAY_FONT = new Font("Courier New", Font.BOLD, 12);
 
     private final Logger logger = LoggerFactory.getLogger(RenderFrame.class);
-    private final String SPACE_BG_IMAGE = "src/main/resources/space.jpg";
+    private final String SPACE_BG_IMAGE = "space.jpg";
     private final int CONFIG_WIDTH = 200;
     //
     private final Map<String, SimulationSet> simulationSet;

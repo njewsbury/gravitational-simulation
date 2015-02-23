@@ -5,6 +5,7 @@ import java.awt.Graphics;
 import java.awt.Image;
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 import org.slf4j.Logger;
@@ -26,10 +27,12 @@ public class ImagePanel extends JPanel implements RenderResizable {
     private Image backgroundImage;
 
     public ImagePanel(String img, Dimension size) {
+        URL resource = getClass().getClassLoader().getResource(img);
+
         Image bgImage;
 
         try {
-            bgImage = ImageIO.read(new File(img));
+            bgImage = ImageIO.read((resource));
             if (bgImage != null) {
                 this.backgroundImage = bgImage;
             }
