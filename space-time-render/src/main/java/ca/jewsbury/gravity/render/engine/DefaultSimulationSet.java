@@ -1,6 +1,6 @@
 package ca.jewsbury.gravity.render.engine;
 
-import ca.jewsbury.gravity.util.SpaceObjectProperty;
+import ca.jewsbury.gravity.util.enumerated.SpaceObjectProperty;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;

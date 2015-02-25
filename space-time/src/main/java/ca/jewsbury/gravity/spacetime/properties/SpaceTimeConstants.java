@@ -26,6 +26,8 @@ public abstract class SpaceTimeConstants {
     
     public static final double EARTH_SURFACE_GRAVITY = 9.81; //[[m/s^2]]
     
+    public static final int PUSH_REQUEST_LIMIT = 50;
+    
     
     /* UTIL FUNCTIONS */
 

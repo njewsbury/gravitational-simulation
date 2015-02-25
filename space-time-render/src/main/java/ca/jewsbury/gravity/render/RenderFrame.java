@@ -1,15 +1,17 @@
 package ca.jewsbury.gravity.render;
 
 import ca.jewsbury.gravity.form.RenderPropertiesForm;
+import ca.jewsbury.gravity.render.engine.DefaultSimulationSet;
 import ca.jewsbury.gravity.render.engine.SimulationEngine;
 import ca.jewsbury.gravity.render.engine.SimulationSet;
+import ca.jewsbury.gravity.render.engine.enumerated.SimulationEngineSignal;
 import ca.jewsbury.gravity.render.panel.ConfigPanel;
 import ca.jewsbury.gravity.render.panel.GraphPanel;
 import ca.jewsbury.gravity.render.panel.ImagePanel;
 import ca.jewsbury.gravity.render.panel.UniversePanel;
 import ca.jewsbury.gravity.spacetime.SpaceTimeException;
-import ca.jewsbury.gravity.spacetime.sim.SpaceTimeSimulation;
 import ca.jewsbury.gravity.util.RenderUtils;
+import ca.jewsbury.gravity.util.factory.SimulationSetFactory;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -18,11 +20,14 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.net.URL;
+import java.util.HashMap;
 import java.util.Map;
 import javax.swing.JFrame;
 import javax.swing.JLayeredPane;
 import javax.swing.JOptionPane;
 import javax.swing.JSplitPane;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,11 +45,11 @@ public class RenderFrame extends ComponentAdapter implements ActionListener {
     public static final Font DISPLAY_FONT = new Font("Courier New", Font.BOLD, 12);
 
     private final Logger logger = LoggerFactory.getLogger(RenderFrame.class);
+    private final String DEFAULT_SIM_DEFINITIONS = "default-sim.json";
     private final String SPACE_BG_IMAGE = "space.jpg";
     private final int CONFIG_WIDTH = 200;
     //
-    private final Map<String, SimulationSet> simulationSet;
-    private SpaceTimeSimulation simulationModel;
+    private Map<String, SimulationSet> simulationSet;
     private SimulationEngine currentSimulation;
     private Thread simulationThread;
     private boolean isPaused = false;
@@ -61,14 +66,38 @@ public class RenderFrame extends ComponentAdapter implements ActionListener {
 
     public RenderFrame(Dimension minimum, Map<String, SimulationSet> simulationSet) {
         Dimension panelMinimum = new Dimension((int) minimum.getHeight(), (int) minimum.getHeight());
-        this.simulationSet = simulationSet;
         currentSimulation = null;
-        //
-
-        //
+        initializeSimulationSet(simulationSet);
         initializeJPanels(panelMinimum);
 
         initializeJFrame(minimum);
+    }
+
+    /**
+     * Initialize the simulation set to have at least the one default entry, or at most
+     * the sum of the file provided defaults and provided simulation sets.
+     * @param providedSet 
+     */
+    private void initializeSimulationSet(Map<String, SimulationSet> providedSet) {
+        URL jsonResource = getClass().getClassLoader().getResource(DEFAULT_SIM_DEFINITIONS);
+        // Read in the default JSON sets.
+        this.simulationSet = SimulationSetFactory.generateSimulationSetFromFile(jsonResource);
+        if( this.simulationSet == null ) {
+            this.simulationSet = new HashMap<String, SimulationSet>();
+        }
+        //Merge the two sets.
+        if (providedSet != null) {
+            logger.info("Merging provided sets....");
+            this.simulationSet.putAll(providedSet);
+            logger.info("Merge complete, new record set contains: " + this.simulationSet.size() + " entries.");
+        } else {
+            logger.debug("Provided set is null. Using only default simulation sets.");
+        }
+        
+        if( this.simulationSet.isEmpty()) {
+            logger.debug("Unable to load any simulation sets. Adding the hard coded default.");
+            this.simulationSet.put("default", new DefaultSimulationSet());
+        }
     }
 
     private void initializeJPanels(Dimension minimum) {
@@ -193,11 +222,38 @@ public class RenderFrame extends ComponentAdapter implements ActionListener {
         }
     }
 
+    /**
+     * This method converts the given actionCommand to an integer
+     * for use with the 'actionPerformed' method.  This is implemented
+     * only to allow targeting Java 1.6+.
+     * 
+     * @param action
+     * @return 
+     */
+    private int getActionIndex(String action) {
+        int actionIndex = 0;
+
+        if (StringUtils.isNotBlank(action)) {
+            if (StringUtils.equalsIgnoreCase("NEW", action)) {
+                actionIndex = 1;
+            } else if (StringUtils.equalsIgnoreCase("PAUSE", action)) {
+                actionIndex = 2;
+            } else if (StringUtils.equalsIgnoreCase("PLAY", action)) {
+                actionIndex = 3;
+            } else if (StringUtils.equalsIgnoreCase("STOP", action)) {
+                actionIndex = 4;
+            }
+        }
+        return actionIndex;
+    }
+
     @Override
     public void actionPerformed(ActionEvent e) {
+        int actionIndex = 0;
         if (e != null && e.getActionCommand() != null) {
-            switch (e.getActionCommand()) {
-                case "NEW": {
+            actionIndex = getActionIndex(e.getActionCommand());
+            switch (actionIndex) {
+                case 1: {
                     logger.info("Run New Simulation.");
                     // START NEW SIMULATION
                     setupNewSimulation();
@@ -208,12 +264,12 @@ public class RenderFrame extends ComponentAdapter implements ActionListener {
                     configPanel.getNewSim().setEnabled(false);
                     break;
                 }
-                case "PAUSE": {
+                case 2: {
                     if (!isPaused) {
                         logger.info("Pause simulation.");
                         // PAUSE SIMULATION
                         if (currentSimulation != null) {
-                            currentSimulation.sendSignal("PAUSE");
+                            currentSimulation.sendSignal(SimulationEngineSignal.PAUSE);
                             try {
                                 simulationThread.join();
                             } catch (InterruptedException ex) {
@@ -228,14 +284,14 @@ public class RenderFrame extends ComponentAdapter implements ActionListener {
                     }
                     break;
                 }
-                case "PLAY": {
+                case 3: {
                     if (isPaused) { // Simulation was paused, restart the simulation
                         logger.info("Resume simulation");
                         isPaused = false;
 
                         if (currentSimulation != null && simulationThread != null) {
                             simulationThread = new Thread(currentSimulation);
-                            currentSimulation.sendSignal("RESUME");
+                            currentSimulation.sendSignal(SimulationEngineSignal.RESUME);
                             simulationThread.start();
                         }
                     } else {
@@ -251,18 +307,18 @@ public class RenderFrame extends ComponentAdapter implements ActionListener {
                     configPanel.getStopSim().setEnabled(true);
                     break;
                 }
-                case "STOP": {
+                case 4: {
                     logger.info("Stop Simulation");
                     isPaused = false;
 
                     if (currentSimulation != null && simulationThread != null) {
                         if (simulationThread.isAlive()) {
-                            currentSimulation.sendSignal("STOP");
+                            currentSimulation.sendSignal(SimulationEngineSignal.STOP);
                             try {
                                 simulationThread.join();
                                 simulationThread = null;
                                 currentSimulation = null;
-                                
+
                             } catch (InterruptedException ex) {
                                 logger.error(ex.getMessage());
                             }
@@ -287,13 +343,13 @@ public class RenderFrame extends ComponentAdapter implements ActionListener {
     public UniversePanel getUniversePanel() {
         return universePanel;
     }
-    
+
     public GraphPanel getGraphPanel() {
         return graphPanel;
     }
-    
+
     public void repaint() {
-        if( renderFrame != null ) {
+        if (renderFrame != null) {
             renderFrame.repaint();
         }
     }

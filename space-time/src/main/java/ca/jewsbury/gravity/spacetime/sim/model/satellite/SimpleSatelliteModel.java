@@ -73,6 +73,7 @@ public class SimpleSatelliteModel extends SpaceTimeSimulation {
                             }
                         }                        
                     }
+                    totalForce.transform((1.0/active.getMass()));
                     active.setAcceleration(totalForce);
                 }
             }

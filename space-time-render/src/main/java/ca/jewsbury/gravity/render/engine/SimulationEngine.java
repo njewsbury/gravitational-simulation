@@ -3,6 +3,7 @@ package ca.jewsbury.gravity.render.engine;
 import ca.jewsbury.gravity.form.RenderPropertiesForm;
 import ca.jewsbury.gravity.model.VisibleSpaceObject;
 import ca.jewsbury.gravity.render.RenderFrame;
+import ca.jewsbury.gravity.render.engine.enumerated.SimulationEngineSignal;
 import ca.jewsbury.gravity.render.panel.GraphPanel;
 import ca.jewsbury.gravity.spacetime.Dimensional;
 import ca.jewsbury.gravity.spacetime.SpaceContainer;
@@ -10,7 +11,7 @@ import ca.jewsbury.gravity.spacetime.SpaceTimeException;
 import ca.jewsbury.gravity.spacetime.model.IntegrationModel;
 import ca.jewsbury.gravity.spacetime.model.Orbital;
 import ca.jewsbury.gravity.spacetime.model.integration.EulerModel;
-import ca.jewsbury.gravity.util.SpaceObjectFactory;
+import ca.jewsbury.gravity.util.factory.SpaceObjectFactory;
 import javax.swing.SwingUtilities;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -121,17 +122,17 @@ public class SimulationEngine implements Runnable {
         }
     }
 
-    public synchronized void sendSignal(String signal) {
+    public synchronized void sendSignal(SimulationEngineSignal signal) {
 
         switch (signal) {
-            case "RESUME": {
+            case RESUME: {
                 if (!runThread) {
                     runThread = true;
                 }
                 break;
             }
-            case "PAUSE":
-            case "STOP": {
+            case PAUSE:
+            case STOP: {
                 if (runThread) {
                     runThread = false;
                 }

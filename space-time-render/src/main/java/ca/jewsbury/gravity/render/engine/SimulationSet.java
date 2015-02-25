@@ -27,4 +27,8 @@ public class SimulationSet {
     public JSONObject getSimulationDefinition() {
         return simulationDefinition;
     }
+    
+    public void setSimulationDefinition(JSONObject json) {
+        this.simulationDefinition = json;
+    }
 }

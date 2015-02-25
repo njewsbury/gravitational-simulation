@@ -25,6 +25,12 @@ public class SpaceTimeRenderer {
 
     public static void main(String[] args) {
         
+        /*
+            In theory, the main program could reach out to
+            the central server to collect JSON points
+            and convert them into simulation sets
+            prior to opening the renderer.
+        */
         RenderFrame rFrame = new RenderFrame( minimum, null );        
         rFrame.display();
         

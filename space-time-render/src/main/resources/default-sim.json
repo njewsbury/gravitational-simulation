@@ -1,64 +1,65 @@
-{
-    "defaults": [
-        {
-            "simulationName": "Figure Eight",
-            "objectList": [
-                {
-                    "objectName": "massOne",
-                    "objectMass": 100,
-                    "objectRadius": 20,
-                    "isStatic": false,
-                    "initialX": 0,
-                    "initialY": 0,
-                    "initialVX": 0,
-                    "initialVY": 0
-                },
-                {
-                    "objectName": "massTwo",
-                    "objectMass": 100,
-                    "objectRadius": 20,
-                    "isStatic": false,
-                    "initialX": 200,
-                    "initialY": 0,
-                    "initialVX": 1.0,
-                    "initialVY": -2.0
-                },
-                {
-                    "objectName": "massThree",
-                    "objectMass": 100,
-                    "objectRadius": 20,
-                    "isStatic": false,
-                    "initialX": -200,
-                    "initialY": 0,
-                    "initialVX": -1.0,
-                    "initialVY": -2.0
-                }
-            ]
-        },
-        {
-            "simulationName": "Default",
-            "objectList": [
-                {
-                    "objectName": "earth",
-                    "objectMass": 100,
-                    "objectRadius": 50,
-                    "isStatic": true,
-                    "initialX": 0,
-                    "initialY": 0,
-                    "initialVX": 0,
-                    "initialVY": 0
-                },
-                {
-                    "objectName": "comet",
-                    "objectMass": 10,
-                    "objectRadius": 20,
-                    "isStatic": false,
-                    "initialX": 200,
-                    "initialY": 0,
-                    "initialVX": 1.0,
-                    "initialVY": -2.0
-                }
-            ]
-        }
-    ]
-}
+[
+    {
+        "simulationId": "default",
+        "simulationName": "Default",
+        "objectList": [
+            {
+                "objectName": "earth",
+                "objectMass": 100,
+                "objectRadius": 50,
+                "isStatic": true,
+                "initialX": 0,
+                "initialY": 0,
+                "initialVX": 0,
+                "initialVY": 0
+            },
+            {
+                "objectName": "comet",
+                "objectMass": 10,
+                "objectRadius": 20,
+                "isStatic": false,
+                "initialX": 200,
+                "initialY": 0,
+                "initialVX": 1.0,
+                "initialVY": -2.0
+            }
+        ]
+    },
+    {
+        "simulationId": "figureEight",
+        "simulationName": "FigureEight",
+        "objectList": [
+            {
+                "objectName": "massOne",
+                "objectMass": 100,
+                "objectRadius": 20,
+                "isStatic": false,
+                "initialX": 0,
+                "initialY": 0,
+                "initialVX": 0,
+                "initialVY": 0
+            },
+            {
+                "objectName": "massTwo",
+                "objectMass": 100,
+                "objectRadius": 20,
+                "isStatic": false,
+                "initialX": 200,
+                "initialY": 0,
+                "initialVX": 1.0,
+                "initialVY": -2.0
+            },
+            {
+                "objectName": "massThree",
+                "objectMass": 100,
+                "objectRadius": 20,
+                "isStatic": false,
+                "initialX": -200,
+                "initialY": 0,
+                "initialVX": -1.0,
+                "initialVY": -2.0
+            }
+        ]
+    }
+]
+

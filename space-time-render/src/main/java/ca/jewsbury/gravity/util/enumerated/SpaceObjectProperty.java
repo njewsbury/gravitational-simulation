@@ -1,4 +1,4 @@
-package ca.jewsbury.gravity.util;
+package ca.jewsbury.gravity.util.enumerated;
 
 /**
  *

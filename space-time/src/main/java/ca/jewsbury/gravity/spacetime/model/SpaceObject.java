@@ -1,5 +1,6 @@
 package ca.jewsbury.gravity.spacetime.model;
 
+import ca.jewsbury.gravity.spacetime.properties.SpaceTimeConstants;
 import org.apache.commons.collections.buffer.CircularFifoBuffer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,6 +31,7 @@ public abstract class SpaceObject implements Orbital {
     protected SpaceTimeVector position; //meters
     protected SpaceTimeVector velocity; //meters per second [[m/s]]
     protected SpaceTimeVector acceleration; //meters per second squared [[ m/s^2 ]]
+    protected int pushRequests;
 
     public SpaceObject(String idName) {
         this.idName = idName;
@@ -40,6 +42,8 @@ public abstract class SpaceObject implements Orbital {
         acceleration = new SpaceTimeVector();
         radius = 1.0;
         mass = 1.0;
+        
+        this.pushRequests = 0;
     }
 
     /**
@@ -74,7 +78,11 @@ public abstract class SpaceObject implements Orbital {
     
     @Override
     public void pushLastPosition(SpaceTimeVector position) {
-        this.lastPositions.add(position);
+        if( this.pushRequests % SpaceTimeConstants.PUSH_REQUEST_LIMIT == 0 ) {
+            this.lastPositions.add(position);
+            this.pushRequests = 0;
+        } 
+        this.pushRequests++;
     }
     
     @Override

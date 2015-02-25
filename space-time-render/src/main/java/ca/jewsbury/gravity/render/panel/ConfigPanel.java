@@ -159,7 +159,7 @@ public class ConfigPanel extends JPanel implements RenderResizable {
         JLabel textLabel;
 
         simulationSelector = new JComboBox();
-        simulationSelector.addItem(DefaultSimulationSet.DEFAULT_IDENTIFIER);
+        //simulationSelector.addItem(DefaultSimulationSet.DEFAULT_IDENTIFIER);
 
         if (simulationSet != null && simulationSet.size() > 0) {
             for (SimulationSet simulation : simulationSet.values()) {
