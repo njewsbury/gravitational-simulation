@@ -4,7 +4,7 @@ import ca.jewsbury.gravity.form.RenderPropertiesForm;
 import ca.jewsbury.gravity.render.engine.DefaultSimulationSet;
 import ca.jewsbury.gravity.render.engine.SimulationEngine;
 import ca.jewsbury.gravity.render.engine.SimulationSet;
-import ca.jewsbury.gravity.render.engine.enumerated.SimulationEngineSignal;
+import ca.jewsbury.gravity.util.enumerated.SimulationEngineSignal;
 import ca.jewsbury.gravity.render.panel.ConfigPanel;
 import ca.jewsbury.gravity.render.panel.GraphPanel;
 import ca.jewsbury.gravity.render.panel.ImagePanel;
@@ -34,7 +34,7 @@ import org.slf4j.LoggerFactory;
 /**
  * RenderFrame.class
  *
- *
+ * Root frame for render project.  Defines all GUI functionality.
  *
  * 14-Feb-2015
  *

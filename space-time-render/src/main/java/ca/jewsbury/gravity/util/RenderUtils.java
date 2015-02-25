@@ -5,7 +5,10 @@ import java.awt.Color;
 import java.util.Random;
 
 /**
- *
+ * RenderUtils
+ * 
+ * Utility class to translate simulation coords to render/panel coords.
+ * 
  * @author Nathan
  */
 public abstract class RenderUtils {

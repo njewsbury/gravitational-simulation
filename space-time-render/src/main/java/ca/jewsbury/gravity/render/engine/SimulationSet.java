@@ -5,7 +5,7 @@ import org.json.JSONObject;
 /**
  * SimulationSet.class
  *
- *
+ * Container class for a JSON defined simulation.
  *
  * 14-Feb-2015
  *

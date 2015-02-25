@@ -14,7 +14,8 @@ import org.slf4j.LoggerFactory;
 /**
  * SpaceObjectFactory.class
  *
- *
+ * Given a particular JSON Object, create the associated Orbital object with
+ * its defined properties.
  *
  * 14-Feb-2015
  *

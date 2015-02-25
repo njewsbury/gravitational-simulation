@@ -1,4 +1,4 @@
-package ca.jewsbury.gravity.render.engine.enumerated;
+package ca.jewsbury.gravity.util.enumerated;
 
 /**
  *

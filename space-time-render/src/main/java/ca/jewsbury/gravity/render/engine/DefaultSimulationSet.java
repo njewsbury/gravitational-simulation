@@ -10,7 +10,8 @@ import org.slf4j.LoggerFactory;
 /**
  * DefaultSimulationSet.class
  *
- *
+ * Hardcoded default 2-body simulation.  If nothing else can be found/loaded
+ * this will at least show up.
  *
  * 14-Feb-2015
  *

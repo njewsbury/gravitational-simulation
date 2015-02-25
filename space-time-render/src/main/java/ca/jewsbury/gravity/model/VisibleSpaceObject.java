@@ -13,7 +13,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- *
+ * Visible Space Object
+ * 
+ * Wrapper class for a Space Object.  Defines the objects visible properties
+ * ie. it's circle and colour.  Required for rendering.
+ * 
  * @author Nathan
  */
 public class VisibleSpaceObject {

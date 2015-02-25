@@ -3,7 +3,7 @@ package ca.jewsbury.gravity.render.engine;
 import ca.jewsbury.gravity.form.RenderPropertiesForm;
 import ca.jewsbury.gravity.model.VisibleSpaceObject;
 import ca.jewsbury.gravity.render.RenderFrame;
-import ca.jewsbury.gravity.render.engine.enumerated.SimulationEngineSignal;
+import ca.jewsbury.gravity.util.enumerated.SimulationEngineSignal;
 import ca.jewsbury.gravity.render.panel.GraphPanel;
 import ca.jewsbury.gravity.spacetime.Dimensional;
 import ca.jewsbury.gravity.spacetime.SpaceContainer;
@@ -20,7 +20,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- *
+ * Simulation Engine
+ * 
+ * Runnable class that progresses the simulation forward in time.  This is runnable
+ * so that while it's active the GUI is still interactive.
+ * 
  * @author Nathan
  */
 public class SimulationEngine implements Runnable {
@@ -37,7 +41,6 @@ public class SimulationEngine implements Runnable {
     private boolean runThread = true;
     private long timeDelayMillis;
     private int framesPerSecond;
-    private long loopCount = 0;
 
     public SimulationEngine(RenderFrame parentFrame) throws SpaceTimeException {
         this.parentFrame = parentFrame;
@@ -149,7 +152,6 @@ public class SimulationEngine implements Runnable {
         while (runThread) {
             start = System.currentTimeMillis();
             sleepTime = timeDelayMillis - (System.currentTimeMillis() - start);
-            loopCount++;
             // UPDATE SIMULATION
             this.integrator.moveUniverseObjects(container);
             updateGraphPanel();

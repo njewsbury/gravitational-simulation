@@ -12,7 +12,8 @@ import org.slf4j.LoggerFactory;
 /**
  * RenderPropertiesForm.class
  *
- *
+ * Class dedicated to storing data input from the user through
+ * the config panel.
  *
  * 14-Feb-2015
  *

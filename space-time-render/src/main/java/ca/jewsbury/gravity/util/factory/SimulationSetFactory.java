@@ -15,7 +15,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- *
+ * SimulationSet Factory
+ * 
+ * Given a JSON file creates all required SimulationSets matching that JSON
+ * definition.  Adds all the found definitions to a HashMap to pass back
+ * to the render frame.
+ * 
  * @author Nathan
  */
 public class SimulationSetFactory {
