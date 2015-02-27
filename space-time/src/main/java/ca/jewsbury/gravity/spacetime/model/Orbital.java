@@ -30,9 +30,9 @@ public interface Orbital {
     void increaseVelocity(SpaceTimeVector delta);
 
     SpaceTimeVector getPosition();
-    
+
     void pushLastPosition(SpaceTimeVector position);
-    
+
     CircularFifoBuffer getLastPositions();
 
     void setPosition(SpaceTimeVector position);
@@ -45,12 +45,22 @@ public interface Orbital {
 
     String getAsciiRender();
 
-    void moveObject();
-    
+    void moveObject(SpaceTimeVector displacement);
+
     double getKineticEnergy();
-    
+
     double getPotentialEnergy();
-    
+
     void setPotentialEnergy(double potential);
+
+    @Override
+    int hashCode();
+
+    @Override
+    boolean equals(Object obj);
+    
+    double distanceToOther(Orbital other);
+    
+    SpaceTimeVector getUnitVectorFacingOther(Orbital other);
 
 }

@@ -1,36 +1,36 @@
 package ca.jewsbury.gravity.spacetime.model.integration;
 
-import ca.jewsbury.gravity.spacetime.model.IntegrationModel;
+import ca.jewsbury.gravity.spacetime.SpaceContainer;
 import ca.jewsbury.gravity.spacetime.model.Orbital;
 import ca.jewsbury.gravity.spacetime.model.SpaceTimeVector;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
  * @author Nathan
  */
-public class SymplecticModel extends IntegrationModel {
+public class SymplecticModel implements Integrator {
 
-    @Override
-    public void moveSingleObject(Orbital moveable) {
-        SpaceTimeVector acceleration, velocity, position;
-        SpaceTimeVector lastPosition;
+    private final Logger logger = LoggerFactory.getLogger(EulerModel.class);
+    private final SpaceContainer container;
 
-        if (moveable != null && !moveable.isStatic()) {
-            position = moveable.getPosition();
-            velocity = moveable.getVelocity();
-            acceleration = moveable.getAcceleration();
-
-            lastPosition = new SpaceTimeVector(position);
-            moveable.pushLastPosition(lastPosition);
-            if (position != null && velocity != null) {
-                position.translate(velocity);
-            }
-            
-            if (velocity != null && acceleration != null) {
-                velocity.translate(acceleration);
-            }
-        }
-
+    public SymplecticModel(SpaceContainer container) {
+        this.container = container;
     }
 
+    @Override
+    public void moveContainedObjects(double timeDelta) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void updateSinglePosition(Orbital orbital, double timeDelta) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void updateOrbitalProperties(Orbital orbital, double timeDelta) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
 }

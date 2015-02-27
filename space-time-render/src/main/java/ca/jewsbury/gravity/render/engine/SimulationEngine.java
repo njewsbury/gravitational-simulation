@@ -5,12 +5,11 @@ import ca.jewsbury.gravity.model.VisibleSpaceObject;
 import ca.jewsbury.gravity.render.RenderFrame;
 import ca.jewsbury.gravity.util.enumerated.SimulationEngineSignal;
 import ca.jewsbury.gravity.render.panel.GraphPanel;
-import ca.jewsbury.gravity.spacetime.Dimensional;
 import ca.jewsbury.gravity.spacetime.SpaceContainer;
 import ca.jewsbury.gravity.spacetime.SpaceTimeException;
-import ca.jewsbury.gravity.spacetime.model.IntegrationModel;
 import ca.jewsbury.gravity.spacetime.model.Orbital;
 import ca.jewsbury.gravity.spacetime.model.integration.EulerModel;
+import ca.jewsbury.gravity.spacetime.model.integration.Integrator;
 import ca.jewsbury.gravity.util.factory.SpaceObjectFactory;
 import javax.swing.SwingUtilities;
 import org.json.JSONArray;
@@ -33,7 +32,7 @@ public class SimulationEngine implements Runnable {
     private final int SECOND_TO_MILLISECOND = 1000;
 
     private final SpaceContainer container;
-    private final IntegrationModel integrator;
+    private final Integrator integrator;
     private final GraphPanel graphPanel;
     private final RenderFrame parentFrame;
 
@@ -47,13 +46,14 @@ public class SimulationEngine implements Runnable {
         if (this.parentFrame == null) {
             throw new SpaceTimeException("Unable to locate parent frame.");
         }
-        this.container = new SpaceContainer((long) 10, Dimensional.TwoD);
-        this.integrator = new EulerModel();
+        this.container = new SpaceContainer();
+        this.integrator = new EulerModel(container);
 
         this.graphPanel = this.parentFrame.getGraphPanel();
         if (this.graphPanel == null) {
             throw new SpaceTimeException("Unable to locate graph panel.");
         }
+        this.graphPanel.setEnergyBuffer(this.container.getTotalEnergyBuffer());
     }
 
     public void setProperties(RenderPropertiesForm properties) {
@@ -106,6 +106,9 @@ public class SimulationEngine implements Runnable {
                         }
                     }
                     parentFrame.getUniversePanel().repaint();
+                    container.refreshEnergyValues();
+                    updateGraphPanel();
+                    parentFrame.getGraphPanel().repaint();
                 }
             } catch (JSONException e) {
                 throw new SpaceTimeException(e.getMessage());
@@ -148,13 +151,17 @@ public class SimulationEngine implements Runnable {
     public void run() {
         logger.trace("Starting simulation engine.");
         long start, sleepTime;
-
+        long loop = 0;
         while (runThread) {
             start = System.currentTimeMillis();
             sleepTime = timeDelayMillis - (System.currentTimeMillis() - start);
             // UPDATE SIMULATION
-            this.integrator.moveUniverseObjects(container);
-            updateGraphPanel();
+            this.integrator.moveContainedObjects(1.0);
+            if( loop % 10 == 0 ) {
+                updateGraphPanel();
+                loop = 0;
+            }
+            
             // DRAW SIMULATION
             try {
                 SwingUtilities.invokeLater(new Runnable() {
@@ -167,6 +174,7 @@ public class SimulationEngine implements Runnable {
             } catch (InterruptedException e) {
                 //
             }
+            loop++;
         }
     }
 

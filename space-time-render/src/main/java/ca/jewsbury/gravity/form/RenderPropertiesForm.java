@@ -12,8 +12,7 @@ import org.slf4j.LoggerFactory;
 /**
  * RenderPropertiesForm.class
  *
- * Class dedicated to storing data input from the user through
- * the config panel.
+ * Class dedicated to storing data input from the user through the config panel.
  *
  * 14-Feb-2015
  *
@@ -152,9 +151,7 @@ public class RenderPropertiesForm {
             logger.error("SelectedValue from configPanel was null.");
         }
         if (selected != null) {
-            if (StringUtils.equalsIgnoreCase(DefaultSimulationSet.DEFAULT_IDENTIFIER, selected)) {
-                this.simulationSet = new DefaultSimulationSet();
-            } else if (setMap != null) {
+            if (setMap != null) {
                 if (setMap.containsKey(selected)) {
                     this.simulationSet = setMap.get(selected);
                 } else {
@@ -201,7 +198,7 @@ public class RenderPropertiesForm {
     public SimulationSet getSimulationSet() {
         return simulationSet;
     }
-    
+
     public int getFrameRate() {
         return frameRate;
     }
