@@ -21,27 +21,37 @@ import javax.swing.border.BevelBorder;
 public class GraphPanel extends JPanel implements RenderResizable {
 
     private final String TOTAL_ENERGY_STRING_TEMPLATE = "Total E. [%010.3f]";
+    private final String TOTAL_KINETIC_STRING_TEMPLATE ="Total K. [%010.3f]";
+    private final String TOTAL_POTNL_STRING_TEMPLATE =  "Total U. [%010.3f]";
     
     private final Dimension graphSize;
     private String totalEnergyString;
-    private double totalEnergy;
+    private String totalKinectString;
+    private String totalPotentialString;
+    private double[] totalEnergy;
 
     public GraphPanel(Dimension size) {
         graphSize = size;
-        totalEnergy = 0.0;
         this.setBackground(Color.white);
-
+        
         setPreferredSize(graphSize);
         setMaximumSize(graphSize);
         setSize(graphSize);
 
         setBorder(new BevelBorder(BevelBorder.LOWERED, Color.lightGray, Color.black));
-        totalEnergyString = String.format(TOTAL_ENERGY_STRING_TEMPLATE, totalEnergy);
+        this.totalEnergy = new double[2];
+        setEnergyStrings();
     }
     
-    public void setTotalEnergy(double totalEnergy) {
+    private void setEnergyStrings() {
+        totalEnergyString = String.format(TOTAL_ENERGY_STRING_TEMPLATE, totalEnergy[0]+totalEnergy[1]);
+        totalKinectString = String.format(TOTAL_KINETIC_STRING_TEMPLATE, totalEnergy[0]);
+        totalPotentialString = String.format(TOTAL_POTNL_STRING_TEMPLATE, totalEnergy[1]);
+    }
+    
+    public void setTotalEnergy(double[] totalEnergy) {
         this.totalEnergy = totalEnergy;
-        totalEnergyString = String.format(TOTAL_ENERGY_STRING_TEMPLATE, totalEnergy);
+        setEnergyStrings();
     }
 
     @Override
@@ -54,6 +64,9 @@ public class GraphPanel extends JPanel implements RenderResizable {
         gfx.setColor(Color.black);
         gfx.setFont(RenderFrame.DISPLAY_FONT);
         gfx.drawString(totalEnergyString, 5, 15);
+        gfx.drawString(totalKinectString, 5, 30 );
+        gfx.drawString(totalPotentialString, 5, 45 );
+        
 
     }
 

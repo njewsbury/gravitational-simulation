@@ -50,5 +50,7 @@ public interface Orbital {
     double getKineticEnergy();
     
     double getPotentialEnergy();
+    
+    void setPotentialEnergy(double potential);
 
 }

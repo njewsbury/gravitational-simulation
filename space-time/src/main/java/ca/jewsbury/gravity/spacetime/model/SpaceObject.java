@@ -31,6 +31,7 @@ public abstract class SpaceObject implements Orbital {
     protected SpaceTimeVector position; //meters
     protected SpaceTimeVector velocity; //meters per second [[m/s]]
     protected SpaceTimeVector acceleration; //meters per second squared [[ m/s^2 ]]
+    protected double potentialEnergy;
     protected int pushRequests;
 
     public SpaceObject(String idName) {
@@ -97,7 +98,7 @@ public abstract class SpaceObject implements Orbital {
     
     @Override
     public double getPotentialEnergy() {
-        return 0.0;
+        return potentialEnergy;
     }
 
     /* *** ACCESSORS AND MUTATORS *** */
@@ -165,6 +166,11 @@ public abstract class SpaceObject implements Orbital {
     @Override
     public void setAcceleration(SpaceTimeVector acceleration) {
         this.acceleration = acceleration;
+    }
+    
+    @Override
+    public void setPotentialEnergy(double potential) {
+        this.potentialEnergy = potential;
     }
 
 }

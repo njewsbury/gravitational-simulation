@@ -19,7 +19,7 @@ public abstract class SpaceTimeConstants {
 
     private static final Logger logger = LoggerFactory.getLogger(SpaceTimeConstants.class);
     
-    public static final double GRAVITATIONAL_CONSTANT = 1;
+    public static final double GRAVITATIONAL_CONSTANT = 10;
     //public static final double GRAVITATIONAL_CONSTANT = 6.67384E-11; //[[m^3 kg^-1 s^-2 ]]
     public static final double MASS_OF_EARTH = 5.972E24; //[[kg]]
     public static final double MEAN_RADIUS_OF_EARTH = 6.371E6; //[[m]]
@@ -39,10 +39,14 @@ public abstract class SpaceTimeConstants {
      * The unit vector representing the direction of the force is:
      * F^ = (R2^ - R1^) / (|R2 - R1|)
      * 
+     * This is wrong, calculate the Gravitational potential, then use the
+     * negative gradient to solve for acceleration.
+     * 
      * @param referenceFrame
      * @param other
      * @return 
      */
+    @Deprecated
     public static SpaceTimeVector getGravitationalForce(Orbital referenceFrame, Orbital other) {
         SpaceTimeVector direction, force = null;
         double distance, magnitude;
@@ -66,5 +70,19 @@ public abstract class SpaceTimeConstants {
             logger.error(e.getMessage());
         }
         return force;
+    }
+    
+    public static double getGravitationalPotential(Orbital pointMass, Orbital orbital) {
+        double distance, magnitude = 0.0;
+        
+        try {
+            if( pointMass != null && orbital != null && pointMass != orbital ) {
+                distance = orbital.getPosition().distanceTo(pointMass.getPosition());
+                magnitude = (- GRAVITATIONAL_CONSTANT * pointMass.getMass()) / (distance);
+            }
+        } catch(SpaceTimeException e ) {
+            logger.error(e.getMessage());
+        }
+        return magnitude;
     }
 }

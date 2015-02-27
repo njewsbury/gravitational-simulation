@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author Nathan
  */
+@Deprecated
 public abstract class SpaceTimeSimulation implements Runnable {
 
     private final Logger logger = LoggerFactory.getLogger(SpaceTimeSimulation.class);

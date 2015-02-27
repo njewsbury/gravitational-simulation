@@ -143,19 +143,10 @@ public class SpaceTimeVector {
     }
 
     /**
-     * Creates a unit vector pointing from [[ THIS ]] to << OTHER >>
-     *
-     * @param other
-     * @return
+     * Normalizes this vector.
      */
-    public SpaceTimeVector getUnitVector(SpaceTimeVector other) {
-        SpaceTimeVector unitVector = null;
-
-        if (other != null) {
-
-        }
-
-        return unitVector;
+    public void normalize() {
+        transform((1.0/getVectorSquared()));
     }
     
     public double getVectorSquared() {

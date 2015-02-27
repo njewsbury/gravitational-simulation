@@ -175,7 +175,7 @@ public class SimulationEngine implements Runnable {
         if (this.graphPanel != null) {
             totalEnergy = container.getTotalEnergy();
             if (totalEnergy != null) {
-                this.graphPanel.setTotalEnergy(totalEnergy[0]);
+                this.graphPanel.setTotalEnergy(totalEnergy);
             }
         }
     }

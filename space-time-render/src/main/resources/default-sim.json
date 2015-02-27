@@ -20,8 +20,8 @@
                 "isStatic": false,
                 "initialX": 200,
                 "initialY": 0,
-                "initialVX": 1.0,
-                "initialVY": -2.0
+                "initialVX": 0.0,
+                "initialVY": -1.0
             }
         ]
     },

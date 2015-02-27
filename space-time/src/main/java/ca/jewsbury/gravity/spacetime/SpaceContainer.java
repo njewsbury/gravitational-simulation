@@ -104,6 +104,8 @@ public class SpaceContainer {
             if( orbitalCollection != null && orbitalCollection.size() > 0 ) {
                 for( Orbital orbital : orbitalCollection ) {
                     totalEnergy[0] += orbital.getKineticEnergy();
+                    //logger.info("'" + orbital.getIdName() + "' potential :: " + orbital.getPotentialEnergy());
+                    totalEnergy[1] += orbital.getPotentialEnergy();
                 }
             }
         }
