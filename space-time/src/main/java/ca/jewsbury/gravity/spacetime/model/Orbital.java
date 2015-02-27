@@ -62,5 +62,9 @@ public interface Orbital {
     double distanceToOther(Orbital other);
     
     SpaceTimeVector getUnitVectorFacingOther(Orbital other);
+    
+    SpaceTimeVector getLastAcceleration();
+    
+    void setLastAcceleration(SpaceTimeVector last);
 
 }

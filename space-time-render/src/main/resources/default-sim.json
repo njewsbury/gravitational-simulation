@@ -8,14 +8,14 @@
                 "objectMass": 100,
                 "objectRadius": 50,
                 "isStatic": true,
-                "initialX": 0,
-                "initialY": 0,
-                "initialVX": 0,
-                "initialVY": 0
+                "initialX": 0.0,
+                "initialY": 0.0,
+                "initialVX": 0.0,
+                "initialVY": 0.0
             },
             {
-                "objectName": "comet",
-                "objectMass": 10,
+                "objectName": "planet",
+                "objectMass": 1.0,
                 "objectRadius": 20,
                 "isStatic": false,
                 "initialX": 200,
@@ -26,38 +26,64 @@
         ]
     },
     {
+        "simulationId": "comet",
+        "simulationName": "SingleComet",
+        "objectList": [
+            {
+                "objectName": "earth",
+                "objectMass": 1250,
+                "objectRadius": 50,
+                "isStatic": true,
+                "initialX": 0.0,
+                "initialY": 0.0,
+                "initialVX": 0.0,
+                "initialVY": 0.0
+            },
+            {
+                "objectName": "comet",
+                "objectMass": 1.0,
+                "objectRadius": 20,
+                "isStatic": false,
+                "initialX": 200,
+                "initialY": 100,
+                "initialVX": -1.5,
+                "initialVY": -10.3
+            }
+        ]
+    },
+    {
         "simulationId": "figureEight",
         "simulationName": "FigureEight",
         "objectList": [
             {
                 "objectName": "massOne",
-                "objectMass": 100,
-                "objectRadius": 20,
+                "objectMass": 10,
+                "objectRadius": 3,
                 "isStatic": false,
-                "initialX": 0,
+                "initialX": -99.5492,
                 "initialY": 0,
                 "initialVX": 0,
                 "initialVY": 0
             },
             {
                 "objectName": "massTwo",
-                "objectMass": 100,
-                "objectRadius": 20,
+                "objectMass": 10,
+                "objectRadius": 3,
                 "isStatic": false,
-                "initialX": 200,
+                "initialX": 99.5492,
                 "initialY": 0,
-                "initialVX": 1.0,
-                "initialVY": -2.0
+                "initialVX": 0.0,
+                "initialVY": 0.0
             },
             {
                 "objectName": "massThree",
-                "objectMass": 100,
-                "objectRadius": 20,
+                "objectMass": 10,
+                "objectRadius": 3,
                 "isStatic": false,
-                "initialX": -200,
+                "initialX": 0,
                 "initialY": 0,
-                "initialVX": -1.0,
-                "initialVY": -2.0
+                "initialVX": 0.695804,
+                "initialVY": 1.067860
             }
         ]
     }

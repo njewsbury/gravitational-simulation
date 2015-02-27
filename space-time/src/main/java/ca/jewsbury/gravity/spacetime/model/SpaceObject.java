@@ -32,6 +32,7 @@ public abstract class SpaceObject implements Orbital {
     protected SpaceTimeVector position; //meters
     protected SpaceTimeVector velocity; //meters per second [[m/s]]
     protected SpaceTimeVector acceleration; //meters per second squared [[ m/s^2 ]]
+    protected SpaceTimeVector lastAcceleration;
     protected double potentialEnergy;
     protected int pushRequests;
 
@@ -218,6 +219,14 @@ public abstract class SpaceObject implements Orbital {
             unitVector.normalize(); // (R2-R1)/|R2-R1|
         }
         return unitVector;
+    }
+
+    public SpaceTimeVector getLastAcceleration() {
+        return lastAcceleration;
+    }
+
+    public void setLastAcceleration(SpaceTimeVector lastAcceleration) {
+        this.lastAcceleration = lastAcceleration;
     }
 
 }

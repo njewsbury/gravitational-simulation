@@ -57,8 +57,12 @@ public class EulerModel implements Integrator {
         SpaceTimeVector currentForce;
         SpaceTimeVector displacement;
         if (orbital != null) {
-            currentForce = this.container.getNetForce(orbital);
-            currentForce.transform((1.0 / orbital.getMass()));
+            if (orbital.getLastAcceleration() == null) {
+                currentForce = this.container.getNetForce(orbital);
+                currentForce.transform((1.0 / orbital.getMass()));
+            } else {
+                currentForce = orbital.getAcceleration();
+            }
 
             orbital.setAcceleration(new SpaceTimeVector(currentForce));
             //logger.info("Calculated Acceleration is :: " + currentForce.toString());
@@ -71,7 +75,7 @@ public class EulerModel implements Integrator {
             //logger.info("Displacement is :: " + displacement.toString());
             //logger.info("Current Position is :: " + orbital.getPosition().toString());
             orbital.moveObject(displacement);
-            
+
             //logger.info("New Position is     :: " + orbital.getPosition().toString());
         }
     }
@@ -85,13 +89,15 @@ public class EulerModel implements Integrator {
             currentForce.transform((1.0 / orbital.getMass())); //alpha
             //logger.info("Calculated Acceleration is :: " + currentForce.toString());
             //logger.info("Orbital Acceleration is :: " + orbital.getAcceleration());
+            orbital.setLastAcceleration(orbital.getAcceleration());
+            orbital.setAcceleration(new SpaceTimeVector(currentForce));
             
             currentForce.translate(orbital.getAcceleration()); //( a + alpha )
             //logger.info("Velocity Initial is :: " + currentForce.toString());
-            
+
             currentForce.transform((1.0 / 2.0)); //( a + alpha ) / 2.0
             //logger.info("Halved :: " + currentForce.toString() );
-            
+
             currentForce.transform(timeDelta); //dT * (a + alpha ) / 2.0
             //logger.info("New Velocity is :: " + currentForce.toString());
             orbital.increaseVelocity(currentForce);

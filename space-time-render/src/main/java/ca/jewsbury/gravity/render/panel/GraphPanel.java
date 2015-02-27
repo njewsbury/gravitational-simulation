@@ -79,7 +79,7 @@ public class GraphPanel extends JPanel implements RenderResizable {
 
     private void visualizeBuffer(Graphics2D gfx) {
         Iterator<Double> iterator;
-        double energyVal = 0.0;
+        Double energyVal = 0.0;
         double lastVal;
         Color oldColor;
         int index = 0;
@@ -92,8 +92,9 @@ public class GraphPanel extends JPanel implements RenderResizable {
                     energyVal = iterator.next();
                 } else {
                     lastVal = energyVal;
-                    energyVal = iterator.next();
-                    gfx.drawLine(index - 1, (this.getHeight() - (int) Math.abs(lastVal)), index, (this.getHeight() - (int)Math.abs(energyVal)));
+                    if ((energyVal = iterator.next()) != null) {
+                        gfx.drawLine(index - 1, (this.getHeight() - (int) Math.abs(lastVal)), index, (this.getHeight() - (int) Math.abs(energyVal)));
+                    }
                 }
                 index++;
             }
