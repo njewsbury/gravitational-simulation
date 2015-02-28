@@ -66,5 +66,8 @@ public interface Orbital {
     SpaceTimeVector getLastAcceleration();
     
     void setLastAcceleration(SpaceTimeVector last);
+    
+    boolean isReferenceObject();
+    void setReferenceObject(boolean isReference);
 
 }

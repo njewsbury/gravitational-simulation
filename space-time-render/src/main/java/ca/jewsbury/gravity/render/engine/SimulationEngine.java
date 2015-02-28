@@ -10,6 +10,7 @@ import ca.jewsbury.gravity.spacetime.SpaceTimeException;
 import ca.jewsbury.gravity.spacetime.model.Orbital;
 import ca.jewsbury.gravity.spacetime.model.integration.EulerModel;
 import ca.jewsbury.gravity.spacetime.model.integration.Integrator;
+import ca.jewsbury.gravity.util.RenderUtils;
 import ca.jewsbury.gravity.util.factory.SpaceObjectFactory;
 import javax.swing.SwingUtilities;
 import org.json.JSONArray;
@@ -35,12 +36,14 @@ public class SimulationEngine implements Runnable {
     private final Integrator integrator;
     private final GraphPanel graphPanel;
     private final RenderFrame parentFrame;
+    
 
     private RenderPropertiesForm properties;
     private boolean runThread = true;
     private long timeDelayMillis;
     private int framesPerSecond;
-
+    private Orbital referenceOrbital;
+    
     public SimulationEngine(RenderFrame parentFrame) throws SpaceTimeException {
         this.parentFrame = parentFrame;
         if (this.parentFrame == null) {
@@ -98,6 +101,7 @@ public class SimulationEngine implements Runnable {
                             if (orbital != null) {
                                 logger.info("Inserting orbital object '" + orbital.getIdName() + "'");
                                 insertOrbital(orbital);
+                                
                             } else {
                                 logger.warn("Orbital object was null.");
                             }
@@ -123,6 +127,10 @@ public class SimulationEngine implements Runnable {
             if (container.insertOrbital(orbital)) {
                 if (parentFrame.getUniversePanel() != null) {
                     parentFrame.getUniversePanel().insertVisibleObject(visible);
+                    
+                    if( orbital.isReferenceObject() ) {
+                        RenderUtils.setReference(visible);
+                    }
                 }
             }
         }
@@ -161,8 +169,8 @@ public class SimulationEngine implements Runnable {
                 updateGraphPanel();
                 loop = 0;
             }
-            
             // DRAW SIMULATION
+            RenderUtils.setCenterOfMass(this.container.getCenterOfMass());
             try {
                 SwingUtilities.invokeLater(new Runnable() {
                     @Override

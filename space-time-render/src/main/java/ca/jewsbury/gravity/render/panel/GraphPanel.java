@@ -30,7 +30,7 @@ public class GraphPanel extends JPanel implements RenderResizable {
     private String totalKinectString;
     private String totalPotentialString;
     private double[] totalEnergy;
-
+    
     private CircularFifoBuffer energyBuffer;
 
     public GraphPanel(Dimension size) {

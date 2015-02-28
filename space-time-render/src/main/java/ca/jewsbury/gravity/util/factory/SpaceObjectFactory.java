@@ -32,7 +32,7 @@ public abstract class SpaceObjectFactory {
         SpaceTimeVector position, velocity;
 
         String objectId;
-        boolean isStatic;
+        boolean isStatic, isReference;
         double x, y, z;
         double vx, vy, vz;
         double mass, radius;
@@ -52,6 +52,12 @@ public abstract class SpaceObjectFactory {
                 } catch (JSONException e) {
                     logger.warn("Caught JSONException parsing isStatic. Setting to true. :: " + e.getMessage());
                     isStatic = true;
+                }
+                
+                try {
+                    isReference = json.getBoolean(SpaceObjectProperty.IS_REFERENCE.getJsonProperty());
+                } catch( JSONException e ) {
+                    isReference = false;
                 }
 
                 x = getValueFromJson(json, SpaceObjectProperty.INITIAL_X.getJsonProperty(), 0.0);
@@ -74,6 +80,7 @@ public abstract class SpaceObjectFactory {
                     } else {
                         newObject = new DynamicObject(objectId);
                     }
+                    newObject.setReferenceObject(isReference);
                     newObject.setMass(mass);
                     newObject.setRadius(radius);
                     newObject.setPosition(position);

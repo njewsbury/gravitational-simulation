@@ -24,6 +24,7 @@ public abstract class SpaceObject implements Orbital {
     protected final boolean DYNAMIC_OBJECT = false;
 
     protected final String idName;
+    protected boolean isReference;
 
     protected double radius; //meters [[m]]
     protected double mass; //kilograms [[kg]]
@@ -47,6 +48,7 @@ public abstract class SpaceObject implements Orbital {
         mass = 1.0;
 
         this.pushRequests = 0;
+        this.isReference = false;
     }
 
     /**
@@ -221,12 +223,23 @@ public abstract class SpaceObject implements Orbital {
         return unitVector;
     }
 
+    @Override
     public SpaceTimeVector getLastAcceleration() {
         return lastAcceleration;
     }
 
+    @Override
     public void setLastAcceleration(SpaceTimeVector lastAcceleration) {
         this.lastAcceleration = lastAcceleration;
     }
 
+    @Override
+    public void setReferenceObject(boolean reference) {
+        this.isReference = reference;
+    }
+
+    @Override
+    public boolean isReferenceObject() {
+        return isReference;
+    }
 }

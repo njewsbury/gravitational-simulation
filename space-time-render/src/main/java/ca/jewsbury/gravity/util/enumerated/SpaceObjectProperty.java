@@ -15,7 +15,8 @@ public enum SpaceObjectProperty {
     INITIAL_Z("initialZ"),
     INITIAL_VX("initialVX"),
     INITIAL_VY("initialVY"), 
-    INITIAL_VZ("initialVZ");
+    INITIAL_VZ("initialVZ"),
+    IS_REFERENCE("referenceObject");
     
     private final String jsonProperty;
     private SpaceObjectProperty(String jsonProp) {

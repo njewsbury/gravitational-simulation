@@ -25,6 +25,7 @@ public class SpaceContainer {
 
     private final Map<String, Orbital> objectMap;
     private final CircularFifoBuffer totalEnergyBuffer;
+    private double totalMass;
 
     public static enum energy {
 
@@ -36,6 +37,7 @@ public class SpaceContainer {
     public SpaceContainer() {
         objectMap = new HashMap< String, Orbital>();
         totalEnergyBuffer = new CircularFifoBuffer(200);
+        totalMass = 0.0;
     }
 
     /*
@@ -51,6 +53,10 @@ public class SpaceContainer {
 
     public boolean containsObject(String name) {
         return objectMap.containsKey(name);
+    }
+    
+    public double getTotalMass() {
+        return totalMass;
     }
 
     public Orbital[] getOrbitalArray() {
@@ -69,6 +75,25 @@ public class SpaceContainer {
         }
         return totalObjects;
     }
+    
+    public SpaceTimeVector getCenterOfMass() {
+        Orbital[] arr = getOrbitalArray();
+        double xCom, yCom;
+        
+        xCom = 0.0;
+        yCom = 0.0;
+        if( arr != null ) {
+            for( Orbital orbital : arr ) {
+                xCom += (orbital.getPosition().getxCoord() * orbital.getMass());
+                yCom += (orbital.getPosition().getyCoord() * orbital.getMass());
+            }
+            if( totalMass > 0 ) {
+                xCom = (xCom / totalMass );
+                yCom = (yCom / totalMass );
+            }
+        }
+        return new SpaceTimeVector( xCom, yCom, 0.0 );
+    }
 
     /**
      * Inserts a unique space object into the map of space objects.
@@ -84,6 +109,7 @@ public class SpaceContainer {
             if (StringUtils.isNotBlank(idName)) {
                 if (!objectMap.containsKey(idName)) {
                     objectMap.put(idName, spaceObject);
+                    totalMass += spaceObject.getMass();
                     insert = true;
                 }
             }
