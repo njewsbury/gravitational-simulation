@@ -89,55 +89,6 @@
                 "referenceObject" : false
             }
         ]
-    },
-    {
-        "simulationId": "threeChain",
-        "simulationName": "ThreeChain",
-        "objectList": [
-            {
-                "objectName": "massOne",
-                "objectMass": 8,
-                "objectRadius": 10,
-                "isStatic": false,
-                "initialX": 138.2857,
-                "initialY": 0,
-                "initialVX": 0,
-                "initialVY": -0.584873
-            },
-            {
-                "objectName": "massTwo",
-                "objectMass": 4,
-                "objectRadius": 10,
-                "isStatic": false,
-                "initialX": 0.0,
-                "initialY": 15.7030,
-                "initialVX": 1.871935,
-                "initialVY": 0.0,
-                "referenceObject": false
-            },
-            {
-                "objectName": "massThree",
-                "objectMass": 4,
-                "objectRadius": 10,
-                "isStatic": false,
-                "initialX": -138.2857,
-                "initialY": 0,
-                "initialVX": 0.0,
-                "initialVY": 0.584873,
-                "referenceObject" : false
-            },
-            {
-                "objectName": "massFour",
-                "objectMass": 4,
-                "objectRadius": 10,
-                "isStatic": false,
-                "initialX": 0,
-                "initialY": -15.7030,
-                "initialVX": -1.871935,
-                "initialVY": 0.0,
-                "referenceObject" : false
-            }
-        ]
     }
 ]
 

@@ -8,7 +8,7 @@ import ca.jewsbury.gravity.render.panel.GraphPanel;
 import ca.jewsbury.gravity.spacetime.SpaceContainer;
 import ca.jewsbury.gravity.spacetime.SpaceTimeException;
 import ca.jewsbury.gravity.spacetime.model.Orbital;
-import ca.jewsbury.gravity.spacetime.model.integration.EulerModel;
+import ca.jewsbury.gravity.spacetime.model.integration.VerletModel;
 import ca.jewsbury.gravity.spacetime.model.integration.Integrator;
 import ca.jewsbury.gravity.util.RenderUtils;
 import ca.jewsbury.gravity.util.factory.SpaceObjectFactory;
@@ -49,7 +49,7 @@ public class SimulationEngine implements Runnable {
             throw new SpaceTimeException("Unable to locate parent frame.");
         }
         this.container = new SpaceContainer();
-        this.integrator = new EulerModel(container);
+        this.integrator = new VerletModel(container);
 
         this.graphPanel = this.parentFrame.getGraphPanel();
         if (this.graphPanel == null) {

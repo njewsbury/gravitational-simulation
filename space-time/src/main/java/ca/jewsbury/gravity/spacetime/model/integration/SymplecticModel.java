@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory;
  */
 public class SymplecticModel implements Integrator {
 
-    private final Logger logger = LoggerFactory.getLogger(EulerModel.class);
+    private final Logger logger = LoggerFactory.getLogger(VerletModel.class);
     private final SpaceContainer container;
 
     public SymplecticModel(SpaceContainer container) {

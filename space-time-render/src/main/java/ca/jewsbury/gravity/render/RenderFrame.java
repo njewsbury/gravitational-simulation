@@ -331,12 +331,6 @@ public class RenderFrame extends ComponentAdapter implements ActionListener, Mou
                         }
                     }
 
-                    /*
-                    Dimension currentSize = universePanel.getSize();
-                    universePanel = new UniversePanel(MINIMUM_PANEL_DIMENSION);
-                    universePanel.addMouseWheelListener(this);
-                    universePanel.setSize(currentSize);
-                    */
                     universePanel.refreshPanel();
                     configPanel.getNewSim().setEnabled(true);
                     configPanel.getPauseSim().setEnabled(false);

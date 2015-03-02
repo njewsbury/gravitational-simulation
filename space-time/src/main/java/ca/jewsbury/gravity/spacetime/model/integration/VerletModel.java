@@ -15,12 +15,12 @@ import org.slf4j.LoggerFactory;
  *
  * @author Nathan
  */
-public class EulerModel implements Integrator {
+public class VerletModel implements Integrator {
 
-    private final Logger logger = LoggerFactory.getLogger(EulerModel.class);
+    private final Logger logger = LoggerFactory.getLogger(VerletModel.class);
     private final SpaceContainer container;
 
-    public EulerModel(SpaceContainer container) {
+    public VerletModel(SpaceContainer container) {
         this.container = container;
     }
 
