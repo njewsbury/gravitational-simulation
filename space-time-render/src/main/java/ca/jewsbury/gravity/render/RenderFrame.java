@@ -83,9 +83,8 @@ public class RenderFrame extends ComponentAdapter implements ActionListener, Mou
      * @param providedSet
      */
     private void initializeSimulationSet(Map<String, SimulationSet> providedSet) {
-        URL jsonResource = getClass().getClassLoader().getResource(DEFAULT_SIM_DEFINITIONS);
         // Read in the default JSON sets.
-        this.simulationSet = SimulationSetFactory.generateSimulationSetFromFile(jsonResource);
+        this.simulationSet = SimulationSetFactory.generateSimulationSetFromFile(DEFAULT_SIM_DEFINITIONS);
         if (this.simulationSet == null) {
             this.simulationSet = new HashMap<String, SimulationSet>();
         }
