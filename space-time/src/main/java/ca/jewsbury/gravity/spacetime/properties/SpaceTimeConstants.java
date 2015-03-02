@@ -1,8 +1,5 @@
 package ca.jewsbury.gravity.spacetime.properties;
 
-import ca.jewsbury.gravity.spacetime.SpaceTimeException;
-import ca.jewsbury.gravity.spacetime.model.Orbital;
-import ca.jewsbury.gravity.spacetime.model.SpaceTimeVector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

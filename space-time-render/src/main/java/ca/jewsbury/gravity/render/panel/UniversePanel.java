@@ -1,6 +1,7 @@
 package ca.jewsbury.gravity.render.panel;
 
 import ca.jewsbury.gravity.model.VisibleSpaceObject;
+import ca.jewsbury.gravity.spacetime.model.SpaceTimeVector;
 import ca.jewsbury.gravity.util.RenderUtils;
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -11,7 +12,6 @@ import java.awt.Stroke;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JPanel;
-import org.apache.commons.collections.buffer.CircularFifoBuffer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -104,5 +104,6 @@ public class UniversePanel extends JPanel implements RenderResizable {
         this.removeAll();
         this.objectList.clear();
         this.repaint();
+        RenderUtils.setCenterOfMass(new SpaceTimeVector());
     }
 }

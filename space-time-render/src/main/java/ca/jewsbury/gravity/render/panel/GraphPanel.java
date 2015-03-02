@@ -6,6 +6,7 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 import javax.swing.JPanel;
 import javax.swing.border.BevelBorder;
 import org.apache.commons.collections.buffer.CircularFifoBuffer;
@@ -92,8 +93,12 @@ public class GraphPanel extends JPanel implements RenderResizable {
                     energyVal = iterator.next();
                 } else {
                     lastVal = energyVal;
+                    try {
                     if ((energyVal = iterator.next()) != null) {
                         gfx.drawLine(index - 1, (this.getHeight() - (int) Math.abs(lastVal)), index, (this.getHeight() - (int) Math.abs(energyVal)));
+                    }
+                    } catch(NoSuchElementException e ) {
+                        //
                     }
                 }
                 index++;

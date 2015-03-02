@@ -29,7 +29,7 @@ public abstract class SpaceObject implements Orbital {
     protected double radius; //meters [[m]]
     protected double mass; //kilograms [[kg]]
 
-    protected CircularFifoBuffer lastPositions;
+    //protected CircularFifoBuffer lastPositions;
     protected SpaceTimeVector position; //meters
     protected SpaceTimeVector velocity; //meters per second [[m/s]]
     protected SpaceTimeVector acceleration; //meters per second squared [[ m/s^2 ]]
@@ -41,7 +41,7 @@ public abstract class SpaceObject implements Orbital {
         this.idName = idName;
 
         position = new SpaceTimeVector();
-        lastPositions = new CircularFifoBuffer(SAVE_LAST_POSITIONS);
+        //lastPositions = new CircularFifoBuffer(SAVE_LAST_POSITIONS);
         velocity = new SpaceTimeVector();
         acceleration = new SpaceTimeVector();
         radius = 1.0;
@@ -79,7 +79,7 @@ public abstract class SpaceObject implements Orbital {
     @Override
     public void pushLastPosition(SpaceTimeVector position) {
         if (this.pushRequests % SpaceTimeConstants.PUSH_REQUEST_LIMIT == 0) {
-            this.lastPositions.add(position);
+            //this.lastPositions.add(position);
             this.pushRequests = 0;
         }
         this.pushRequests++;
@@ -143,7 +143,7 @@ public abstract class SpaceObject implements Orbital {
 
     @Override
     public CircularFifoBuffer getLastPositions() {
-        return lastPositions;
+        return null;
     }
 
     @Override

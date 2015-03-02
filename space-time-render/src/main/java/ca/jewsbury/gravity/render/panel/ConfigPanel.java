@@ -1,7 +1,6 @@
 package ca.jewsbury.gravity.render.panel;
 
 import ca.jewsbury.gravity.render.RenderFrame;
-import ca.jewsbury.gravity.render.engine.DefaultSimulationSet;
 import ca.jewsbury.gravity.render.engine.SimulationSet;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -92,7 +91,7 @@ public class ConfigPanel extends JPanel implements RenderResizable {
         scaleInput = new JFormattedTextField((DecimalFormat) NumberFormat.getNumberInstance(Locale.ENGLISH));
         scaleInput.setColumns(15);
         scaleInput.setValue(0.5);
-
+        
         textLabel = new JLabel("Display scale");
         textLabel.setForeground(Color.white);
         textLabel.setFont(RenderFrame.DISPLAY_FONT);

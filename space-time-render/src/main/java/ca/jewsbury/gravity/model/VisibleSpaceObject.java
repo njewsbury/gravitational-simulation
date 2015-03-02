@@ -2,6 +2,7 @@ package ca.jewsbury.gravity.model;
 
 import ca.jewsbury.gravity.spacetime.model.Orbital;
 import ca.jewsbury.gravity.spacetime.model.SpaceTimeVector;
+import ca.jewsbury.gravity.spacetime.properties.SpaceTimeConstants;
 import ca.jewsbury.gravity.util.RenderUtils;
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -14,10 +15,10 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Visible Space Object
- * 
- * Wrapper class for a Space Object.  Defines the objects visible properties
- * ie. it's circle and colour.  Required for rendering.
- * 
+ *
+ * Wrapper class for a Space Object. Defines the objects visible properties ie.
+ * it's circle and colour. Required for rendering.
+ *
  * @author Nathan
  */
 public class VisibleSpaceObject {
@@ -27,11 +28,16 @@ public class VisibleSpaceObject {
     private Color objectColour;
     private Orbital spaceObject;
 
+    protected CircularFifoBuffer lastPositions;
+    private int positionRequests;
+
     public VisibleSpaceObject(Orbital object) {
         if (object != null) {
             spaceObject = object;
             objectColour = RenderUtils.getRandomColour();
         }
+        lastPositions = new CircularFifoBuffer(1000);
+        positionRequests = 0;
     }
 
     public Ellipse2D getObjectVisual() {
@@ -52,6 +58,11 @@ public class VisibleSpaceObject {
         int displayX = (int) ((displayLocation.getxCoord() * RenderUtils.getScale() - spaceObject.getRadius() * RenderUtils.getScale()));
         int displayY = (int) ((displayLocation.getyCoord() * RenderUtils.getScale() - spaceObject.getRadius() * RenderUtils.getScale()));
 
+        if (positionRequests % 3*SpaceTimeConstants.PUSH_REQUEST_LIMIT == 0) {
+            this.lastPositions.add(new SpaceTimeVector(displayX, displayY, 0));
+            positionRequests = 0;
+        }
+
         return new int[]{displayX, displayY};
     }
 
@@ -62,9 +73,9 @@ public class VisibleSpaceObject {
         newx = (int) ((visual.getCenterX() + (spaceObject.getVelocity().getxCoord() / RenderUtils.getScale())));
         newy = (int) ((visual.getCenterY() + (spaceObject.getVelocity().getyCoord() / RenderUtils.getScale())));
 
-        gfx.setColor(Color.CYAN);
-        gfx.setStroke(new BasicStroke(2));
-        gfx.drawLine((int) visual.getCenterX(), (int) visual.getCenterY(), newx, newy);
+        //gfx.setColor(Color.CYAN);
+        //gfx.setStroke(new BasicStroke(2));
+        //gfx.drawLine((int) visual.getCenterX(), (int) visual.getCenterY(), newx, newy);
         // Draw the space object
         gfx.setColor(objectColour);
         gfx.fill(visual);
@@ -74,32 +85,29 @@ public class VisibleSpaceObject {
     }
 
     public void traceLastPositions(Graphics2D gfx) {
-        CircularFifoBuffer buffer = this.spaceObject.getLastPositions();
         SpaceTimeVector currentPosition, lastPosition;
         Iterator<SpaceTimeVector> positionIterator;
         int pos = 0;
 
         lastPosition = null;
-        if (buffer != null && buffer.size() > 1) {
-            gfx.setColor(Color.white);
-            positionIterator = buffer.iterator();
+        if (lastPositions != null && lastPositions.size() > 1) {
+            gfx.setColor(this.objectColour.brighter().brighter());
+            positionIterator = lastPositions.iterator();
             while (positionIterator.hasNext()) {
                 if (pos > 0) {
-                    currentPosition = RenderUtils.translateCoordinate(positionIterator.next());
-                    //currentPosition = positionIterator.next();
+                    currentPosition = positionIterator.next();
                     // DRAW LINE
                     if (lastPosition != null) {
-                        gfx.drawLine((int) ((currentPosition.getxCoord() )* RenderUtils.getScale()),
-                                (int) ((currentPosition.getyCoord() )* RenderUtils.getScale()),
-                                (int) ((lastPosition.getxCoord() )* RenderUtils.getScale()),
-                                (int) ((lastPosition.getyCoord() )* RenderUtils.getScale())
+                        gfx.drawLine((int) ((currentPosition.getxCoord() + this.spaceObject.getRadius() )),
+                                (int) ((currentPosition.getyCoord() + this.spaceObject.getRadius())),
+                                (int) ((lastPosition.getxCoord() + this.spaceObject.getRadius())),
+                                (int) ((lastPosition.getyCoord() + this.spaceObject.getRadius()))
                         );
                     }
                     //
                     lastPosition = currentPosition;
                 } else {
-                    lastPosition = RenderUtils.translateCoordinate(positionIterator.next());
-                    //lastPosition = positionIterator.next();
+                    lastPosition = positionIterator.next();
                 }
                 pos++;
             }

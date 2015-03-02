@@ -21,10 +21,10 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Simulation Engine
- * 
- * Runnable class that progresses the simulation forward in time.  This is runnable
- * so that while it's active the GUI is still interactive.
- * 
+ *
+ * Runnable class that progresses the simulation forward in time. This is
+ * runnable so that while it's active the GUI is still interactive.
+ *
  * @author Nathan
  */
 public class SimulationEngine implements Runnable {
@@ -36,14 +36,13 @@ public class SimulationEngine implements Runnable {
     private final Integrator integrator;
     private final GraphPanel graphPanel;
     private final RenderFrame parentFrame;
-    
 
     private RenderPropertiesForm properties;
     private boolean runThread = true;
     private long timeDelayMillis;
     private int framesPerSecond;
     private Orbital referenceOrbital;
-    
+
     public SimulationEngine(RenderFrame parentFrame) throws SpaceTimeException {
         this.parentFrame = parentFrame;
         if (this.parentFrame == null) {
@@ -101,7 +100,7 @@ public class SimulationEngine implements Runnable {
                             if (orbital != null) {
                                 logger.info("Inserting orbital object '" + orbital.getIdName() + "'");
                                 insertOrbital(orbital);
-                                
+
                             } else {
                                 logger.warn("Orbital object was null.");
                             }
@@ -127,8 +126,8 @@ public class SimulationEngine implements Runnable {
             if (container.insertOrbital(orbital)) {
                 if (parentFrame.getUniversePanel() != null) {
                     parentFrame.getUniversePanel().insertVisibleObject(visible);
-                    
-                    if( orbital.isReferenceObject() ) {
+
+                    if (orbital.isReferenceObject()) {
                         RenderUtils.setReference(visible);
                     }
                 }
@@ -165,7 +164,7 @@ public class SimulationEngine implements Runnable {
             sleepTime = timeDelayMillis - (System.currentTimeMillis() - start);
             // UPDATE SIMULATION
             this.integrator.moveContainedObjects(1.0);
-            if( loop % 10 == 0 ) {
+            if (loop % 10 == 0) {
                 updateGraphPanel();
                 loop = 0;
             }
@@ -178,7 +177,11 @@ public class SimulationEngine implements Runnable {
                         parentFrame.repaint();
                     }
                 });
-                Thread.sleep(sleepTime);
+                if (sleepTime > 0) {
+                    Thread.sleep(sleepTime);
+                } else {
+                    Thread.sleep(1);
+                }
             } catch (InterruptedException e) {
                 //
             }

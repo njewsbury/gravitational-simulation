@@ -20,6 +20,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
@@ -34,13 +36,13 @@ import org.slf4j.LoggerFactory;
 /**
  * RenderFrame.class
  *
- * Root frame for render project.  Defines all GUI functionality.
+ * Root frame for render project. Defines all GUI functionality.
  *
  * 14-Feb-2015
  *
  * @author Nathan
  */
-public class RenderFrame extends ComponentAdapter implements ActionListener {
+public class RenderFrame extends ComponentAdapter implements ActionListener, MouseWheelListener {
 
     public static final Font DISPLAY_FONT = new Font("Courier New", Font.BOLD, 12);
 
@@ -48,6 +50,7 @@ public class RenderFrame extends ComponentAdapter implements ActionListener {
     private final String DEFAULT_SIM_DEFINITIONS = "default-sim.json";
     private final String SPACE_BG_IMAGE = "space.jpg";
     private final int CONFIG_WIDTH = 200;
+    private final Dimension MINIMUM_PANEL_DIMENSION;
     //
     private Map<String, SimulationSet> simulationSet;
     private SimulationEngine currentSimulation;
@@ -65,24 +68,25 @@ public class RenderFrame extends ComponentAdapter implements ActionListener {
     private boolean isVisible = false;
 
     public RenderFrame(Dimension minimum, Map<String, SimulationSet> simulationSet) {
-        Dimension panelMinimum = new Dimension((int) minimum.getHeight(), (int) minimum.getHeight());
+        MINIMUM_PANEL_DIMENSION = new Dimension((int) minimum.getHeight(), (int) minimum.getHeight());
         currentSimulation = null;
         initializeSimulationSet(simulationSet);
-        initializeJPanels(panelMinimum);
-
+        initializeJPanels(MINIMUM_PANEL_DIMENSION);
         initializeJFrame(minimum);
     }
 
     /**
-     * Initialize the simulation set to have at least the one default entry, or at most
-     * the sum of the file provided defaults and provided simulation sets.
-     * @param providedSet 
+     * Initialize the simulation set to have at least the one default entry, or
+     * at most the sum of the file provided defaults and provided simulation
+     * sets.
+     *
+     * @param providedSet
      */
     private void initializeSimulationSet(Map<String, SimulationSet> providedSet) {
         URL jsonResource = getClass().getClassLoader().getResource(DEFAULT_SIM_DEFINITIONS);
         // Read in the default JSON sets.
         this.simulationSet = SimulationSetFactory.generateSimulationSetFromFile(jsonResource);
-        if( this.simulationSet == null ) {
+        if (this.simulationSet == null) {
             this.simulationSet = new HashMap<String, SimulationSet>();
         }
         //Merge the two sets.
@@ -93,8 +97,8 @@ public class RenderFrame extends ComponentAdapter implements ActionListener {
         } else {
             logger.debug("Provided set is null. Using only default simulation sets.");
         }
-        
-        if( this.simulationSet.isEmpty()) {
+
+        if (this.simulationSet.isEmpty()) {
             logger.debug("Unable to load any simulation sets. Adding the hard coded default.");
             this.simulationSet.put("default", new DefaultSimulationSet());
         }
@@ -109,10 +113,12 @@ public class RenderFrame extends ComponentAdapter implements ActionListener {
 
         logger.trace("Initializing JPanel - Universe Panel.");
         universePanel = new UniversePanel(minimum);
+        universePanel.addMouseWheelListener(this);
         logger.trace("Universe Panel created - [" + universePanel.getWidth() + ", " + universePanel.getHeight() + "]");
 
         logger.trace("Initializing JPanel - Config Panel.");
         configPanel = new ConfigPanel(this);
+        RenderUtils.setScale(0.5);
         configPanel.setBackground(Color.darkGray);
         configPanel.setNewSize(new Dimension(CONFIG_WIDTH, (int) minimum.getHeight() - CONFIG_WIDTH));
         logger.trace("Config Panel created - [" + configPanel.getWidth() + ", " + configPanel.getHeight() + "]");
@@ -223,12 +229,12 @@ public class RenderFrame extends ComponentAdapter implements ActionListener {
     }
 
     /**
-     * This method converts the given actionCommand to an integer
-     * for use with the 'actionPerformed' method.  This is implemented
-     * only to allow targeting Java 1.6+.
-     * 
+     * This method converts the given actionCommand to an integer for use with
+     * the 'actionPerformed' method. This is implemented only to allow targeting
+     * Java 1.6+.
+     *
      * @param action
-     * @return 
+     * @return
      */
     private int getActionIndex(String action) {
         int actionIndex = 0;
@@ -325,6 +331,13 @@ public class RenderFrame extends ComponentAdapter implements ActionListener {
                         }
                     }
 
+                    /*
+                    Dimension currentSize = universePanel.getSize();
+                    universePanel = new UniversePanel(MINIMUM_PANEL_DIMENSION);
+                    universePanel.addMouseWheelListener(this);
+                    universePanel.setSize(currentSize);
+                    */
+                    universePanel.refreshPanel();
                     configPanel.getNewSim().setEnabled(true);
                     configPanel.getPauseSim().setEnabled(false);
                     configPanel.getPlaySim().setEnabled(false);
@@ -352,5 +365,23 @@ public class RenderFrame extends ComponentAdapter implements ActionListener {
         if (renderFrame != null) {
             renderFrame.repaint();
         }
+    }
+
+    @Override
+    public void mouseWheelMoved(MouseWheelEvent e) {
+        int notches = e.getWheelRotation();
+        double currentScale = RenderUtils.getScale();
+        double notchTranslation = 0.05;
+        
+        if( currentScale <= 0.1 ) {
+            notchTranslation = 0.005;
+        }
+        double amount = -(notches * notchTranslation);
+
+        currentScale += amount;
+        if( currentScale >= 0.01 ) {
+            RenderUtils.setScale(currentScale);
+        } 
+        this.configPanel.getScaleInput().setValue(currentScale);
     }
 }

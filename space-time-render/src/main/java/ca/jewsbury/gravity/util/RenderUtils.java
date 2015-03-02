@@ -43,6 +43,9 @@ public abstract class RenderUtils {
     public static void setCenterOfMass(SpaceTimeVector com) {
         centerOfMass = com;
     }
+    public static SpaceTimeVector getCenterofMass() {
+        return centerOfMass;
+    }
 
     public static void setScale(double scl) {
         scale = scl;
