@@ -18,6 +18,8 @@
         <script>
             $(document).ready(function () {
                 OrbitalViewer.initialize($("#container-div"), new SimulationEngine("default"));
+                OrbitalViewer.insertObject(new SpaceObject("sun", [0, 0], [0, 0], 1, 1));
+                OrbitalViewer.insertObject(new SpaceObject("earth", [0.99, 0], [0,0], 1, 1));
             });
         </script>
     </ui:define>

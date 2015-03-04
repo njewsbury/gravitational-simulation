@@ -9,12 +9,14 @@ OrbitalViewer.initialize = function (container, engine) {
     this.redraw = true;
     this.context = null;
     this.canvas = null;
+    
+    this.currentScale = [100, 100];
 
     this.axisStyle = "#FF0101";
     this.axisWidth = 1;
-    
-    this.repaintInterval = 30;
-    
+
+    this.repaintInterval = 300;
+
     this.simulationEngine = engine;
 
     this.createCanvas(container);
@@ -23,14 +25,21 @@ OrbitalViewer.initialize = function (container, engine) {
     }
 
     window.addEventListener('resize', this.resize, false);
-    this.intrvl = setInterval( function() {
+    this.intrvl = setInterval(function () {
         OrbitalViewer.repaint();
     }, OrbitalViewer.repaintInterval);
     
+    this.moveIntrvl = setInterval( function() {
+        console.log("Moving objects.");
+        OrbitalViewer.simulationEngine.moveAllObjects();
+        OrbitalViewer.redraw=true;
+    }, 600);
+
 };
 
-OrbitalViewer.insertObject = function( spaceObject ) {
-    
+OrbitalViewer.insertObject = function (spaceObject) {
+    this.simulationEngine.insertOrbital(spaceObject);
+    this.redraw = true;
 };
 
 
@@ -66,11 +75,11 @@ OrbitalViewer.repaintAxes = function (context, canvas) {
     oldStyle = context.strokeStyle;
     oldWidth = context.lineWidth;
     oldOpacity = context.globalAlpha;
-
+    
     context.strokeStyle = OrbitalViewer.axisStyle;
     context.lineWidth = OrbitalViewer.axisWidth;
     context.globalAlpha = 0.5;
-    
+
     context.beginPath();
     context.moveTo(-canvas.width / 2, 0);
     context.lineTo(canvas.width / 2, 0);
@@ -89,14 +98,23 @@ OrbitalViewer.repaintAxes = function (context, canvas) {
 OrbitalViewer.repaint = function () {
     var context = OrbitalViewer.context;
     var canvas = OrbitalViewer.canvas;
+    var objList;
+
     // LOW LAYER
     if (OrbitalViewer.redraw) {
-        context.clearRect(0, 0, context.width, context.height);
-        OrbitalViewer.repaintAxes(context, canvas);
-
-        // MEDIUM LAYER
+        context.clearRect(-(canvas.width/2), -(canvas.height/2), canvas.width, canvas.height);
         
+        OrbitalViewer.repaintAxes(context, canvas);
+        // MEDIUM LAYER
+
         // OBJECT LAYER
+
+        objList = OrbitalViewer.simulationEngine.objectList;
+        if (objList !== null && objList !== undefined) {
+            $.each(objList, function (index, element) {
+                element.draw(context, OrbitalViewer.currentScale);
+            });
+        }
         OrbitalViewer.redraw = false;
     }
 };
