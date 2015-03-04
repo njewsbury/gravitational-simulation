@@ -3,19 +3,23 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>ca.jewsbury.gravity.spacetime</groupId>
     <artifactId>gravitational-simulation</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>0.5-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Gravitational Simulation</name>
+    
     <modules>
         <module>space-time</module>
         <module>space-time-render</module>
+        <module>orbit-solver</module>
     </modules>
+    
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
     
     <dependencyManagement>
         <dependencies>
+            <!-- LOGGING DEPENDENCIES -->
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-log4j12</artifactId>

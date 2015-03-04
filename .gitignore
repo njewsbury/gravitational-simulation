@@ -1,3 +1,7 @@
 /space-time-render/target/
 /space-time/target/
 /space-time-render/nbactions.xml
+/space-time-collector/target/
+/orbit-solver/orbit-solver-dao/target/
+/orbit-solver/orbit-solver-view/target/
+/orbit-solver/orbit-solver-ear/target/
