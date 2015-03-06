@@ -2,33 +2,54 @@
                 xmlns="http://www.w3.org/1999/xhtml"
                 xmlns:f="http://java.sun.com/jsf/core"
                 xmlns:h="http://java.sun.com/jsf/html"
-                xmlns:ui="http://java.sun.com/jsf/facelets">
-    <ui:define name="pageTitle">Solver Home Page</ui:define>
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui">
+    <ui:define name="pageTitle">Orbital Solver Landing</ui:define>
 
+    <ui:define name="additional-headers">
+        <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1" />
+    </ui:define>
 
     <ui:define name="content">
-        <h:outputScript library="js" name="orbitalViewer.js" target="head"></h:outputScript>
-        <h:outputScript library="js" name="simulationEngine.js" target="head"></h:outputScript>
-        <h:outputScript library="js" name="spaceObject.js" target="head"></h:outputScript>
-        <h:outputStylesheet library="css" name="index-style.css"/>
-
-
-        <div id="container-div"></div>
+        <h:outputStylesheet library="css" name="landing-style.css"/>
+        <link href='http://fonts.googleapis.com/css?family=Dosis:400,800' rel='stylesheet' type='text/css'/>
+        
+        
+        <div id="landing-header">
+            <div id="inner-container">
+                <h1>Orbital Solver &amp; Display</h1>
+                <div id="buttons">
+                    <p:button id="viewer" value="Orbital Viewer" outcome="viewer.xhtml"/>
+                    <p:button id="solver" value="Orbital Solver" />
+                </div>
+                <span>A Physics 4250 Final Project by Nathan Jewsbury &amp; Scott Osadchuk</span>
+            </div>
+        </div>
 
         <script>
+            function resize() {
+                var windowHeight = $(window).height();
+                var divHeight = $("#landing-header").height();
+                
+                $("#landing-header").css("margin-top", (windowHeight - divHeight) / 2.0);
+                $("#landing-header").css("height", ($("#inner-container").height()));
+            }
+
             $(document).ready(function () {
-                OrbitalViewer.initialize($("#container-div"), new SimulationEngine("default"));
-                OrbitalViewer.insertObject(new SpaceObject("sun", [0, 0], [0, 0], [0,0], 5, 1));
-                OrbitalViewer.insertObject(new SpaceObject("earth", [0.99, 0], [0,0], [0,1], 1, 1));
+                $(window).resize(function () {
+                    resize();
+                });
+                resize();
                 
-                OrbitalViewer.initializeDisplay();
-                //OrbitalViewer.startSimulation();
-                
-                /*
-                setTimeout( function() {
-                    OrbitalViewer.stop();
-                }, 10000);
-                */
+                $("#landing-header").animate({
+                    opacity:0.8
+                }, 900 );
+                $("#inner-container").animate({
+                    opacity: 1
+                }, 1000 );
+                $("#inner-container h1").animate({
+                    marginTop:'0.2em'
+                }, 1500);
             });
         </script>
     </ui:define>

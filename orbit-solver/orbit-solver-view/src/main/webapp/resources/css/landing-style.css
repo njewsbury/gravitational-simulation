@@ -1,0 +1,46 @@
+
+body {
+    background-image: url(#{resource['images/earth-bg-min.jpg']});
+    background-size: cover;
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-color: black;
+    color: #E8E8E8;
+    overflow: hidden;
+
+    font-weight: bold;
+    font-family: 'Dosis', sans-serif;
+    padding: 0;
+    margin: 0;
+    
+    height: 100%;
+}
+
+#inner-container {
+    display:inline-block;
+    margin: 0 auto 0 auto;
+    opacity: 0;
+}
+
+#landing-header {
+    padding: 0;
+    margin: 0;
+    
+    background: #202020;
+    opacity: 0.1;
+    
+    border-top: 3px solid #FF9900;
+    border-bottom: 3px solid #FF9900;
+    text-align:center;
+    
+    height: 7em;
+}
+
+#landing-header h1 {
+    margin-bottom:0.2em;
+}
+
+button {
+    width: 175px;
+}

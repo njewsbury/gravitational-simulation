@@ -1,0 +1,32 @@
+
+body, html {
+    padding: 0;
+    margin: 0;
+    overflow: hidden;
+}
+
+#rootContainer {
+    overflow: hidden;
+}
+
+canvas {
+    position: absolute;
+    left: 0;
+}
+
+canvas.bottom-layer {
+    background: black;
+    z-index: 5;
+}
+
+canvas.mid-layer {
+    /*background: black;*/
+    opaque: false;
+    z-index: 10;
+}
+
+#config {
+    padding-bottom: 3px;
+    border-bottom: 5px #FF9900 double;
+    background-color: #202020;
+}

@@ -1,0 +1,36 @@
+<ui:composition template="/WEB-INF/templates/root-template/root-template.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui">
+    <ui:define name="pageTitle">Orbital Viewer</ui:define>
+
+
+    <ui:define name="content">
+        <h:outputScript library="js" name="orbitalViewer.js" target="head"></h:outputScript>
+        <h:outputScript library="js" name="simulationEngine.js" target="head"></h:outputScript>
+        <h:outputScript library="js" name="spaceObject.js" target="head"></h:outputScript>
+        <h:outputStylesheet library="css" name="viewer-style.css"/>
+
+        <div id="config">
+            <p:commandButton id="new-orbit" value="New Orbit" type="button" onclick="OrbitalViewer.defaultSimulation()"/>
+            <p:commandButton id="start-orbit" value="Start" type="button" onclick="OrbitalViewer.startOrbit()"/>
+            <p:commandButton id="stop-orbit" value="Stop" type="button" onclick="OrbitalViewer.stopOrbit()"/>
+            <p:commandButton id="restart-orbit" value="Restart" type="button" onclick="OrbitalViewer.restartLastOrbit()"/>
+        </div>
+        <div id="container-div"></div>
+        
+
+        <script>
+            $(document).ready(function () {
+                OrbitalViewer.pageInitialization($("#container-div"));
+                //OrbitalViewer.insertObject(new SpaceObject("sun", [0, 0], [0, 0], [0, 0], 5, 1));
+                //OrbitalViewer.insertObject(new SpaceObject("earth", [0.99, 0], [0, 0], [0, 1], 1, 1));
+
+                //OrbitalViewer.initializeDisplay();
+            });
+        </script>
+    </ui:define>
+</ui:composition>
+

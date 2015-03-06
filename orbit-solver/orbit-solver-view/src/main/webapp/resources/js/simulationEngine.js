@@ -1,5 +1,7 @@
-var SimulationEngine = function( identifier ) {
+var SimulationEngine = function( identifier, bodyCount, totalMass ) {
     this.id = identifier;
+    this.bodyCount = bodyCount;
+    this.totalMass = totalMass;
     this.objectList = [];    
 };
 
@@ -88,7 +90,7 @@ SimulationEngine.prototype.getNetForce = function( activeObject ) {
     var _this = this;
     $.each(this.objectList, function( index, element ) {
         netForce = [0,0];
-        if( element.id !== activeObject.id) {
+        if( element.orbitalId !== activeObject.orbitalId) {
             singleForce = [0,0];
             unitVector = _this.getUnitVector( activeObject, element );
             distance = _this.distance( activeObject.position, element.position);
@@ -104,10 +106,8 @@ SimulationEngine.prototype.getNetForce = function( activeObject ) {
 SimulationEngine.prototype.moveSingleObject = function( activeObject ) {
     var currentForce, displacement;
     
-    console.log("Attempting to move :: " + activeObject.id );
     currentForce = this.getNetForce( activeObject );
     currentForce = numeric.mul((1.0/activeObject.mass), currentForce);
-    console.log("Calculated Net Force :: " + currentForce[0] + ", " + currentForce[1] );
     activeObject.setAcceleration(currentForce);
     
     displacement = activeObject.getVelocity();

@@ -1,43 +1,98 @@
-var SpaceObject = function (identifier, q, p, v, mass, massDensity) {
-    this.id = identifier;
-    this.position = q;
-    this.momentum = p;
+var SpaceObject = function (identifier, jsonDef) {
+    this.orbitalId = identifier;
+    this.orbitalName = jsonDef.objectName;
 
-    this.velocity = v;
+    this.mass = jsonDef.objectMass;
+    this.radius = jsonDef.objectRadius;
+
+    this.position = jsonDef.position;
+    this.velocity = jsonDef.velocity;
     this.acceleration = [0, 0];
-
-    this.mass = mass;
-    this.massDensity = massDensity;
-
-    this.colour = "#04FF04";
+    this.renderOptions = jsonDef.render;
+    this.lastPos = this.position;
 };
 
-SpaceObject.prototype.draw = function (canvas, context, scale, com) {
-    var oldStyle, oldWidth, oldFill;
-    var drawPos = [0, 0];
-    var viewSize = [ canvas.width, canvas.height];
-    
-    oldStyle = context.strokeStyle;
-    oldWidth = context.lineWidth;
-    oldFill = context.fillStyle;
+SpaceObject.prototype.validate = function () {
+    var isValid = true;
 
-    context.fillStyle = this.colour;
-    context.lineWidth = 1 / scale[0];
+    if (this.orbitalId === undefined || this.orbitalId.length > 0) {
+        isValid = false;
+        console.log("Invalid orbitalId.");
+    }
+
+    if (this.position === undefined || numeric.dim(this.position)[0] !== 2) {
+        isValid = false;
+        console.log("Invalid position vector.");
+    }
+
+    if (this.velocity === undefined || numeric.dim(this.velocity)[0] !== 2) {
+        isValid = false;
+        console.log("Invalid velocity vector.");
+    }
+
+    if (this.mass === undefined || this.mass <= 0) {
+        isValid = false;
+        console.log("Invalid mass :: " + this.mass);
+    }
+    if (this.radius === undefined || this.radius <= 0) {
+        isValid = false;
+        console.log("Invalid radius :: " + this.radius);
+        console.log(typeof (this.radius));
+    }
+    return isValid;
+};
+
+SpaceObject.prototype.draw = function (context, trace, scale, pageExtent, centerOfMass) {
+    var gradient;
+    var drawPos = this.position;
+    var lastPos = this.lastPosition;
+    context.save();
+
+    context.lineWidth = this.renderOptions.lineWidth / scale;
+    context.strokeStyle = this.renderOptions.strokeColour;
+
+    drawPos = numeric.sub(drawPos, centerOfMass);
+    lastPos = numeric.sub(lastPos, centerOfMass);
+    
+    gradient = context.createRadialGradient(
+            drawPos[0],
+            drawPos[1],
+            this.radius / (10 * scale),
+            drawPos[0],
+            drawPos[1],
+            (10 * this.radius) / scale);
+
+    gradient.addColorStop(0, this.renderOptions.fillColourOne);
+    gradient.addColorStop(1, this.renderOptions.fillColourTwo);
 
     context.beginPath();
-    drawPos = numeric.sub(this.position, com);
-    //drawPos = numeric.sub(viewSize, drawPos );
-    context.arc(drawPos[0], drawPos[1], 10 * (this.mass * this.massDensity) / scale[0], 2 * Math.PI, false);
-    
+    context.arc(
+            drawPos[0],
+            drawPos[1],
+            10 * this.radius / scale,
+            2.0 * Math.PI, false);
+
+    context.fillStyle = gradient;
     context.fill();
     context.stroke();
 
-    context.strokeStyle = oldStyle;
-    context.lineWidth = oldWidth;
-    context.fillStyle = oldFill;
+    context.restore();
+
+    trace.save();
+
+    
+
+    trace.beginPath();
+    trace.strokeStyle = this.renderOptions.strokeColour;
+    trace.lineWidth = this.renderOptions.lineWidth / scale;
+    trace.moveTo(lastPos[0], lastPos[1]);
+    trace.lineTo(drawPos[0], drawPos[1]);
+    trace.stroke();
+    trace.restore();
 };
 
 SpaceObject.prototype.translate = function (delta) {
+    this.lastPosition = this.position;
     this.position = numeric.add(this.position, delta);
 };
 
@@ -49,10 +104,10 @@ SpaceObject.prototype.getVelocity = function () {
     return this.velocity;
 };
 
-SpaceObject.prototype.getAcceleration = function() {
+SpaceObject.prototype.getAcceleration = function () {
     return this.acceleration;
 };
 
-SpaceObject.prototype.changeVelocity = function(delta) {
+SpaceObject.prototype.changeVelocity = function (delta) {
     this.velocity = numeric.add(this.velocity, delta);
 };
