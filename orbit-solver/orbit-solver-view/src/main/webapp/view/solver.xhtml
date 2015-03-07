@@ -1,0 +1,37 @@
+<ui:composition template="/WEB-INF/templates/root-template/root-template.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui">
+    <ui:define name="pageTitle">Orbit Solver Page</ui:define>
+
+
+    <ui:define name="content">
+        <h:outputScript library="js" name="orbitalSolver.js" target="head"></h:outputScript>
+        <h:outputStylesheet library="css" name="solver-style.css"/>
+
+
+        <div id="container-div">
+            <h3 id='solver-title'>Periodic Solutions</h3>
+            <div id='button-container'>
+                <p:commandButton id="start-solve" value="Start Solver" type="button" onclick="OrbitalSolver.initialize()"/>
+                <p:commandButton id="stop-solve" value="Stop Solver" type="button" onclick="OrbitalSolver.endSolver()"/>
+                <p:commandButton id="clear-solve" value="Clear Logs" type="button" onclick="OrbitalSolver.clearLogs()"/>
+                
+            </div>
+            <div id='output-container'>
+                <div id='console-output'></div>
+            </div>
+            <script>
+                $(document).ready(function () {
+                    $("#clear-logs").on('click', function () {
+                        $("#console-output").empty();
+                    });                    
+                });
+            </script>
+
+        </div>
+
+    </ui:define>
+</ui:composition>
