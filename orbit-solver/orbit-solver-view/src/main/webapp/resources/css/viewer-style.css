@@ -21,7 +21,7 @@ canvas.bottom-layer {
 
 canvas.mid-layer {
     /*background: black;*/
-    opaque: false;
+    /*opaque: false;*/
     z-index: 10;
 }
 

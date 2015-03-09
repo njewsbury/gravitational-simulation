@@ -6,10 +6,15 @@ var SpaceObject = function (identifier, jsonDef) {
     this.radius = jsonDef.objectRadius;
 
     this.position = jsonDef.position;
+
+    this.firstDrawPos = null;
+
     this.velocity = jsonDef.velocity;
     this.acceleration = [0, 0];
+    this.lastAcceleration = null;
     this.renderOptions = jsonDef.render;
-    this.lastPos = this.position;
+    this.lastPos = null;
+    this.orbitCount = 0;
 };
 
 SpaceObject.prototype.validate = function () {
@@ -42,29 +47,50 @@ SpaceObject.prototype.validate = function () {
     return isValid;
 };
 
+SpaceObject.prototype.checkCompleteOrbit = function (drawPos) {
+    var diff;
+    if (this.orbitalId === 1) {
+        if (this.firstDrawPos !== null) {
+            diff = numeric.sub(this.firstDrawPos, drawPos);
+            diff = numeric.norm2(diff);
+            if( diff < 0.05 ) {                
+                this.orbitCount++;                
+            }
+        }
+    }
+};
+
 SpaceObject.prototype.draw = function (context, trace, scale, pageExtent, centerOfMass) {
     var gradient;
     var drawPos = this.position;
-    var lastPos = this.lastPosition;
+    var lastDrawPos = [];
     context.save();
 
     context.lineWidth = this.renderOptions.lineWidth / scale;
     context.strokeStyle = this.renderOptions.strokeColour;
 
     drawPos = numeric.sub(drawPos, centerOfMass);
-    lastPos = numeric.sub(lastPos, centerOfMass);
+    if (this.firstDrawPos === null) {
+        this.firstDrawPos = numeric.clone(drawPos);
+    } else {
+        this.checkCompleteOrbit(drawPos);
+    }
+    lastDrawPos = numeric.clone(drawPos);
     
-    gradient = context.createRadialGradient(
-            drawPos[0],
-            drawPos[1],
-            this.radius / (10 * scale),
-            drawPos[0],
-            drawPos[1],
-            (10 * this.radius) / scale);
-
-    gradient.addColorStop(0, this.renderOptions.fillColourOne);
-    gradient.addColorStop(1, this.renderOptions.fillColourTwo);
-
+    /*
+     gradient = context.createRadialGradient(
+     drawPos[0],
+     drawPos[1],
+     this.radius / (10 * scale),
+     drawPos[0],
+     drawPos[1],
+     (10 * this.radius) / scale);
+     
+     gradient.addColorStop(0, this.renderOptions.fillColourOne);
+     gradient.addColorStop(1, this.renderOptions.fillColourTwo);
+     context.fillStyle = gradient;
+     */
+    context.fillStyle = this.renderOptions.fillColourTwo;
     context.beginPath();
     context.arc(
             drawPos[0],
@@ -72,31 +98,30 @@ SpaceObject.prototype.draw = function (context, trace, scale, pageExtent, center
             10 * this.radius / scale,
             2.0 * Math.PI, false);
 
-    context.fillStyle = gradient;
     context.fill();
     context.stroke();
-
     context.restore();
 
-    trace.save();
+    if (this.lastPos !== undefined && this.lastPos !== null) {
+        trace.save();
 
-    
-
-    trace.beginPath();
-    trace.strokeStyle = this.renderOptions.strokeColour;
-    trace.lineWidth = this.renderOptions.lineWidth / scale;
-    trace.moveTo(lastPos[0], lastPos[1]);
-    trace.lineTo(drawPos[0], drawPos[1]);
-    trace.stroke();
-    trace.restore();
+        trace.beginPath();
+        trace.strokeStyle = this.renderOptions.strokeColour;
+        trace.lineWidth = this.renderOptions.lineWidth / scale;
+        trace.moveTo(this.lastPos[0], this.lastPos[1]);
+        trace.lineTo(drawPos[0], drawPos[1]);
+        trace.stroke();
+        trace.restore();
+    }
+    this.lastPos = lastDrawPos;
 };
 
 SpaceObject.prototype.translate = function (delta) {
-    this.lastPosition = this.position;
     this.position = numeric.add(this.position, delta);
 };
 
 SpaceObject.prototype.setAcceleration = function (newAcc) {
+    
     this.acceleration = numeric.mul(1.0, newAcc);
 };
 

@@ -12,7 +12,7 @@ OrbitalViewer.pageInitialization = function (canvasContainer) {
     this.axisWidth = 1;
     //
     this.drawDelay = 30;
-    this.simDelay = 60;
+    this.simDelay = 900;
     //
     this.canvas = null;
     this.traceCanvas = null;
@@ -26,6 +26,8 @@ OrbitalViewer.pageInitialization = function (canvasContainer) {
     this.drawInterval = setInterval(function () {
         OrbitalViewer.repaint();
     }, OrbitalViewer.drawDelay);
+
+
 };
 
 OrbitalViewer.initializeCanvas = function (canvasContainer) {
@@ -35,13 +37,13 @@ OrbitalViewer.initializeCanvas = function (canvasContainer) {
     $(canvasContainer).append(element);
 
     OrbitalViewer.canvas = $("#" + this.canvasName)[0];
-    
+
     element = $("<canvas></canvas>");
     $(element).prop('id', this.traceName);
     $(element).prop('class', 'bottom-layer');
     $(canvasContainer).append(element);
     OrbitalViewer.traceCanvas = $("#" + this.traceName)[0];
-    
+
     if (this.canvas !== undefined && this.canvas !== null) {
         this.redraw = true;
     } else {
@@ -68,13 +70,52 @@ OrbitalViewer.resize = function () {
         OrbitalViewer.canvas.height = pageExtent[1];
         OrbitalViewer.traceCanvas.width = pageExtent[0];
         OrbitalViewer.traceCanvas.height = pageExtent[1];
-        
+
         $("canvas").css('top', $("#config").outerHeight());
-        
+
         OrbitalViewer.redraw = true;
     }
 };
-
+/*
+ OrbitalViewer.defaultSimulation = function () {
+ var defaultSim = {
+ 'simulationId': 'default',
+ 'nBodies': 2,
+ 'totalMass': 6,
+ 'objectList': [
+ {
+ 'objectId': 0,
+ 'objectName': 'sun',
+ 'objectMass': 5,
+ 'objectRadius': 5,
+ 'position': [0.00, 0.00],
+ 'velocity': [0.00, 0.00],
+ 'render': {
+ 'lineWidth': 2,
+ 'strokeColour': '#FF9900',
+ 'fillColourOne': 'black',
+ 'fillColourTwo': '#FFFF80'
+ }
+ },
+ {
+ 'objectId': 1,
+ 'objectName': 'earth',
+ 'objectMass': 1,
+ 'objectRadius': 1,
+ 'position': [0.99, 0.00],
+ 'velocity': [0.00, 1.00],
+ 'render': {
+ 'lineWidth': 2,
+ 'strokeColour': '#00CCFF',
+ 'fillColourOne': '#003300',
+ 'fillColourTwo': '#0066FF'
+ }
+ }
+ ]
+ };
+ this.initializeOrbit(JSON.stringify(defaultSim));
+ };
+ */
 OrbitalViewer.defaultSimulation = function () {
     var defaultSim = {
         'simulationId': 'default',
@@ -82,11 +123,11 @@ OrbitalViewer.defaultSimulation = function () {
         'totalMass': 6,
         'objectList': [
             {
-                'objectId': 0,
+                'objectId': 1,
                 'objectName': 'sun',
-                'objectMass': 5,
-                'objectRadius': 5,
-                'position': [0.00, 0.00],
+                'objectMass': 1,
+                'objectRadius': 1,
+                'position': [-0.995492, 0.00],
                 'velocity': [0.00, 0.00],
                 'render': {
                     'lineWidth': 2,
@@ -96,12 +137,26 @@ OrbitalViewer.defaultSimulation = function () {
                 }
             },
             {
-                'objectId': 1,
+                'objectId': 2,
                 'objectName': 'earth',
                 'objectMass': 1,
                 'objectRadius': 1,
-                'position': [0.99, 0.00],
-                'velocity': [0.00, 1.00],
+                'position': [0.995492, 0.00],
+                'velocity': [0.00, 0.00],
+                'render': {
+                    'lineWidth': 2,
+                    'strokeColour': '#00CCFF',
+                    'fillColourOne': '#003300',
+                    'fillColourTwo': '#0066FF'
+                }
+            },
+            {
+                'objectId': 3,
+                'objectName': 'comet',
+                'objectMass': 1,
+                'objectRadius': 1,
+                'position': [0.0, 0.00],
+                'velocity': [0.695804, 1.067860],
                 'render': {
                     'lineWidth': 2,
                     'strokeColour': '#00CCFF',
@@ -113,7 +168,6 @@ OrbitalViewer.defaultSimulation = function () {
     };
     this.initializeOrbit(JSON.stringify(defaultSim));
 };
-
 OrbitalViewer.initializeOrbit = function (simulationJson) {
     var orbitJson;
     var simName, simMass, simBodies;
@@ -178,9 +232,9 @@ OrbitalViewer.stopOrbit = function () {
         }
         OrbitalViewer.redraw = true;
         OrbitalViewer.repaint();
-        
+
         traceContext = OrbitalViewer.traceCanvas.getContext('2d');
-        traceContext.clearRect(-pageExtent[0]/2.0, -pageExtent[1]/2.0, 2*pageExtent[0], 2*pageExtent[1]);
+        traceContext.clearRect(-pageExtent[0] / 2.0, -pageExtent[1] / 2.0, 2 * pageExtent[0], 2 * pageExtent[1]);
     }
 };
 
@@ -188,6 +242,23 @@ OrbitalViewer.restartLastOrbit = function () {
     if (OrbitalViewer.lastSimulation !== null) {
         OrbitalViewer.stopOrbit();
         OrbitalViewer.initializeOrbit(OrbitalViewer.lastSimulation);
+    }
+};
+
+OrbitalViewer.clearTrace = function () {
+    var traceContext;
+    var pageExtent = OrbitalViewer.getPageExtent();
+    pageExtent = numeric.mul(pageExtent, (1.0 / 2.0));
+
+    if (OrbitalViewer.traceCanvas !== null) {
+        traceContext = OrbitalViewer.traceCanvas.getContext('2d');
+
+        traceContext.save();
+        traceContext.setTransform(1, 0, 0, 1, 0, 0);
+        traceContext.translate(pageExtent[0], pageExtent[1]);
+
+        traceContext.clearRect(-pageExtent[0], -pageExtent[1], 2.0 * pageExtent[0], 2.0 * pageExtent[1]);
+        traceContext.restore();
     }
 };
 
@@ -224,7 +295,7 @@ OrbitalViewer.repaint = function () {
     if (OrbitalViewer.canvas !== null) {
         context = OrbitalViewer.canvas.getContext('2d');
         trace = OrbitalViewer.traceCanvas.getContext('2d');
-        
+
         if (context !== undefined && context !== null) {
             if (OrbitalViewer.redraw === true) {
                 if (OrbitalViewer.orbit !== null && OrbitalViewer.orbit !== undefined) {
@@ -233,22 +304,22 @@ OrbitalViewer.repaint = function () {
                 // Context setup
                 context.save();
                 trace.save();
-                
+
                 context.setTransform(1, 0, 0, 1, 0, 0);
                 trace.setTransform(1, 0, 0, 1, 0, 0);
-                
+
                 //
                 //pageExtent = numeric.sub(pageExtent, centerOfMass);
                 context.translate(pageExtent[0], pageExtent[1]);
                 trace.translate(pageExtent[0], pageExtent[1]);
-                
+
                 context.scale(OrbitalViewer.globalScale, -OrbitalViewer.globalScale);
                 trace.scale(OrbitalViewer.globalScale, -OrbitalViewer.globalScale);
-                
+
                 // Axis Setup
                 context.clearRect(-pageExtent[0], -pageExtent[1], 2.0 * pageExtent[0], 2.0 * pageExtent[1]);
                 //trace.clearRect(-pageExtent[0], -pageExtent[1], 2.0 * pageExtent[0], 2.0 * pageExtent[1]);
-                
+
                 OrbitalViewer.drawGridSystem(context);
 
                 if (OrbitalViewer.orbit !== null && OrbitalViewer.orbit !== undefined) {
