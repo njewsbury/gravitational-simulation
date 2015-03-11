@@ -12,11 +12,13 @@ OrbitalViewer.pageInitialization = function (canvasContainer) {
     this.axisWidth = 1;
     //
     this.drawDelay = 30;
-    this.simDelay = 900;
+    this.simDelay = 60;
     //
     this.canvas = null;
     this.traceCanvas = null;
+    this.startCount = 0;
 
+    //
     this.initializeCanvas(canvasContainer);
     this.initializeEvents();
 
@@ -76,6 +78,112 @@ OrbitalViewer.resize = function () {
         OrbitalViewer.redraw = true;
     }
 };
+
+OrbitalViewer.defaultSimulation = function () {
+    /*
+     var defaultSim = {
+     'simulationId': 'default',
+     'nBodies': 2,
+     'totalMass': 6,
+     'objectList': [
+     {
+     'objectId': 0,
+     'objectName': 'sun',
+     'objectMass': 5,
+     'objectRadius': 5,
+     'position': [0.00, 0.00],
+     'velocity': [0.00, 0.00],
+     'render': {
+     'lineWidth': 2,
+     'strokeColour': '#FF9900',
+     'fillColourOne': 'black',
+     'fillColourTwo': '#FFFF80'
+     }
+     },
+     {
+     'objectId': 1,
+     'objectName': 'earth',
+     'objectMass': 1,
+     'objectRadius': 1,
+     'position': [0.99, 0.00],
+     'velocity': [0.00, 1.00],
+     'render': {
+     'lineWidth': 2,
+     'strokeColour': '#00CCFF',
+     'fillColourOne': '#003300',
+     'fillColourTwo': '#0066FF'
+     }
+     }
+     ]
+     };
+     */
+    var defaultSim = {
+        'simulationId': 'default',
+        'nBodies': 3,
+        'totalMass': 3,
+        'objectList': [
+            {
+                'objectId': 1,
+                'objectName': 'obj1',
+                'objectMass': 1,
+                'objectRadius': 1,
+                'position': [
+                    -0.15925000049173832,
+                    -0.009632525925990194
+                ],
+                'velocity': [
+                    0.7812883926089853,
+                    0.0014433338772505515
+                ],
+                'render': {
+                    'lineWidth': 2,
+                    'strokeColour': '#FF9900',
+                    'fillColourOne': 'black',
+                    'fillColourTwo': '#FFFF80'
+                }
+            },
+            {
+                'objectId': 2,
+                'objectName': 'obj2',
+                'objectMass': 1,
+                'objectRadius': 1,
+                'position': [
+                    0.3565031820908189,
+                    -0.0011078951484523713
+                ],
+                'velocity': [
+                    1.0670570025686175,
+                    -0.016867029299028218],
+                'render': {
+                    'lineWidth': 2,
+                    'strokeColour': '#00CCFF',
+                    'fillColourOne': '#003300',
+                    'fillColourTwo': '#0066FF'
+                }
+            },
+            {
+                'objectId': 3,
+                'objectName': 'obj3',
+                'objectMass': 1,
+                'objectRadius': 1,
+                'position': [
+                    1.5207050838507712,
+                    0.007624188070185483
+                ],
+                'velocity': [
+                    1.8437436767853796,
+                    0.000756452267523855],
+                'render': {
+                    'lineWidth': 2,
+                    'strokeColour': '#00CCFF',
+                    'fillColourOne': '#003300',
+                    'fillColourTwo': '#0066FF'
+                }
+            }
+        ]
+    };
+    this.initializeOrbit(JSON.stringify(defaultSim));
+};
 /*
  OrbitalViewer.defaultSimulation = function () {
  var defaultSim = {
@@ -84,11 +192,11 @@ OrbitalViewer.resize = function () {
  'totalMass': 6,
  'objectList': [
  {
- 'objectId': 0,
+ 'objectId': 1,
  'objectName': 'sun',
- 'objectMass': 5,
- 'objectRadius': 5,
- 'position': [0.00, 0.00],
+ 'objectMass': 1,
+ 'objectRadius': 1,
+ 'position': [-0.995492, 0.00],
  'velocity': [0.00, 0.00],
  'render': {
  'lineWidth': 2,
@@ -98,12 +206,26 @@ OrbitalViewer.resize = function () {
  }
  },
  {
- 'objectId': 1,
+ 'objectId': 2,
  'objectName': 'earth',
  'objectMass': 1,
  'objectRadius': 1,
- 'position': [0.99, 0.00],
- 'velocity': [0.00, 1.00],
+ 'position': [0.995492, 0.00],
+ 'velocity': [0.00, 0.00],
+ 'render': {
+ 'lineWidth': 2,
+ 'strokeColour': '#00CCFF',
+ 'fillColourOne': '#003300',
+ 'fillColourTwo': '#0066FF'
+ }
+ },
+ {
+ 'objectId': 3,
+ 'objectName': 'comet',
+ 'objectMass': 1,
+ 'objectRadius': 1,
+ 'position': [0.0, 0.00],
+ 'velocity': [0.695804, 1.067860],
  'render': {
  'lineWidth': 2,
  'strokeColour': '#00CCFF',
@@ -116,58 +238,6 @@ OrbitalViewer.resize = function () {
  this.initializeOrbit(JSON.stringify(defaultSim));
  };
  */
-OrbitalViewer.defaultSimulation = function () {
-    var defaultSim = {
-        'simulationId': 'default',
-        'nBodies': 2,
-        'totalMass': 6,
-        'objectList': [
-            {
-                'objectId': 1,
-                'objectName': 'sun',
-                'objectMass': 1,
-                'objectRadius': 1,
-                'position': [-0.995492, 0.00],
-                'velocity': [0.00, 0.00],
-                'render': {
-                    'lineWidth': 2,
-                    'strokeColour': '#FF9900',
-                    'fillColourOne': 'black',
-                    'fillColourTwo': '#FFFF80'
-                }
-            },
-            {
-                'objectId': 2,
-                'objectName': 'earth',
-                'objectMass': 1,
-                'objectRadius': 1,
-                'position': [0.995492, 0.00],
-                'velocity': [0.00, 0.00],
-                'render': {
-                    'lineWidth': 2,
-                    'strokeColour': '#00CCFF',
-                    'fillColourOne': '#003300',
-                    'fillColourTwo': '#0066FF'
-                }
-            },
-            {
-                'objectId': 3,
-                'objectName': 'comet',
-                'objectMass': 1,
-                'objectRadius': 1,
-                'position': [0.0, 0.00],
-                'velocity': [0.695804, 1.067860],
-                'render': {
-                    'lineWidth': 2,
-                    'strokeColour': '#00CCFF',
-                    'fillColourOne': '#003300',
-                    'fillColourTwo': '#0066FF'
-                }
-            }
-        ]
-    };
-    this.initializeOrbit(JSON.stringify(defaultSim));
-};
 OrbitalViewer.initializeOrbit = function (simulationJson) {
     var orbitJson;
     var simName, simMass, simBodies;
@@ -211,6 +281,8 @@ OrbitalViewer.startOrbit = function () {
             OrbitalViewer.orbit.moveAllObjects();
             OrbitalViewer.redraw = true;
         }, OrbitalViewer.simDelay);
+        OrbitalViewer.startCount++;
+        $("#start-number").text(OrbitalViewer.startCount);
     }
 };
 
@@ -335,178 +407,3 @@ OrbitalViewer.repaint = function () {
         }
     }
 };
-
-
-
-
-/*
- OrbitalViewer.initialize = function (container) {
- this.canvasName = "draw-canvas";
- this.enabled = false;
- this.redraw = true;
- this.context = null;
- this.canvas = null;
- 
- this.globalScale = 100;
- this.currentScale = [this.globalScale, -this.globalScale];
- 
- this.axisStyle = "#FF0101";
- this.axisWidth = 1;
- 
- this.repaintInterval = 300;
- this.moveInterval = 600;
- 
- this.rootOrigin = [0, 0];
- 
- this.simulationEngine = engine;
- 
- this.createCanvas(container);
- if (this.enabled) {
- this.resize();
- }
- window.addEventListener('resize', this.resize, false);
- };
- 
- OrbitalViewer.initializeDisplay = function () {
- if (this.enabled) {
- this.repaint();
- console.log("Display Initialized!");
- }
- };
- 
- OrbitalViewer.startSimulation = function () {
- if (this.enabled) {
- this.intrvl = setInterval(function () {
- OrbitalViewer.repaint();
- }, OrbitalViewer.repaintInterval);
- 
- this.moveIntrvl = setInterval(function () {
- OrbitalViewer.simulationEngine.moveAllObjects();
- OrbitalViewer.redraw = true;
- }, OrbitalViewer.moveInterval);
- } else {
- alert("Unable to start simulation due to errors!");
- }
- };
- 
- OrbitalViewer.stop = function () {
- this.redraw = false;
- clearInterval(this.moveIntrvl);
- clearInterval(this.intrvl);
- this.clearCanvas();
- 
- };
- 
- OrbitalViewer.insertObject = function (spaceObject) {
- this.simulationEngine.insertOrbital(spaceObject);
- this.redraw = true;
- };
- 
- OrbitalViewer.clearCanvas = function () {
- 
- if (this.context !== undefined) {
- this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
- }
- };
- 
- OrbitalViewer.createCanvas = function (container) {
- var element = $("<canvas></canvas>");
- $(element).prop('id', this.canvasName);
- 
- $(container).append(element);
- this.canvas = $("#" + this.canvasName)[0];
- if (this.canvas !== undefined && this.canvas !== null) {
- this.context = this.canvas.getContext('2d');
- if (this.context !== undefined && this.context !== null) {
- this.enabled = true;
- this.redraw = true;
- } else {
- console.log("Unable to get 2DContext from canvas.");
- }
- } else {
- console.log("Unable to initialize canvas element.");
- }
- };
- 
- OrbitalViewer.resize = function () {
- OrbitalViewer.canvas.width = window.innerWidth;
- OrbitalViewer.canvas.height = window.innerHeight - $("#config").outerHeight();
- OrbitalViewer.redraw = true;
- };
- 
- OrbitalViewer.repaintAxes = function (context, canvas, com) {
- var oldStyle, oldWidth, oldOpacity;
- var widthLimit, heightLimit;
- oldStyle = context.strokeStyle;
- oldWidth = context.lineWidth;
- oldOpacity = context.globalAlpha;
- 
- context.strokeStyle = OrbitalViewer.axisStyle;
- context.lineWidth = OrbitalViewer.axisWidth / OrbitalViewer.currentScale[0];
- context.globalAlpha = 0.5;
- //com = numeric.mul(OrbitalViewer.currentScale[0], com);
- widthLimit = (canvas.width + com[0]) / 2.0;
- heightLimit = (canvas.height + com[1]) / 2.0;
- 
- context.beginPath();
- context.moveTo(-widthLimit, 0);
- context.lineTo(widthLimit, 0);
- context.stroke();
- 
- context.beginPath();
- context.moveTo(0, -heightLimit);
- context.lineTo(0, heightLimit);
- context.stroke();
- 
- context.strokeStyle = oldStyle;
- context.lineWidth = oldWidth;
- context.globalAlpha = oldOpacity;
- };
- 
- OrbitalViewer.repaint = function () {
- var context = OrbitalViewer.context;
- var canvas = OrbitalViewer.canvas;
- var objList;
- var com = [0, 0];
- var widthLimit, heightLimit;
- // LOW LAYER
- if (OrbitalViewer.redraw) {
- //com = OrbitalViewer.simulationEngine.getCenterOfMass();
- com = [1, 1];
- if (com === undefined) {
- com = [0, 0];
- }
- //com = numeric.mul(OrbitalViewer.currentScale[0], com);
- 
- console.log("COM :: " + com[0] + ", " + com[1]);
- widthLimit = (canvas.width - com[0]) / 2.0;
- heightLimit = (canvas.height - com[1]) / 2.0;
- console.log("WL : " + widthLimit + " HL: " + heightLimit);
- 
- // LOWER LAYER
- context.setTransform(1, 0, 0, 1, 0, 0);
- OrbitalViewer.clearCanvas();
- context.translate(widthLimit, heightLimit);
- this.context.scale(OrbitalViewer.currentScale[0], OrbitalViewer.currentScale[1]);
- 
- // MEDIUM LAYER
- 
- // OBJECT LAYER
- 
- objList = OrbitalViewer.simulationEngine.objectList;
- if (objList !== null && objList !== undefined) {
- $.each(objList, function (index, element) {
- element.draw(context, OrbitalViewer.currentScale, com, OrbitalViewer.rootOrigin);
- });
- }
- OrbitalViewer.repaintAxes(context, canvas, com);
- 
- context.beginPath();
- context.fillStyle = "#0F00F1";
- context.arc(com[0], com[1], 2 / (OrbitalViewer.globalScale), 2.0 * Math.PI, false);
- context.fill();
- 
- OrbitalViewer.redraw = false;
- }
- };
- */

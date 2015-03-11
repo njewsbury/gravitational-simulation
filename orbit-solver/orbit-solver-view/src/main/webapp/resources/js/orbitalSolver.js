@@ -8,7 +8,7 @@ OrbitalSolver.log = function (str) {
     var logDiv = $("<div class='log-text'></div>");
 
     $(dateDiv).text(new Date().toDateString());
-    $(logDiv).text(str);
+    $(logDiv).html(str);
 
     $(newDiv).append(dateDiv);
     $(newDiv).append(logDiv);
@@ -18,7 +18,7 @@ OrbitalSolver.log = function (str) {
 
 
 OrbitalSolver.clearLogs = function () {
-    $("#console-log").clear();
+    $("#console-log").html("");
 };
 
 
@@ -26,8 +26,13 @@ OrbitalSolver.initialize = function () {
     OrbitalSolver.solvedOrbits = 0;
 
     OrbitalSolver.nBodies = 3;
-    OrbitalSolver.fourierPrecision = 2;
+    OrbitalSolver.fourierPrecision = 5;
     OrbitalSolver.timePrecision = 10;
+
+    OrbitalSolver.AS_OFFSET = 0;
+    OrbitalSolver.AC_OFFSET = (this.nBodies * this.fourierPrecision);
+    OrbitalSolver.BS_OFFSET = 2.0 * (this.nBodies * this.fourierPrecision);
+    OrbitalSolver.BC_OFFSET = 3.0 * (this.nBodies * this.fourierPrecision);
 
     OrbitalSolver.aNot = Array.apply(null, new Array(this.nBodies))
             .map(Number.prototype.valueOf, 0);
@@ -48,62 +53,186 @@ OrbitalSolver.initialize = function () {
     OrbitalSolver.selectParams();
 };
 
+OrbitalSolver.calculateQRegular = function (paramArray) {
+    var x = new Array(OrbitalSolver.nBodies);
+    var y = new Array(OrbitalSolver.nBodies);
 
-OrbitalSolver.minimizeFunction = function (paramArray) {
-    
-    var paramDimension = numeric.dim( paramArray );
-    console.log( paramDimension );
-    
-    var as = numeric.clone(paramArray[0]);
-    var ac = numeric.clone(paramArray[1]);
-    var bs = numeric.clone(paramArray[2]);
-    var bc = numeric.clone(paramArray[3]);
-    
-    
-    
-    OrbitalSolver.minimizeLoopCount++;
-    console.log("Orbital Minimizer Loop Count :: " + OrbitalSolver.minimizeLoopCount);
+    for (var m = 0; m < OrbitalSolver.nBodies; m++) {
+        x[m] = new Array(OrbitalSolver.timePrecision);
+        y[m] = new Array(OrbitalSolver.timePrecision);
+    }
 
-    var xit = new Array(OrbitalSolver.nBodies);
-    var yit = new Array(OrbitalSolver.nBodies);
+    for (var i = 0; i < OrbitalSolver.nBodies; i++) {
+        for (var t = 0; t < OrbitalSolver.timePrecision; t++) {
+            x[i][t] = OrbitalSolver.aNot[i];
+            y[i][t] = OrbitalSolver.bNot[i];
+            for (var k = 0; k < OrbitalSolver.fourierPrecision; k++) {
+
+                x[i][t] += (
+                        paramArray[OrbitalSolver.AS_OFFSET + (i * OrbitalSolver.fourierPrecision) + k]
+                        * Math.sin(k * OrbitalSolver.thetaMap[t])
+                        );
+                x[i][t] += (
+                        paramArray[OrbitalSolver.AC_OFFSET + (i * OrbitalSolver.fourierPrecision) + k]
+                        * Math.cos(k * OrbitalSolver.thetaMap[t])
+                        );
+
+                y[i][t] += (
+                        paramArray[OrbitalSolver.BS_OFFSET + (i * OrbitalSolver.fourierPrecision) + k]
+                        * Math.sin(k * OrbitalSolver.thetaMap[t])
+                        );
+                y[i][t] += (
+                        paramArray[OrbitalSolver.BC_OFFSET + (i * OrbitalSolver.fourierPrecision) + k]
+                        * Math.cos(k * OrbitalSolver.thetaMap[t])
+                        );
+            }
+
+        }
+    }
+    return [x, y];
+};
+
+OrbitalSolver.calculateQDot = function (paramArray) {
     var xdot = new Array(OrbitalSolver.nBodies);
     var ydot = new Array(OrbitalSolver.nBodies);
 
     for (var m = 0; m < OrbitalSolver.nBodies; m++) {
-        xit[m] = new Array(OrbitalSolver.timePrecision);
-        yit[m] = new Array(OrbitalSolver.timePrecision);
         xdot[m] = new Array(OrbitalSolver.timePrecision);
         ydot[m] = new Array(OrbitalSolver.timePrecision);
     }
 
-    var kinetic = [];
-    var potential = [];
+    for (var i = 0; i < OrbitalSolver.nBodies; i++) {
+        for (var t = 0; t < OrbitalSolver.timePrecision; t++) {
+            xdot[i][t] = 0.0;
+            ydot[i][t] = 0.0;
+            for (var k = 0; k < OrbitalSolver.fourierPrecision; k++) {
+
+                xdot[i][t] += (
+                        paramArray[OrbitalSolver.AS_OFFSET + (i * OrbitalSolver.fourierPrecision) + k]
+                        * k * Math.cos(k * OrbitalSolver.thetaMap[t])
+                        );
+                xdot[i][t] -= (
+                        paramArray[OrbitalSolver.AC_OFFSET + (i * OrbitalSolver.fourierPrecision) + k]
+                        * k * Math.sin(k * OrbitalSolver.thetaMap[t])
+                        );
+
+                ydot[i][t] += (
+                        paramArray[OrbitalSolver.BS_OFFSET + (i * OrbitalSolver.fourierPrecision) + k]
+                        * k * Math.cos(k * OrbitalSolver.thetaMap[t])
+                        );
+                ydot[i][t] -= (
+                        paramArray[OrbitalSolver.BC_OFFSET + (i * OrbitalSolver.fourierPrecision) + k]
+                        * k * Math.sin(k * OrbitalSolver.thetaMap[t])
+                        );
+            }
+        }
+    }
+    return [xdot, ydot];
+};
+
+OrbitalSolver.calculateQDotDot = function (paramArray) {
+    var xdotdot = new Array(OrbitalSolver.nBodies);
+    var ydotdot = new Array(OrbitalSolver.nBodies);
+
+    for (var m = 0; m < OrbitalSolver.nBodies; m++) {
+        xdotdot[m] = new Array(OrbitalSolver.timePrecision);
+        ydotdot[m] = new Array(OrbitalSolver.timePrecision);
+    }
 
     for (var i = 0; i < OrbitalSolver.nBodies; i++) {
         for (var t = 0; t < OrbitalSolver.timePrecision; t++) {
-            xit[i][t] = OrbitalSolver.aNot[i];
-            yit[i][t] = OrbitalSolver.bNot[i];
-
+            xdotdot[i][t] = 0.0;
+            ydotdot[i][t] = 0.0;
             for (var k = 0; k < OrbitalSolver.fourierPrecision; k++) {
-                xit[i][t] += (as[i][k] * Math.sin(k * OrbitalSolver.thetaMap[t]));
-                xit[i][t] += (ac[i][k] * Math.cos(k * OrbitalSolver.thetaMap[t]));
 
-                yit[i][t] += (bs[i][k] * Math.sin(k * OrbitalSolver.thetaMap[t]));
-                yit[i][t] += (bc[i][k] * Math.cos(k * OrbitalSolver.thetaMap[t]));
-            }
+                xdotdot[i][t] -= (
+                        paramArray[OrbitalSolver.AS_OFFSET + (i * OrbitalSolver.fourierPrecision) + k]
+                        * k * k * Math.sin(k * OrbitalSolver.thetaMap[t])
+                        );
+                xdotdot[i][t] -= (
+                        paramArray[OrbitalSolver.AC_OFFSET + (i * OrbitalSolver.fourierPrecision) + k]
+                        * k * k * Math.cos(k * OrbitalSolver.thetaMap[t])
+                        );
 
-            if (t > 0) {
-                xdot[i][t - 1] = (xit[i][t] - xit[i][t - 1]) / OrbitalSolver.dt;
-                ydot[i][t - 1] = (yit[i][t] - yit[i][t - 1]) / OrbitalSolver.dt;
+                ydotdot[i][t] -= (
+                        paramArray[OrbitalSolver.BS_OFFSET + (i * OrbitalSolver.fourierPrecision) + k]
+                        * k * k * Math.sin(k * OrbitalSolver.thetaMap[t])
+                        );
+                ydotdot[i][t] -= (
+                        paramArray[OrbitalSolver.BC_OFFSET + (i * OrbitalSolver.fourierPrecision) + k]
+                        * k * k * Math.cos(k * OrbitalSolver.thetaMap[t])
+                        );
             }
         }
-        var endTime = OrbitalSolver.timePrecision - 1;
-        xdot[i][endTime] =
-                (xit[i][endTime] - xit[i][endTime - 1]) / OrbitalSolver.dt;
-        ydot[i][endTime] =
-                (yit[i][endTime] - yit[i][endTime - 1]) / OrbitalSolver.dt;
-
     }
+    return [xdotdot, ydotdot];
+};
+
+
+OrbitalSolver.calculateActionGradient = function (paramArray) {
+    var mu = [];
+    var kappa = [];
+    var q, qdot, qdotdot;
+    var modQDot, modQDotDot;
+    var actionGradient = 0.0;
+    var x, y, xdot, ydot, xdotdot, ydotdot;
+
+    q = OrbitalSolver.calculateQRegular(paramArray);
+    qdot = OrbitalSolver.calculateQDot(paramArray);
+    qdotdot = OrbitalSolver.calculateQDotDot(paramArray);
+
+    x = q[0];
+    y = q[1];
+
+    xdot = qdot[0];
+    ydot = qdot[1];
+
+    xdotdot = qdotdot[0];
+    ydotdot = qdotdot[1];
+
+    for (var t = 0; t < OrbitalSolver.timePrecision; t++) {
+        kappa[t] = 0.0;
+        mu[t] = 0.0;
+
+        for (var i = 0; i < OrbitalSolver.nBodies; i++) {
+            modQDot = Math.sqrt((xdot[i][t] * xdot[i][t]) + (ydot[i][t] * ydot[i][t]));
+            modQDotDot = Math.sqrt((xdotdot[i][t] * xdotdot[i][t]) + (ydotdot[i][t] * ydotdot[i][t]));
+            kappa[t] += (modQDot * modQDotDot);
+
+            for (var j = (i + 1); j < OrbitalSolver.nBodies; j++) {
+                var xSingle = (x[i][t] - x[j][t]);
+                var ySingle = (y[i][t] - y[j][t]);
+
+                var sum = (xSingle * xSingle) + (ySingle * ySingle);
+                mu[t] = (1.0 / (sum));
+            }
+        }
+    }
+
+    for (var t = 0; t < OrbitalSolver.timePrecision; t++) {
+        actionGradient += ((kappa[t] - mu[t]) * OrbitalSolver.dt);
+    }
+
+    var actionGradientVector = new Array(1);
+    actionGradientVector[0] = actionGradient;
+    //console.log("Action Gradient :: " + actionGradient);
+    return actionGradientVector;
+};
+
+OrbitalSolver.calculateActionFunction = function (paramArray) {
+    var actionFunction = 0.0;
+    var x, y, xdot, ydot;
+    var potential = [];
+    var kinetic = [];
+    var q, qdot;
+
+    q = OrbitalSolver.calculateQRegular(paramArray);
+    qdot = OrbitalSolver.calculateQDot(paramArray);
+
+    x = q[0];
+    y = q[1];
+    xdot = qdot[0];
+    ydot = qdot[1];
 
     for (var t = 0; t < OrbitalSolver.timePrecision; t++) {
         kinetic[t] = 0.0;
@@ -115,8 +244,8 @@ OrbitalSolver.minimizeFunction = function (paramArray) {
             kinetic[t] *= (1.0 / 2.0);
 
             for (var j = (i + 1); j < OrbitalSolver.nBodies; j++) {
-                var xSingle = (xit[i][t] - xit[j][t]);
-                var ySingle = (yit[i][t] - yit[j][t]);
+                var xSingle = (x[i][t] - x[j][t]);
+                var ySingle = (y[i][t] - y[j][t]);
 
                 var sum = (xSingle * xSingle) + (ySingle * ySingle);
                 potential[t] = (1.0 / Math.sqrt(sum));
@@ -124,32 +253,117 @@ OrbitalSolver.minimizeFunction = function (paramArray) {
         }
     }
 
-    var actionFunction = 0.0;
     for (var t = 0; t < OrbitalSolver.timePrecision; t++) {
-        actionFunction += (kinetic[t] - potential[t]) * OrbitalSolver.dt;
+        actionFunction += ((kinetic[t] - potential[t]) * OrbitalSolver.dt);
     }
-
-
+    //console.log("Action Function :: " + actionFunction);
     return actionFunction;
 };
 
 OrbitalSolver.selectParams = function () {
     OrbitalSolver.log("Selecting initial parameters.");
 
-    var paramSet = [];
-    // Push AS, a nBodies x fourier Precision array.
-    paramSet.push([[1, 1.2], [1, 1.3], [1, 1.2]]);
-    // Push AC, a nBodies x fourier Precision array.
-    paramSet.push([[1, 1.5], [1, 1.7], [1, 1.2]]);
-    // Push BS, a nBodies x fourier Precision array.
-    paramSet.push([[1, 1.7], [1, 1.2], [1, 1.3]]);
-    // Push BC, a nBodies x fourier Precision array.
-    paramSet.push([[1, 1.8], [1, 1.4], [1, 1.9]]);
+    var paramSet;
+    /*
+     paramSet = [
+     1, 1.2, 0.5, 1.3, 1, 1.2, //as
+     1, 1.5, 1, 1.7, 1, 1.2, //ac,
+     1, 1.7, 1, 1.2, 1, 1.3, //bs
+     1, 1.8, 1, 1.4, 1, 1.9  //bc       
+     ];
+     */
+    var results;
+    var msgArr = [];
+    var callbackFunction = function (i, x, f, g, H) {
+        msgArr.push({i: i, x: x, f: f, g: g, H: H});
+    };
+    for (var i = 0; i < 1; i++) {
+        paramSet = OrbitalSolver.findRandomizedParamSet();
+        try {
+            msgArr = [];
+            results = numeric.uncmin(
+                    OrbitalSolver.calculateActionFunction,
+                    paramSet,
+                    1e-10,
+                    OrbitalSolver.calculateActionGradient,
+                    1e10, callbackFunction
+                    );//.solution;
+            OrbitalSolver.log("Found initial condition set.");
 
-    var results = numeric.uncmin(OrbitalSolver.minimizeFunction, paramSet).solution;
+            var initialPos = OrbitalSolver.findInitialPosition(results.solution);
+            var initialVel = OrbitalSolver.findInitialVelocity(results.solution);
 
-    console.log(results);
+            var initialString = "";
+            for (var n = 0; n < OrbitalSolver.nBodies; n++) {
+                initialString = "Body :: " + n + "<br>";
+                initialString += "Xo :: " + initialPos[0][n] + "<br>";
+                initialString += "Yo :: " + initialPos[1][n] + "<br>";
+                initialString += "VXo : " + initialVel[0][n] + "<br>";
+                initialString += "VYo : " + initialVel[1][n];
 
+                OrbitalSolver.log(initialString);
+            }
+        } catch (err) {
+            OrbitalSolver.log("Error :: " + err);
+        }
+    }
+    OrbitalSolver.log("Done searching for solutions.");
+};
+
+OrbitalSolver.findInitialPosition = function (resultArray) {
+    var x = new Array(OrbitalSolver.nBodies);
+    var y = new Array(OrbitalSolver.nBodies);
+
+    for (var i = 0; i < OrbitalSolver.nBodies; i++) {
+        x[i] = OrbitalSolver.aNot[i];
+        y[i] = OrbitalSolver.bNot[i];
+        for (var k = 0; k < OrbitalSolver.fourierPrecision; k++) {
+
+            x[i] += (
+                    resultArray[OrbitalSolver.AC_OFFSET + (i * OrbitalSolver.fourierPrecision) + k]
+                    );
+
+            y[i] += (
+                    resultArray[OrbitalSolver.BC_OFFSET + (i * OrbitalSolver.fourierPrecision) + k]
+                    );
+        }
+    }
+    return [x, y];
+};
+
+OrbitalSolver.findInitialVelocity = function (resultArray) {
+    var vx = new Array(OrbitalSolver.nBodies);
+    var vy = new Array(OrbitalSolver.nBodies);
+
+    for (var i = 0; i < OrbitalSolver.nBodies; i++) {
+        vx[i] = 0;
+        vy[i] = 0;
+
+        for (var k = 0; k < OrbitalSolver.fourierPrecision; k++) {
+            vx[i] += (
+                    resultArray[OrbitalSolver.AS_OFFSET + (i * OrbitalSolver.fourierPrecision) + k] * k
+                    );
+            vy[i] += (
+                    resultArray[OrbitalSolver.BS_OFFSET + (i * OrbitalSolver.fourierPrecision) + k] * k
+                    );
+        }
+    }
+    return [vx, vy];
+};
+
+OrbitalSolver.findRandomizedParamSet = function () {
+    var required = (4 * OrbitalSolver.nBodies * OrbitalSolver.fourierPrecision);
+    var aParams = numeric.random([1, required / 2])[0];
+    var bParams = numeric.random([1, required / 2])[0];
+
+    aParams = numeric.sub(aParams, 0.5);
+    aParams = numeric.mul(1.0, aParams);
+
+    bParams = numeric.sub(bParams, 0.5);
+    bParams = numeric.mul(0.01, bParams);
+
+
+    return aParams.concat(bParams);
 };
 
 
