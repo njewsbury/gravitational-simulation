@@ -5,12 +5,8 @@ body {
     background-position: center center;
     background-repeat: no-repeat;
     background-attachment: fixed;
-    background-color: black;
-    color: #E8E8E8;
-    overflow: hidden;
-
-    font-weight: bold;
-    font-family: 'Dosis', sans-serif;
+    
+    overflow: hidden;    
     padding: 0;
     margin: 0;
     

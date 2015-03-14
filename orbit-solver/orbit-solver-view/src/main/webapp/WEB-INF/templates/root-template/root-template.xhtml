@@ -7,13 +7,15 @@
 
     <h:head>
         <meta content='text/html; charset=UTF-8' http-equiv="Content-Type"/>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
         <title>
             <ui:insert name="pageTitle">Orbital Solver Set</ui:insert>            
         </title>
         <h:outputScript library="primefaces" name="jquery/jquery.js" target="head" />
         <h:outputScript library="primefaces" name="jquery/jquery-plugins.js" target="head" />
         <h:outputScript library="js" name="numeric-1.2.6.js" target="head"/>
+        
+        <h:outputStylesheet library="css" name="global-style.css"/>
         <ui:insert name="addional-headers"/>
     </h:head>
     <h:body>

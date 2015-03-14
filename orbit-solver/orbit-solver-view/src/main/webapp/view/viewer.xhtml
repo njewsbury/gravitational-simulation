@@ -8,11 +8,41 @@
 
 
     <ui:define name="content">
+        <h:outputScript library="js" name="Chart.min.js" target="head"></h:outputScript>
+
         <h:outputScript library="js" name="orbitalViewer.js" target="head"></h:outputScript>
+        <h:outputScript library="js" name="orbitalSolver.js" target="head"></h:outputScript>
+
         <h:outputScript library="js" name="simulationEngine.js" target="head"></h:outputScript>
         <h:outputScript library="js" name="spaceObject.js" target="head"></h:outputScript>
+
+        <h:outputScript library="js" name="ringBuffer.js" target="head"></h:outputScript>
+
         <h:outputStylesheet library="css" name="viewer-style.css"/>
 
+        <p:toolbar style="width:100%">
+            <f:facet name="left">
+                <p:commandButton value="New Orbit" type="button" id="orbit-context"
+                                 onclick="OrbitalViewer.contextButton()"/>
+                <p:commandButton value="Clear Trace" type="button"
+                                 onclick="OrbitalViewer.clearTrace()"/>
+            </f:facet>
+            <f:facet name="right">
+                <p:commandButton value="Load" type="button"
+                                 onclick="OrbitalViewer.defaultSimulation()"/>
+                <p:commandButton value="Force" type="button"
+                                 onclick="OrbitalViewer.forceOrbit()"/>
+                <p:commandButton value="Settings" type="button" icon="ui-icon-gear"/>
+            </f:facet>
+
+        </p:toolbar>
+
+        <div id="container-div"></div>
+
+        <p:panel>
+            <div id="message-output">Orbital Viewer</div>
+        </p:panel>
+        <!--
         <div id="config">
             <p:commandButton id="new-orbit" value="New Orbit" type="button" onclick="OrbitalViewer.defaultSimulation()"/>
             <p:commandButton id="start-orbit" value="Start" type="button" onclick="OrbitalViewer.startOrbit()"/>
@@ -21,16 +51,13 @@
             <p:commandButton id="clear-trace" value="Clear trace" type="button" onclick="OrbitalViewer.clearTrace()"/>
             <span id="start-count" style="color: white;">#<span id="start-number">0</span></span>
         </div>
-        <div id="container-div"></div>
-        
+        -->
+
+
 
         <script>
             $(document).ready(function () {
                 OrbitalViewer.pageInitialization($("#container-div"));
-                //OrbitalViewer.insertObject(new SpaceObject("sun", [0, 0], [0, 0], [0, 0], 5, 1));
-                //OrbitalViewer.insertObject(new SpaceObject("earth", [0.99, 0], [0, 0], [0, 1], 1, 1));
-
-                //OrbitalViewer.initializeDisplay();
             });
         </script>
     </ui:define>

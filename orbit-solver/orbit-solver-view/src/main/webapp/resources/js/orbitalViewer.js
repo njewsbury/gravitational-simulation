@@ -4,38 +4,121 @@ var OrbitalViewer = new Object();
 OrbitalViewer.pageInitialization = function (canvasContainer) {
     this.currentOrbit = null;
     this.drawInterval = null;
-    this.simInterval = null;
+    this.simInterval = [];
     //
     this.canvasName = "orbital-canvas";
     this.traceName = "trace-canvas";
     this.globalScale = 100;
     this.axisWidth = 1;
     //
+    this.totalKineticEnergy = 0.0;
+    this.lastTotalKinetic = 0.0;
+
+    this.totalPotentialEnergy = 0.0;
+    this.lastPotentialEnergy = 0.0;
+    //
     this.drawDelay = 30;
-    this.simDelay = 60;
+    this.simDelay = 1500;
     //
     this.canvas = null;
     this.traceCanvas = null;
+    this.graphCanvas = null;
     this.startCount = 0;
-
+    this.energyBuffer = new RingBuffer(100);
     //
     this.initializeCanvas(canvasContainer);
     this.initializeEvents();
-
     this.resize();
     this.repaint();
+
+
+    var initialOptions = {
+        maintainAspectRatio: true,
+        responsive: false,
+        pointDot: false,
+        datasetFill: false,
+        bezierCurve: false
+    }
+
+    var labelSet = Array.apply(null, new Array(1))
+            .map(String.prototype.valueOf, "");
+    var initialData = {
+        labels: labelSet,
+        datasets: [
+            {
+                label: "Emergies",
+                fillColor: "rgba(220,220,220,0.2)",
+                strokeColor: "rgba(220,220,220,1)",
+                pointColor: "rgba(220,220,220,1)",
+                pointStrokeColor: "#fff",
+                pointHighlightFill: "#fff",
+                pointHighlightStroke: "rgba(220,220,220,1)",
+                data: []
+            }
+        ]
+    };
+    this.lineChart = new Chart(OrbitalViewer.graphCanvas.getContext('2d')).Line(initialData, initialOptions);
+    $("canvas.medium-layer").hide();
 
     this.drawInterval = setInterval(function () {
         OrbitalViewer.repaint();
     }, OrbitalViewer.drawDelay);
 
+    this.buttonState = 0;
+};
 
+OrbitalViewer.updateContextButtontext = function () {
+    OrbitalViewer.buttonState = (OrbitalViewer.buttonState + 1) % 3;
+    switch (OrbitalViewer.buttonState) {
+        case 0 :
+        {
+            // New Orbit
+            $("#orbit-context .ui-button-text").text("New Orbit");
+            break;
+        }
+        case 1 :
+        {
+            // Start Orbit
+            $("#orbit-context .ui-button-text").text("Start Orbit");
+            break;
+        }
+        case 2 :
+        {
+            // Stop Orbit
+            $("#orbit-context .ui-button-text").text("Stop Orbit");
+            break;
+        }
+    }
+};
+
+OrbitalViewer.contextButton = function () {
+    switch (OrbitalViewer.buttonState) {
+        case 0 :
+        {
+            // New Orbit
+            OrbitalViewer.displayNewOrbit();
+            break;
+        }
+        case 1 :
+        {
+            // Start Orbit
+            OrbitalViewer.startOrbit();
+            break;
+        }
+        case 2 :
+        {
+            // Stop Orbit
+            OrbitalViewer.stopOrbit()
+            break;
+        }
+    }
+    OrbitalViewer.updateContextButtontext();
 };
 
 OrbitalViewer.initializeCanvas = function (canvasContainer) {
     var element = $("<canvas></canvas>");
     $(element).prop('id', this.canvasName);
-    $(element).prop('class', 'mid-layer');
+    $(element).prop('class', 'top-layer');
     $(canvasContainer).append(element);
 
     OrbitalViewer.canvas = $("#" + this.canvasName)[0];
@@ -45,6 +128,12 @@ OrbitalViewer.initializeCanvas = function (canvasContainer) {
     $(element).prop('class', 'bottom-layer');
     $(canvasContainer).append(element);
     OrbitalViewer.traceCanvas = $("#" + this.traceName)[0];
+
+    element = $("<canvas></canvas>");
+    $(element).prop('id', "graph-canvas");
+    $(element).prop('class', 'medium-layer');
+    $(canvasContainer).append(element);
+    OrbitalViewer.graphCanvas = $("#graph-canvas")[0];
 
     if (this.canvas !== undefined && this.canvas !== null) {
         this.redraw = true;
@@ -60,18 +149,33 @@ OrbitalViewer.initializeEvents = function () {
 OrbitalViewer.getPageExtent = function () {
     var pageExtent = [
         window.innerWidth,
-        window.innerHeight - $("#config").outerHeight()
+        window.innerHeight - (
+                $(".ui-widget.ui-toolbar").outerHeight()
+                + $(".ui-widget.ui-panel").outerHeight()
+                )
     ];
     return pageExtent;
 };
 
 OrbitalViewer.resize = function () {
+    var winWidth = window.innerWidth;
+    var winHeight = window.innerHeight;
     var pageExtent = OrbitalViewer.getPageExtent();
+
+    $("html").width(winWidth);
+    $("html").height(winHeight);
+
+    $("#container-div").height(pageExtent[1]);
+    $(".ui-widget.ui-toolbar, .ui-widget.ui-panel").width('100%');
+
     if (OrbitalViewer.canvas !== null && OrbitalViewer.canvas !== undefined) {
         OrbitalViewer.canvas.width = pageExtent[0];
         OrbitalViewer.canvas.height = pageExtent[1];
         OrbitalViewer.traceCanvas.width = pageExtent[0];
         OrbitalViewer.traceCanvas.height = pageExtent[1];
+
+        OrbitalViewer.graphCanvas.width = (pageExtent[0] / 10);
+        OrbitalViewer.graphCanvas.height = (pageExtent[0] / 10);
 
         $("canvas").css('top', $("#config").outerHeight());
 
@@ -80,61 +184,19 @@ OrbitalViewer.resize = function () {
 };
 
 OrbitalViewer.defaultSimulation = function () {
-    /*
-     var defaultSim = {
-     'simulationId': 'default',
-     'nBodies': 2,
-     'totalMass': 6,
-     'objectList': [
-     {
-     'objectId': 0,
-     'objectName': 'sun',
-     'objectMass': 5,
-     'objectRadius': 5,
-     'position': [0.00, 0.00],
-     'velocity': [0.00, 0.00],
-     'render': {
-     'lineWidth': 2,
-     'strokeColour': '#FF9900',
-     'fillColourOne': 'black',
-     'fillColourTwo': '#FFFF80'
-     }
-     },
-     {
-     'objectId': 1,
-     'objectName': 'earth',
-     'objectMass': 1,
-     'objectRadius': 1,
-     'position': [0.99, 0.00],
-     'velocity': [0.00, 1.00],
-     'render': {
-     'lineWidth': 2,
-     'strokeColour': '#00CCFF',
-     'fillColourOne': '#003300',
-     'fillColourTwo': '#0066FF'
-     }
-     }
-     ]
-     };
-     */
+    OrbitalViewer.updateContextButtontext();
     var defaultSim = {
         'simulationId': 'default',
-        'nBodies': 3,
-        'totalMass': 3,
+        'nBodies': 2,
+        'totalMass': 6,
         'objectList': [
             {
-                'objectId': 1,
-                'objectName': 'obj1',
-                'objectMass': 1,
-                'objectRadius': 1,
-                'position': [
-                    -0.15925000049173832,
-                    -0.009632525925990194
-                ],
-                'velocity': [
-                    0.7812883926089853,
-                    0.0014433338772505515
-                ],
+                'objectId': 0,
+                'objectName': 'sun',
+                'objectMass': 5,
+                'objectRadius': 5,
+                'position': [0.00, 0.00],
+                'velocity': [0.00, 0.00],
                 'render': {
                     'lineWidth': 2,
                     'strokeColour': '#FF9900',
@@ -143,36 +205,12 @@ OrbitalViewer.defaultSimulation = function () {
                 }
             },
             {
-                'objectId': 2,
-                'objectName': 'obj2',
+                'objectId': 1,
+                'objectName': 'earth',
                 'objectMass': 1,
                 'objectRadius': 1,
-                'position': [
-                    0.3565031820908189,
-                    -0.0011078951484523713
-                ],
-                'velocity': [
-                    1.0670570025686175,
-                    -0.016867029299028218],
-                'render': {
-                    'lineWidth': 2,
-                    'strokeColour': '#00CCFF',
-                    'fillColourOne': '#003300',
-                    'fillColourTwo': '#0066FF'
-                }
-            },
-            {
-                'objectId': 3,
-                'objectName': 'obj3',
-                'objectMass': 1,
-                'objectRadius': 1,
-                'position': [
-                    1.5207050838507712,
-                    0.007624188070185483
-                ],
-                'velocity': [
-                    1.8437436767853796,
-                    0.000756452267523855],
+                'position': [0.99, 0.00],
+                'velocity': [0.00, 1.00],
                 'render': {
                     'lineWidth': 2,
                     'strokeColour': '#00CCFF',
@@ -184,60 +222,28 @@ OrbitalViewer.defaultSimulation = function () {
     };
     this.initializeOrbit(JSON.stringify(defaultSim));
 };
-/*
- OrbitalViewer.defaultSimulation = function () {
- var defaultSim = {
- 'simulationId': 'default',
- 'nBodies': 2,
- 'totalMass': 6,
- 'objectList': [
- {
- 'objectId': 1,
- 'objectName': 'sun',
- 'objectMass': 1,
- 'objectRadius': 1,
- 'position': [-0.995492, 0.00],
- 'velocity': [0.00, 0.00],
- 'render': {
- 'lineWidth': 2,
- 'strokeColour': '#FF9900',
- 'fillColourOne': 'black',
- 'fillColourTwo': '#FFFF80'
- }
- },
- {
- 'objectId': 2,
- 'objectName': 'earth',
- 'objectMass': 1,
- 'objectRadius': 1,
- 'position': [0.995492, 0.00],
- 'velocity': [0.00, 0.00],
- 'render': {
- 'lineWidth': 2,
- 'strokeColour': '#00CCFF',
- 'fillColourOne': '#003300',
- 'fillColourTwo': '#0066FF'
- }
- },
- {
- 'objectId': 3,
- 'objectName': 'comet',
- 'objectMass': 1,
- 'objectRadius': 1,
- 'position': [0.0, 0.00],
- 'velocity': [0.695804, 1.067860],
- 'render': {
- 'lineWidth': 2,
- 'strokeColour': '#00CCFF',
- 'fillColourOne': '#003300',
- 'fillColourTwo': '#0066FF'
- }
- }
- ]
- };
- this.initializeOrbit(JSON.stringify(defaultSim));
- };
- */
+
+
+OrbitalViewer.displayNewOrbit = function () {
+    var nBodies = 2;
+    var fourierPrecision = 35;
+    var timePrecision = 1000;
+
+    var orbitalSolver = new OrbitalSolver(nBodies, fourierPrecision, timePrecision);
+    var orbitDef = orbitalSolver.solve();
+    if (orbitDef) {
+        if (orbitDef.success) {
+            $("#message-output").text("Solved new orbit : " + orbitDef.simulationId);
+            OrbitalViewer.initializeOrbit(JSON.stringify(orbitDef));
+        } else {
+            var errMsg = orbitDef.errMsg || "Unknown Error";
+            $("#message-output").text("Error encountered " + errMsg);
+        }
+    } else {
+        $("#message-output").text("Unknown error encountered.");
+    }
+};
+
 OrbitalViewer.initializeOrbit = function (simulationJson) {
     var orbitJson;
     var simName, simMass, simBodies;
@@ -261,6 +267,14 @@ OrbitalViewer.initializeOrbit = function (simulationJson) {
                     console.log(element);
                 }
             });
+            
+            OrbitalViewer.totalKineticEnergy = OrbitalViewer.orbit.getTotalKineticEnergy();
+            OrbitalViewer.lastTotalKinetic = OrbitalViewer.totalKineticEnergy;
+            
+            OrbitalViewer.totalPotentialEnergy = OrbitalViewer.orbit.getTotalPotentialEnergy();
+            OrbitalViewer.lastPotentialEnergy = OrbitalViewer.totalPotentialEnergy;
+            //$("canvas.medium-layer").show();
+
             OrbitalViewer.repaint();
         }
     }
@@ -275,22 +289,34 @@ OrbitalViewer.insertOrbitalObject = function (orbital) {
     }
 };
 
-OrbitalViewer.startOrbit = function () {
-    if (this.orbit !== null) {
-        this.simInterval = setInterval(function () {
-            OrbitalViewer.orbit.moveAllObjects();
-            OrbitalViewer.redraw = true;
-        }, OrbitalViewer.simDelay);
-        OrbitalViewer.startCount++;
-        $("#start-number").text(OrbitalViewer.startCount);
+OrbitalViewer.forceOrbit = function () {
+    if (OrbitalViewer.buttonState !== 2) {
+        OrbitalViewer.buttonState = 1;
+        OrbitalViewer.updateContextButtontext();
     }
+    OrbitalViewer.startOrbit();
 };
 
-OrbitalViewer.pauseOrbit = function () {
+OrbitalViewer.startOrbit = function () {
     if (this.orbit !== null) {
-        if (this.simInterval !== null) {
-            clearInterval(this.simInterval);
-        }
+        this.simInterval.push(setInterval(function () {
+            if (typeof OrbitalViewer.orbit === "undefined" || OrbitalViewer.orbit !== null) {
+                OrbitalViewer.orbit.moveAllObjects();
+
+                OrbitalViewer.lastTotalKinetic = OrbitalViewer.totalKineticEnergy;
+                OrbitalViewer.totalKineticEnergy = OrbitalViewer.orbit.getTotalKineticEnergy();
+
+                OrbitalViewer.lastPotentialEnergy = OrbitalViewer.totalPotentialEnergy;
+                OrbitalViewer.totalPotentialEnergy = OrbitalViewer.orbit.getTotalPotentialEnergy();
+
+                OrbitalViewer.energyBuffer.push(OrbitalViewer.totalKineticEnergy + OrbitalViewer.totalPotentialEnergy);
+
+                OrbitalViewer.redraw = true;
+            }
+        }, OrbitalViewer.simDelay)
+                );
+        OrbitalViewer.startCount++;
+        $("#start-number").text(OrbitalViewer.startCount);
     }
 };
 
@@ -299,21 +325,23 @@ OrbitalViewer.stopOrbit = function () {
     var pageExtent = OrbitalViewer.getPageExtent();
     if (OrbitalViewer.orbit !== null) {
         OrbitalViewer.orbit = null;
+
         if (OrbitalViewer.simInterval !== null) {
-            clearInterval(OrbitalViewer.simInterval);
+            $.each(OrbitalViewer.simInterval, function (index, element) {
+                clearInterval(element);
+            });
         }
+        OrbitalViewer.startCount = 0;
         OrbitalViewer.redraw = true;
         OrbitalViewer.repaint();
 
         traceContext = OrbitalViewer.traceCanvas.getContext('2d');
         traceContext.clearRect(-pageExtent[0] / 2.0, -pageExtent[1] / 2.0, 2 * pageExtent[0], 2 * pageExtent[1]);
-    }
-};
 
-OrbitalViewer.restartLastOrbit = function () {
-    if (OrbitalViewer.lastSimulation !== null) {
-        OrbitalViewer.stopOrbit();
-        OrbitalViewer.initializeOrbit(OrbitalViewer.lastSimulation);
+        $("canvas.medium-layer").hide();
+        OrbitalViewer.lineChart.datasets[0].data = [];
+        OrbitalViewer.lineChart.update();
+
     }
 };
 
@@ -358,6 +386,76 @@ OrbitalViewer.drawGridSystem = function (context) {
     }
 };
 
+OrbitalViewer.writeSystemProperties = function (context) {
+    var pageExtent = OrbitalViewer.getPageExtent();
+    var fontSize = 15;
+    var horizOffset = 10;
+    var linePos = pageExtent[1] - fontSize;
+    var decimalPlaces = 3;
+    var sum, diff;
+
+    if (context !== undefined && context !== null) {
+        pageExtent = numeric.mul(pageExtent, (1.0 / 2.0));
+        context.save();
+
+        context.setTransform(1, 0, 0, 1, 0, 0);
+        context.font = fontSize + 'px Courier New';
+        context.fillStyle = 'white';
+        context.strokeStyle = 'white';
+        context.lineWidth = 2;
+
+        linePos -= fontSize;
+        context.fillText("Force Count : " + OrbitalViewer.startCount, horizOffset, linePos);
+
+        context.beginPath();
+        context.moveTo(horizOffset, linePos - fontSize);
+        context.lineTo(horizOffset + 160, linePos - fontSize);
+        context.stroke();
+
+        linePos -= fontSize + 10;
+        context.fillText("Total K.E : " + (this.totalKineticEnergy).toFixed(decimalPlaces), horizOffset, linePos);
+        diff = (this.totalKineticEnergy - this.lastTotalKinetic);
+        if (diff > 0) {
+            context.fillStyle = 'green';
+        } else if (diff < 0) {
+            context.fillStyle = 'red';
+        }
+        context.fillText(" [" + diff.toFixed(decimalPlaces) + "] ", horizOffset + 175, linePos);
+        context.fillStyle = 'white';
+
+        linePos -= fontSize;
+        context.fillText("Total P.E : " + (this.totalPotentialEnergy).toFixed(decimalPlaces), horizOffset, linePos);
+        diff = (this.totalPotentialEnergy - this.lastPotentialEnergy);
+        if (diff > 0) {
+            context.fillStyle = 'green';
+        } else if (diff < 0) {
+            context.fillStyle = 'red';
+        }
+        context.fillText(" [" + diff.toFixed(decimalPlaces) + "] ", horizOffset + 175, linePos);
+        context.fillStyle = 'white';
+
+
+
+        context.beginPath();
+        context.moveTo(horizOffset, linePos - fontSize);
+        context.lineTo(horizOffset + 160, linePos - fontSize);
+        context.stroke();
+        linePos -= fontSize + 10;
+        sum = (this.totalKineticEnergy + this.totalPotentialEnergy);
+        /*
+         context.fillText("Avg. ENRG : " + (
+         this.energyBuffer.getAverage()
+         ).toFixed(decimalPlaces), horizOffset, linePos);
+         */
+        context.fillText("Total ENRG: " + (
+                sum
+                ).toFixed(decimalPlaces), horizOffset, linePos);
+        context.restore();
+    }
+
+};
+
+
 OrbitalViewer.repaint = function () {
     var centerOfMass = [0, 0];
     var context, trace;
@@ -376,31 +474,24 @@ OrbitalViewer.repaint = function () {
                 // Context setup
                 context.save();
                 trace.save();
-
                 context.setTransform(1, 0, 0, 1, 0, 0);
                 trace.setTransform(1, 0, 0, 1, 0, 0);
-
                 //
-                //pageExtent = numeric.sub(pageExtent, centerOfMass);
                 context.translate(pageExtent[0], pageExtent[1]);
                 trace.translate(pageExtent[0], pageExtent[1]);
-
                 context.scale(OrbitalViewer.globalScale, -OrbitalViewer.globalScale);
                 trace.scale(OrbitalViewer.globalScale, -OrbitalViewer.globalScale);
-
                 // Axis Setup
                 context.clearRect(-pageExtent[0], -pageExtent[1], 2.0 * pageExtent[0], 2.0 * pageExtent[1]);
-                //trace.clearRect(-pageExtent[0], -pageExtent[1], 2.0 * pageExtent[0], 2.0 * pageExtent[1]);
-
                 OrbitalViewer.drawGridSystem(context);
-
+                OrbitalViewer.writeSystemProperties(context);
+                //
                 if (OrbitalViewer.orbit !== null && OrbitalViewer.orbit !== undefined) {
                     // Orbital Object Draw
                     $.each(OrbitalViewer.orbit.getOrbitalList(), function (index, element) {
                         element.draw(context, trace, OrbitalViewer.globalScale, pageExtent, centerOfMass);
                     });
                 }
-
                 context.restore();
                 OrbitalViewer.redraw = false;
             }

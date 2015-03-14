@@ -1,14 +1,17 @@
-
-.date-span {
-    font-weight: bold;
+#message-section {
+    height:25px;
+    margin-top: 10px;
+    opacity: 0;
+    
+    padding: 10px 5px 5px 5px;
+    border: 2px solid #E8E8E8;
+    border-radius: 15px;
+    overflow: hidden;
 }
-.log-msg:nth-of-type(2) {
-    background-color: #E8E8E8
-}
 
-#output-container { 
-    border: 1px solid black;
-    height: 90%;
-    overflow-y: scroll;
-    overflow-x: hidden;
+.success {
+    background: #308014;
+}
+.error {
+    background: #800000;
 }

@@ -2,10 +2,10 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-    <artifactId>orbit-solver</artifactId>
-    <groupId>ca.jewsbury.gravity.spacetime</groupId>
-    <version>0.5-SNAPSHOT</version>
-  </parent>
+        <artifactId>orbit-solver</artifactId>
+        <groupId>ca.jewsbury.gravity.spacetime</groupId>
+        <version>0.5-SNAPSHOT</version>
+    </parent>
 
     <groupId>ca.jewsbury.gravity.spacetime</groupId>
     <artifactId>orbit-solver-view</artifactId>
@@ -33,6 +33,13 @@
             <groupId>org.primefaces</groupId>
             <artifactId>primefaces</artifactId>
             <version>5.1</version>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.primefaces.themes</groupId>
+            <artifactId>orange-tron</artifactId>
+            <version>1.0.10</version>
+            <type>jar</type>
         </dependency>
         <dependency>
             <groupId>javax</groupId>

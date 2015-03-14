@@ -5,6 +5,11 @@ body, html {
     overflow: hidden;
 }
 
+.ui-widget.ui-toolbar {
+    font-size: 0.8em;
+    width: 100%;
+}
+
 #rootContainer {
     overflow: hidden;
 }
@@ -19,9 +24,22 @@ canvas.bottom-layer {
     z-index: 5;
 }
 
-canvas.mid-layer {
-    /*background: black;*/
-    /*opaque: false;*/
+canvas.medium-layer {
+    visibility: hidden;
+}
+
+@media (min-width:600px) {
+    canvas.medium-layer {
+        margin: 10px;
+        background: #cd5615;
+        opacity: 0.8;
+        z-index: 7;
+        border-bottom: 1px solid #E8E8E8;
+        border-right: 1px solid #E8E8E8;
+        visibility: visible;
+    }
+}
+canvas.top-layer {
     z-index: 10;
 }
 
@@ -29,4 +47,12 @@ canvas.mid-layer {
     padding-bottom: 3px;
     border-bottom: 5px #FF9900 double;
     background-color: #202020;
+}
+
+#message-output {
+    font-size: 0.9em;
+}
+
+.disabled-text {
+    color: #E8E8E8;
 }
