@@ -9,73 +9,43 @@
 
     <ui:define name="content">
         <h:outputScript library="js" name="orbitalSolver.js" target="head"></h:outputScript>
+        <h:outputScript library="js" name="solverPage.js" target="head"></h:outputScript>
+
         <h:outputStylesheet library="css" name="solver-style.css"/>
 
-        <p:toolbar>
-            <f:facet name="left">
-                <h:outputText value="Periodic Solutions Test" id="test-header"/>
-                <span class="ui-separator">
-                    <span class="ui-icon ui-icon-grip-dotted-vertical" />
-                </span>
-                <p:commandButton type="button" value="Test Solver" icon="ui-icon-plus" onclick="SolverPage.testSolver()"/>
-            </f:facet>
+        <p:layout fullPage="true">
+            <p:layoutUnit position="north" size="125">
+                <p:toolbar>
+                    <f:facet name="left">
+                        <p:commandButton type="button" value="Test Solver" icon="ui-icon-plus" onclick="SolverPage.testSolver()"/>
+                    </f:facet>
 
-            <f:facet name="right">
-                <p:button id="home" value="Back" icon="fa fa-home" outcome="index.xhtml"/>
-                <p:commandButton type="button" value="Settings" icon="ui-icon-gear" onclick="SolverPage.changeSettings()"/>
-            </f:facet>
-        </p:toolbar>
+                    <f:facet name="right">
+                        <p:commandButton type="button" value="Settings" icon="ui-icon-gear" onclick="SolverPage.changeSettings()"/>
+                    </f:facet>
+                </p:toolbar>
+                <div id="message-section"></div>
 
-        <div id="display">
-            <div id="message-section"></div>
-            <div id='result-section'></div>
-        </div>
+            </p:layoutUnit>
+            <p:layoutUnit position="west" minSize="400">
+                <div id='result-section'></div>
+            </p:layoutUnit>
+            <p:layoutUnit id='result-layout' position="center">
+                <canvas id="orbit-display"></canvas>
+            </p:layoutUnit>
+        </p:layout>
 
         <script>
-            var SolverPage = new Object();
-
-            SolverPage.default_n_bodies = 3;
-            SolverPage.default_fourier_precision = 5;
-            SolverPage.default_time_precision = 10;
-
-            SolverPage.testSolver = function () {
-                var orbitalSolver = new OrbitalSolver(
-                        SolverPage.default_n_bodies,
-                        SolverPage.default_fourier_precision,
-                        SolverPage.default_time_precision
-                        );
-
-                var jsonResult = orbitalSolver.solve();
-                if (jsonResult.success) {
-                    var jsonString = JSON.stringify(jsonResult);
-                    jsonString = jsonString.replace(/,/g, "<br/>");
-                    $("#message-section").removeClass("error");
-                    $("#message-section").addClass("success");
-
-                    $("#message-section").text("Found solution :: " + jsonResult.simulationId);
-                    $("#result-section").html(jsonString);
-                } else {
-                    $("#message-section").removeClass("success");
-                    $("#message-section").addClass("error");
-
-                    var errMsg = jsonResult.errorMsg || "Unknown error";
-                    $("#message-section").text("Error encountered :: " + errMsg);
-
-                }
-                $("#message-section").show();
-                $("#message-section").animate({
-                    opacity: 1
-                }, 1500);
-            };
-
-            SolverPage.changeSettings = function () {
-
-            };
 
             $(document).ready(function () {
+                SolverPage.initialize();
                 $("#message-section").hide();
-            });
+                $("#result-section").text(
+                        $("#result-layout").innerWidth() + ", " +
+                        $("#result-layout").innerHeight()
+                        );
 
+            });
         </script>
     </ui:define>
 </ui:composition>
