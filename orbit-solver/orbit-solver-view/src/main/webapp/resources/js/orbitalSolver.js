@@ -211,12 +211,16 @@ OrbitalSolver.prototype.calculateActionFunction = function (paramArray) {
             kinetic[t] += (ydot[i][t] * ydot[i][t]);
             kinetic[t] *= (1.0 / 2.0);
 
-            for (var j = (i + 1); j < this.nBodies; j++) {
-                var xSingle = (x[i][t] - x[j][t]);
-                var ySingle = (y[i][t] - y[j][t]);
+            //for (var j = (i + 1); j < this.nBodies; j++) {
+            for (var j = 0; j < this.nBodies; j++) {
+                if (i !== j) {
+                    var xSingle = (x[i][t] - x[j][t]);
+                    var ySingle = (y[i][t] - y[j][t]);
 
-                var sum = (xSingle * xSingle) + (ySingle * ySingle);
-                potential[t] = (1.0 / Math.sqrt(sum));
+                    var sum = (xSingle * xSingle) + (ySingle * ySingle);
+                    potential[t] = (1.0 / Math.sqrt(sum));
+                    //potential[t] = (1.0/sum);
+                }
             }
         }
     }
@@ -273,11 +277,11 @@ OrbitalSolver.prototype.findRandomizedParamSet = function (seed) {
     var aParams = numeric.random([1, required / 2])[0];
     var bParams = numeric.random([1, required / 2])[0];
 
-    aParams = numeric.sub(aParams, 0.5);
-    aParams = numeric.mul(1.0, aParams);
+    aParams = numeric.sub(aParams, 0.0);
+    aParams = numeric.mul(1.5, aParams);
 
-    bParams = numeric.sub(bParams, 0.5);
-    bParams = numeric.mul(0.01, bParams);
+    bParams = numeric.sub(bParams, 0.0);
+    bParams = numeric.mul(.950, bParams);
     return aParams.concat(bParams);
 };
 
@@ -287,6 +291,8 @@ OrbitalSolver.prototype.solve = function (seed) {
     var msgArr = [];
     var jsonVar = {};
     var objectList = [];
+
+    this.solution = [];
 
     var callbackFunction = function (i, x, f, g, H) {
         msgArr.push({i: i, x: x, f: f, g: g, H: H});
@@ -307,10 +313,10 @@ OrbitalSolver.prototype.solve = function (seed) {
         jsonVar.simulationId = "randomGenSim";
         jsonVar.nBodies = this.nBodies;
 
+        this.solution = results.solution;
 
-
-        var initialPos = this.findInitialPosition(results.solution);
-        var initialVel = this.findInitialVelocity(results.solution);
+        var initialPos = this.findInitialPosition(this.solution);
+        var initialVel = this.findInitialVelocity(this.solution);
         var singleJson;
         var totalMass = 0;
 

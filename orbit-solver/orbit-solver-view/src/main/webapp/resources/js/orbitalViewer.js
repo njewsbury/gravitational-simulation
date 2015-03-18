@@ -18,7 +18,7 @@ OrbitalViewer.pageInitialization = function (canvasContainer) {
     this.lastPotentialEnergy = 0.0;
     //
     this.drawDelay = 30;
-    this.simDelay = 1500;
+    this.simDelay = 60;
     //
     this.canvas = null;
     this.traceCanvas = null;
@@ -38,7 +38,7 @@ OrbitalViewer.pageInitialization = function (canvasContainer) {
         pointDot: false,
         datasetFill: false,
         bezierCurve: false
-    }
+    };
 
     var labelSet = Array.apply(null, new Array(1))
             .map(String.prototype.valueOf, "");
@@ -46,7 +46,7 @@ OrbitalViewer.pageInitialization = function (canvasContainer) {
         labels: labelSet,
         datasets: [
             {
-                label: "Emergies",
+                label: "Energies",
                 fillColor: "rgba(220,220,220,0.2)",
                 strokeColor: "rgba(220,220,220,1)",
                 pointColor: "rgba(220,220,220,1)",
@@ -187,15 +187,15 @@ OrbitalViewer.defaultSimulation = function () {
     OrbitalViewer.updateContextButtontext();
     var defaultSim = {
         'simulationId': 'default',
-        'nBodies': 2,
-        'totalMass': 6,
+        'nBodies': 3,
+        'totalMass': 3,
         'objectList': [
             {
                 'objectId': 0,
-                'objectName': 'sun',
-                'objectMass': 5,
-                'objectRadius': 5,
-                'position': [0.00, 0.00],
+                'objectName': 'X1',
+                'objectMass': 1,
+                'objectRadius': 1,
+                'position': [-0.995492, 0.00],
                 'velocity': [0.00, 0.00],
                 'render': {
                     'lineWidth': 2,
@@ -206,11 +206,25 @@ OrbitalViewer.defaultSimulation = function () {
             },
             {
                 'objectId': 1,
-                'objectName': 'earth',
+                'objectName': 'X2',
                 'objectMass': 1,
                 'objectRadius': 1,
-                'position': [0.99, 0.00],
-                'velocity': [0.00, 1.00],
+                'position': [0.995492, 0.00],
+                'velocity': [0.00, 0.00],
+                'render': {
+                    'lineWidth': 2,
+                    'strokeColour': '#00CCFF',
+                    'fillColourOne': '#003300',
+                    'fillColourTwo': '#0066FF'
+                }
+            },
+            {
+                'objectId': 3,
+                'objectName': 'X3',
+                'objectMass': 1,
+                'objectRadius': 1,
+                'position': [0.0, 0.00],
+                'velocity': [0.695804, 1.067860],
                 'render': {
                     'lineWidth': 2,
                     'strokeColour': '#00CCFF',
@@ -218,6 +232,7 @@ OrbitalViewer.defaultSimulation = function () {
                     'fillColourTwo': '#0066FF'
                 }
             }
+
         ]
     };
     this.initializeOrbit(JSON.stringify(defaultSim));
@@ -225,8 +240,8 @@ OrbitalViewer.defaultSimulation = function () {
 
 
 OrbitalViewer.displayNewOrbit = function () {
-    var nBodies = 2;
-    var fourierPrecision = 35;
+    var nBodies = 3;
+    var fourierPrecision = 75;
     var timePrecision = 1000;
 
     var orbitalSolver = new OrbitalSolver(nBodies, fourierPrecision, timePrecision);
@@ -267,10 +282,10 @@ OrbitalViewer.initializeOrbit = function (simulationJson) {
                     console.log(element);
                 }
             });
-            
+
             OrbitalViewer.totalKineticEnergy = OrbitalViewer.orbit.getTotalKineticEnergy();
             OrbitalViewer.lastTotalKinetic = OrbitalViewer.totalKineticEnergy;
-            
+
             OrbitalViewer.totalPotentialEnergy = OrbitalViewer.orbit.getTotalPotentialEnergy();
             OrbitalViewer.lastPotentialEnergy = OrbitalViewer.totalPotentialEnergy;
             //$("canvas.medium-layer").show();

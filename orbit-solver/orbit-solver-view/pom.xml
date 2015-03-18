@@ -34,13 +34,21 @@
             <artifactId>primefaces</artifactId>
             <version>5.1</version>
         </dependency>
+        <dependency>
+            <groupId>org.primefaces.themes</groupId>
+            <artifactId>all-themes</artifactId>
+            <version>1.0.10</version>
+            <type>jar</type>
+        </dependency>
         
+        <!--
         <dependency>
             <groupId>org.primefaces.themes</groupId>
             <artifactId>orange-tron</artifactId>
             <version>1.0.10</version>
             <type>jar</type>
         </dependency>
+        -->
         <dependency>
             <groupId>javax</groupId>
             <artifactId>javaee-web-api</artifactId>

@@ -28,6 +28,15 @@
 }
 
 #orbit-display {
-    margin: 15px auto 15px auto;
-    background: #E8E8E8;
+    background: #cd5a00;
+    border-radius: 15px;
+    border-style: double;
+    border-color: black;
+    border-width: 3px;
+    padding: 15px;
+}
+
+#result-layout .ui-layout-unit-content {
+    overflow: hidden;
+    margin: 15px;
 }

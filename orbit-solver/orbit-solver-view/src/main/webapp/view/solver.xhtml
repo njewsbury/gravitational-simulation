@@ -8,12 +8,13 @@
 
 
     <ui:define name="content">
-        <h:outputScript library="js" name="orbitalSolver.js" target="head"></h:outputScript>
+        <h:outputScript library='js' name='Chart.min.js' target='head'></h:outputScript>
+        <h:outputScript library="js" name="newOrbitalSolver.js" target="head"></h:outputScript>
         <h:outputScript library="js" name="solverPage.js" target="head"></h:outputScript>
 
         <h:outputStylesheet library="css" name="solver-style.css"/>
 
-        <p:layout fullPage="true">
+        <p:layout fullPage="true" widgetVar="pageLayout">
             <p:layoutUnit position="north" size="125">
                 <p:toolbar>
                     <f:facet name="left">
@@ -27,9 +28,6 @@
                 <div id="message-section"></div>
 
             </p:layoutUnit>
-            <p:layoutUnit position="west" minSize="400">
-                <div id='result-section'></div>
-            </p:layoutUnit>
             <p:layoutUnit id='result-layout' position="center">
                 <canvas id="orbit-display"></canvas>
             </p:layoutUnit>
@@ -40,11 +38,6 @@
             $(document).ready(function () {
                 SolverPage.initialize();
                 $("#message-section").hide();
-                $("#result-section").text(
-                        $("#result-layout").innerWidth() + ", " +
-                        $("#result-layout").innerHeight()
-                        );
-
             });
         </script>
     </ui:define>

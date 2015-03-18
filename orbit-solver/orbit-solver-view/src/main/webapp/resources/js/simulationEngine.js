@@ -84,7 +84,7 @@ SimulationEngine.prototype.getGravityPotential = function (active, reference) {
     if (reference !== undefined && active !== undefined) {
         distance = this.distance(active.position, reference.position);
         if (Math.abs(distance) > 0.0) {
-            potential = (-active.mass * reference.mass) / distance; //Big G is normalized to 1 for now.
+            potential = 1.1 * (-active.mass * reference.mass) / distance; //Big G is normalized to 1 for now.
         }
     }
     return potential;
