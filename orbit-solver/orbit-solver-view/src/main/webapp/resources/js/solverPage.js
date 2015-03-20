@@ -1,70 +1,18 @@
 var SolverPage = new Object();
 
 SolverPage.initialize = function () {
-    this.default_n_bodies = 2;
+    this.default_n_bodies = 3;
     this.default_fourier_precision = 1;
-    this.default_time_precision = 10;
+    this.default_time_precision = 20;
+    this.default_max_mass = 10;
 
-    this.layout = $(PrimeFaces.widgets['pageLayout'])[0];
-    this.westHidden = false;
     this.resultCanvas = $("#orbit-display")[0];
 
 
-    //window.addEventListener('resize', SolverPage.resize, false);
+    window.addEventListener('resize', SolverPage.resize, false);
     SolverPage.resize();
 
-    /* Chart JS for debugging */
-    var canvasContext = SolverPage.resultCanvas.getContext('2d');
-    var chartOptions = {
-        maintainAspectRatio: true,
-        responsive: false,
-        pointDot: false,
-        datasetFill: true,
-        bezierCurve: true,
-        animation: false
-
-    };
-
-    var dataSet = {
-        "labels": [],
-        "datasets": [
-            {
-                label: "Kinetic Energy",
-                fillColor: "rgba(220,220,220,0.2)",
-                strokeColor: "rgba(220,220,220,1)",
-                pointColor: "rgba(220,220,220,1)",
-                pointStrokeColor: "#fff",
-                pointHighlightFill: "#fff",
-                pointHighlightStroke: "rgba(220,220,220,1)",
-                data: []
-            },
-            {
-                label: "Potential Energy",
-                fillColor: "rgba(151,187,205,0.2)",
-                strokeColor: "rgba(151,187,205,1)",
-                pointColor: "rgba(151,187,205,1)",
-                pointStrokeColor: "#fff",
-                pointHighlightFill: "#fff",
-                pointHighlightStroke: "rgba(151,187,205,1)",
-                data: []
-            }, {
-                label: "Total Action",
-                fillColor: "rgba(255,51,51,0.2)",
-                strokeColor: "rgba(255,51,51,1)",
-                pointColor: "rgba(255,51,51,1)",
-                pointStrokeColor: "#fff",
-                pointHighlightFill: "#fff",
-                pointHighlightStroke: "rgba(255,51,51,1)",
-                data: []
-            }
-        ]
-    };
-
-    this.lineChart = new Chart(canvasContext).Line(dataSet, chartOptions);
     /**/
-
-
-
 };
 
 SolverPage.resize = function () {
@@ -72,132 +20,90 @@ SolverPage.resize = function () {
 
     SolverPage.resultCanvas.width = ($("#result-layout").width() - styleOffset);
     SolverPage.resultCanvas.height = ($("#result-layout").height() - styleOffset);
-    if (typeof SolverPage.lineChart !== "undefined") {
-        SolverPage.lineChart.resize();
-    }
 };
 
 SolverPage.testSolver = function () {
 
-    var actionValues = [];
-    var deltaAction = [];
-    
-    for (var i =-10; i < 10; i++) {
-        var solverConfig = {
-            "nBodies": SolverPage.default_n_bodies,
-            "precision": [
-                SolverPage.default_fourier_precision,
-                SolverPage.default_time_precision
-            ],
-            "equalMasses": true,
-            "gravConst": 1.0,
-            "seedValue" : "GammaFunction" + i
-        };
+    var solverConfig = {
+        "nBodies": SolverPage.default_n_bodies,
+        "precision": [
+            SolverPage.default_fourier_precision,
+            SolverPage.default_time_precision
+        ],
+        "equalMasses": false,
+        "maximumMass": SolverPage.default_max_mass,
+        "gravConst": 1.0,
+        //"seedValue": "GammaFunction" + 0
+    };
 
-        var orbitalSolver = new NewOrbitalSolver(
-                solverConfig
-                );
-        actionValues.push( orbitalSolver.getActionValue());
+    var solverParams = new SolverParams(
+            solverConfig
+            );
+    SolverUtil.setParams(solverParams);
+    var result = SolverUtil.minimizeFunction();
+    if (result) {
+        SolverPage.displayOrbit(SolverUtil);
+    } else {
+        console.log("No.");
     }
-    for( var n = 0; n < actionValues.length-1; n++ ) {
-        deltaAction[n] = (actionValues[n+1]-actionValues[n])/(2.0*Math.PI/SolverPage.default_time_precision);
-    }
-    
-    for( var n = 0; n < deltaAction.length; n++ ) {
-        SolverPage.lineChart.addData([0,0, deltaAction[n]], n);
-    }
-    
-    /*
-     var kineticMap = orbitalSolver.getKineticEnergy();
-     var potentialMap = orbitalSolver.getPotentialEnergy();
-     
-     console.log("Kinetic Energy :: ");
-     console.log(kineticMap);
-     
-     console.log("Potential Energy :: ");
-     console.log(potentialMap);
-     
-     var actionValue = 0.0;
-     
-     for (var i = 0; i < kineticMap.length; i++) {
-     actionValue += (kineticMap[i] - potentialMap[i]);
-     SolverPage.lineChart.addData([
-     kineticMap[i],
-     potentialMap[i],
-     actionValue
-     
-     ],
-     "" + i);
-     }
-     */
-
-    /*
-     var jsonResult = orbitalSolver.findOrbit();
-     if (jsonResult.success) {
-     var jsonString = JSON.stringify(jsonResult);
-     jsonString = jsonString.replace(/,/g, "<br/>");
-     $("#message-section").removeClass("error");
-     $("#message-section").addClass("success");
-     
-     $("#message-section").text("Found solution :: " + jsonResult.simulationId);
-     //$("#result-section").html(jsonString);
-     
-     SolverPage.displayOrbit(orbitalSolver);
-     } else {
-     $("#message-section").removeClass("success");
-     $("#message-section").addClass("error");
-     
-     var errMsg = jsonResult.errorMsg || "Unknown error";
-     $("#message-section").text("Error encountered :: " + errMsg);
-     
-     }
-     $("#message-section").show();
-     $("#message-section").animate({
-     opacity: 1
-     }, 1500);
-     */
 };
 
-SolverPage.displayOrbit = function (orbitalSolver) {
+SolverPage.displayOrbit = function (solverUtil) {
 
-    var params = orbitalSolver.solution;
-    var qRegular = orbitalSolver.calculateQRegular(params);
-
+    var positionMap = solverUtil.getPositionMap(solverUtil.solution);
     var xList, yList;
-
-    var colourList = ['black', 'green', 'blue'];
     var canvasContext;
 
-    if (typeof qRegular !== "undefined" && qRegular.length) {
-        xList = qRegular[0];
-        yList = qRegular[1];
+    if (typeof positionMap !== "undefined" && positionMap.length) {
 
         canvasContext = $("canvas")[0].getContext('2d');
         if (typeof canvasContext !== "undefined") {
             canvasContext.clearRect(0, 0, $("canvas").width(), $("canvas").height());
-            for (var i = 0; i < 3; i++) {
+
+            for (var n = 0; n < positionMap.length; n++) {
+                xList = (positionMap[n])[0];
+                yList = (positionMap[n])[1];
+
+                var r, g, b;
+                r = (255 * Math.random());
+                g = (255 * Math.random());
+                b = (255 * Math.random());
+
+                var colour = 'rgba(' + r.toFixed(0) + ',' + g.toFixed(0) + ',' + b.toFixed(0) + ', 1)';
                 canvasContext.save();
 
                 canvasContext.translate($("canvas").width() / 2, $("canvas").height() / 2);
-                canvasContext.scale(50, -50);
-                canvasContext.strokeStyle = colourList[i];
+                canvasContext.scale(75, -75);
+                canvasContext.strokeStyle = colour;
                 canvasContext.lineWidth = 1 / 200;
 
-                /*
-                 console.log( "----- Orbital ## " + i );
-                 console.log(xList[i]);
-                 console.log(yList[i]);
-                 console.log(" =======================" );
-                 */
-                for (var r = 1; r < xList[i].length; r++) {
+                var radius = (1 / 75) * (solverUtil.paramSet.massValues[n]);
+
+
+                canvasContext.beginPath();
+                canvasContext.arc(xList[0], yList[0], radius, 0, 2 * Math.PI, false);
+                canvasContext.fillStyle = colour;
+                canvasContext.fill();
+                canvasContext.stroke();
+
+                for (var r = 1; r < xList.length; r++) {
                     canvasContext.beginPath();
-                    canvasContext.moveTo(xList[i][r - 1], yList[i][r - 1]);
-                    canvasContext.lineTo(xList[i][r], yList[i][r]);
+                    canvasContext.moveTo(xList[r - 1], yList[r - 1]);
+                    canvasContext.lineTo(xList[r], yList[r]);
                     canvasContext.stroke();
                 }
+                canvasContext.beginPath();
+                canvasContext.moveTo(xList[xList.length - 1], yList[yList.length - 1]);
+                canvasContext.lineTo(xList[0], yList[0]);
+                canvasContext.stroke();
                 canvasContext.restore();
             }
+
+        } else {
+            console.log("Context not available.");
         }
+    } else {
+        console.log("No available position map.");
     }
 
 };

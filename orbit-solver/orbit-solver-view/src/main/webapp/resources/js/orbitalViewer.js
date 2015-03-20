@@ -186,53 +186,38 @@ OrbitalViewer.resize = function () {
 OrbitalViewer.defaultSimulation = function () {
     OrbitalViewer.updateContextButtontext();
     var defaultSim = {
-        'simulationId': 'default',
-        'nBodies': 3,
-        'totalMass': 3,
-        'objectList': [
+        "simulationId": "small-binary",
+        "nBodies": 2,
+        "totalMass": 2,
+        "objectList": [
             {
-                'objectId': 0,
-                'objectName': 'X1',
-                'objectMass': 1,
-                'objectRadius': 1,
-                'position': [-0.995492, 0.00],
-                'velocity': [0.00, 0.00],
-                'render': {
-                    'lineWidth': 2,
-                    'strokeColour': '#FF9900',
-                    'fillColourOne': 'black',
-                    'fillColourTwo': '#FFFF80'
+                "objectId": 0,
+                "objectName": "obj1",
+                "objectMass": 1,
+                "objectRadius": 1,
+                "position": [-0.99, 0.00],
+                "velocity": [0.00, -0.30],
+                "render": {
+                    "lineWidth": 2,
+                    "strokeColour": "#FF9900",
+                    "fillColourOne": "black",
+                    "fillColourTwo": "#FFFF80"
                 }
             },
             {
-                'objectId': 1,
-                'objectName': 'X2',
-                'objectMass': 1,
-                'objectRadius': 1,
-                'position': [0.995492, 0.00],
-                'velocity': [0.00, 0.00],
-                'render': {
-                    'lineWidth': 2,
-                    'strokeColour': '#00CCFF',
-                    'fillColourOne': '#003300',
-                    'fillColourTwo': '#0066FF'
-                }
-            },
-            {
-                'objectId': 3,
-                'objectName': 'X3',
-                'objectMass': 1,
-                'objectRadius': 1,
-                'position': [0.0, 0.00],
-                'velocity': [0.695804, 1.067860],
-                'render': {
-                    'lineWidth': 2,
-                    'strokeColour': '#00CCFF',
-                    'fillColourOne': '#003300',
-                    'fillColourTwo': '#0066FF'
+                "objectId": 1,
+                "objectName": "obj2",
+                "objectMass": 1,
+                "objectRadius": 1,
+                "position": [0.99, 0.00],
+                "velocity": [0.00, 0.30],
+                "render": {
+                    "lineWidth": 2,
+                    "strokeColour": "#00CCFF",
+                    "fillColourOne": "#003300",
+                    "fillColourTwo": "#0066FF"
                 }
             }
-
         ]
     };
     this.initializeOrbit(JSON.stringify(defaultSim));
