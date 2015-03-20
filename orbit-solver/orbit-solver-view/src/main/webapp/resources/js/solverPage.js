@@ -48,6 +48,14 @@ SolverPage.testSolver = function () {
     }
 };
 
+SolverPage.getPastelColour = function () {
+    var r = (Math.round(Math.random() * 127) + 127).toString(16);
+    var g = (Math.round(Math.random() * 127) + 127).toString(16);
+    var b = (Math.round(Math.random() * 127) + 127).toString(16);
+    return '#' + r + g + b;
+};
+
+
 SolverPage.displayOrbit = function (solverUtil) {
 
     var positionMap = solverUtil.getPositionMap(solverUtil.solution);
@@ -64,12 +72,7 @@ SolverPage.displayOrbit = function (solverUtil) {
                 xList = (positionMap[n])[0];
                 yList = (positionMap[n])[1];
 
-                var r, g, b;
-                r = (255 * Math.random());
-                g = (255 * Math.random());
-                b = (255 * Math.random());
-
-                var colour = 'rgba(' + r.toFixed(0) + ',' + g.toFixed(0) + ',' + b.toFixed(0) + ', 1)';
+                var colour = SolverPage.getPastelColour();
                 canvasContext.save();
 
                 canvasContext.translate($("canvas").width() / 2, $("canvas").height() / 2);
