@@ -156,7 +156,7 @@ SolverPage.displayOrbit = function (solverUtil) {
                     xList = (positionMap[n])[0];
                     yList = (positionMap[n])[1];
 
-                    var colour = SolverPage.getPastelColour();
+                    var colour = SolverUtil.getPastelColour();
                     canvasContext.save();
 
                     canvasContext.translate($("canvas").width() / 2, $("canvas").height() / 2);
