@@ -90,6 +90,7 @@ SpaceObject.prototype.draw = function (context, trace, scale, pageExtent, center
      gradient.addColorStop(1, this.renderOptions.fillColourTwo);
      context.fillStyle = gradient;
      */
+    this.radius = (2/scale)*this.mass;
     context.fillStyle = this.renderOptions.fillColourTwo;
     context.beginPath();
     context.arc(

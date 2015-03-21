@@ -24,40 +24,11 @@ OrbitalViewer.pageInitialization = function (canvasContainer) {
     this.traceCanvas = null;
     this.graphCanvas = null;
     this.startCount = 0;
-    this.energyBuffer = new RingBuffer(100);
     //
     this.initializeCanvas(canvasContainer);
     this.initializeEvents();
     this.resize();
     this.repaint();
-
-
-    var initialOptions = {
-        maintainAspectRatio: true,
-        responsive: false,
-        pointDot: false,
-        datasetFill: false,
-        bezierCurve: false
-    };
-
-    var labelSet = Array.apply(null, new Array(1))
-            .map(String.prototype.valueOf, "");
-    var initialData = {
-        labels: labelSet,
-        datasets: [
-            {
-                label: "Energies",
-                fillColor: "rgba(220,220,220,0.2)",
-                strokeColor: "rgba(220,220,220,1)",
-                pointColor: "rgba(220,220,220,1)",
-                pointStrokeColor: "#fff",
-                pointHighlightFill: "#fff",
-                pointHighlightStroke: "rgba(220,220,220,1)",
-                data: []
-            }
-        ]
-    };
-    this.lineChart = new Chart(OrbitalViewer.graphCanvas.getContext('2d')).Line(initialData, initialOptions);
     $("canvas.medium-layer").hide();
 
     this.drawInterval = setInterval(function () {
@@ -225,22 +196,48 @@ OrbitalViewer.defaultSimulation = function () {
 
 
 OrbitalViewer.displayNewOrbit = function () {
-    var nBodies = 3;
-    var fourierPrecision = 75;
-    var timePrecision = 1000;
+    var config = {
+        "nBodies": 3,
+        "precision": [
+            1,
+            30
+        ],
+        "equalMasses": true,
+        "maximumMass": 1,
+        "gravConst": 1.0,
+        "seedValue": undefined
+    };
 
-    var orbitalSolver = new OrbitalSolver(nBodies, fourierPrecision, timePrecision);
-    var orbitDef = orbitalSolver.solve();
-    if (orbitDef) {
-        if (orbitDef.success) {
-            $("#message-output").text("Solved new orbit : " + orbitDef.simulationId);
-            OrbitalViewer.initializeOrbit(JSON.stringify(orbitDef));
+    var solverConfig = new SolverParams(config);
+    SolverUtil.setParams(solverConfig);
+    SolverUtil.minimizeFunction(OrbitalViewer.solverCallback);
+    /*
+     if (orbitDef) {
+     if (orbitDef.success) {
+     $("#message-output").text("Solved new orbit : " + orbitDef.simulationId);
+     OrbitalViewer.initializeOrbit(JSON.stringify(orbitDef));
+     } else {
+     var errMsg = orbitDef.errMsg || "Unknown Error";
+     $("#message-output").text("Error encountered " + errMsg);
+     }
+     } else {
+     $("#message-output").text("Unknown error encountered.");
+     }
+     */
+};
+
+OrbitalViewer.solverCallback = function () {
+    var jsonRes;
+    if (typeof SolverUtil !== "undefined" && SolverUtil.solved) {
+        jsonRes = SolverUtil.getOrbitJson();
+        if (typeof jsonRes !== "undefined" && jsonRes.success) {
+            //console.log(jsonRes);
+            OrbitalViewer.initializeOrbit(JSON.stringify(jsonRes));
         } else {
-            var errMsg = orbitDef.errMsg || "Unknown Error";
-            $("#message-output").text("Error encountered " + errMsg);
+            $("#message-output").text("Unable to solve for orbit.");
         }
     } else {
-        $("#message-output").text("Unknown error encountered.");
+        $("#message-output").text("Unable to solve for orbit.");
     }
 };
 
@@ -256,6 +253,8 @@ OrbitalViewer.initializeOrbit = function (simulationJson) {
             simName = orbitJson.simulationId;
             simMass = orbitJson.totalMass;
             simBodies = orbitJson.nBodies;
+
+            //console.log(orbitJson.objectList);
 
             OrbitalViewer.orbit = new SimulationEngine(simName, simBodies, simMass);
             $.each(orbitJson.objectList, function (index, element) {
@@ -309,8 +308,7 @@ OrbitalViewer.startOrbit = function () {
                 OrbitalViewer.lastPotentialEnergy = OrbitalViewer.totalPotentialEnergy;
                 OrbitalViewer.totalPotentialEnergy = OrbitalViewer.orbit.getTotalPotentialEnergy();
 
-                OrbitalViewer.energyBuffer.push(OrbitalViewer.totalKineticEnergy + OrbitalViewer.totalPotentialEnergy);
-
+                
                 OrbitalViewer.redraw = true;
             }
         }, OrbitalViewer.simDelay)
@@ -339,8 +337,6 @@ OrbitalViewer.stopOrbit = function () {
         traceContext.clearRect(-pageExtent[0] / 2.0, -pageExtent[1] / 2.0, 2 * pageExtent[0], 2 * pageExtent[1]);
 
         $("canvas.medium-layer").hide();
-        OrbitalViewer.lineChart.datasets[0].data = [];
-        OrbitalViewer.lineChart.update();
 
     }
 };

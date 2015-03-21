@@ -1,25 +1,99 @@
 var SolverUtil = new Object();
+
 SolverUtil.setParams = function (paramSet) {
     SolverUtil.paramSet = paramSet;
     SolverUtil.solution = null;
+    SolverUtil.solved = false;
+
 };
 
 SolverUtil.getActionValue = function () {
     return SolverUtil.solveActionFunction(SolverUtil.paramSet.initialSet);
 };
 
-SolverUtil.minimizeFunction = function () {
-    var foundSolution = false;
+SolverUtil.minimizeFunction = function (callback) {
+    SolverUtil.solved = false;
     var solutionSet;
 
     try {
         solutionSet = numeric.uncmin(SolverUtil.solveActionFunction, SolverUtil.paramSet.initialSet);
         SolverUtil.solution = (solutionSet.solution);
-        foundSolution = true;
+        SolverUtil.solved = true;
     } catch (err) {
         console.log(err);
     }
-    return foundSolution;
+    callback();
+};
+
+SolverUtil.getPastelColour = function () {
+    var r = (Math.round(Math.random() * 127) + 127).toString(16);
+    var g = (Math.round(Math.random() * 127) + 127).toString(16);
+    var b = (Math.round(Math.random() * 127) + 127).toString(16);
+    return '#' + r + g + b;
+};
+
+SolverUtil.getOrbitJson = function () {
+    var positionMap, velocityMap;
+    var solutionVals, nBodies, id;
+    var totalMass, colour;
+    var spaceObject;
+    var objectList = [];
+
+    var solution = {
+        "success": false
+    };
+
+    if (SolverUtil.solved === true) {
+        solutionVals = SolverUtil.solution;
+        positionMap = SolverUtil.getPositionMap(solutionVals);
+        velocityMap = SolverUtil.getVelocityMap(solutionVals);
+
+        nBodies = SolverUtil.paramSet.nBodies;
+        solution.nBodies = nBodies;
+
+        id = (nBodies + "[");
+        totalMass = 0.0;
+
+        for (var i = 0; i < nBodies; i++) {
+            id += SolverUtil.paramSet.massValues[i].toFixed(3).toString();
+            totalMass += SolverUtil.paramSet.massValues[i];
+            colour = SolverUtil.getPastelColour();
+
+            if (i < nBodies - 1) {
+                id += ",";
+            }
+            spaceObject = {
+                "objectId": i,
+                "objectName": "SpaceObject-" + i.toString(),
+                "objectMass": SolverUtil.paramSet.massValues[i],
+                "objectRadius" : 1,
+                "position": [
+                    ((positionMap[i])[0])[0], //Xo
+                    ((positionMap[i])[1])[0] //Yo
+                ],
+                "velocity": [
+                    ((velocityMap[i])[0])[0], //VXo
+                    ((velocityMap[i])[1])[0] //VYo
+                ],
+                "render": {
+                    "lineWidth": 2,
+                    "strokeColour": colour,
+                    "fillColour": colour
+                }
+            };
+            objectList.push(spaceObject);
+        }
+        id += "]";
+        if (typeof SolverUtil.paramSet.solutionSeed !== "undefined") {
+            id += SolverUtil.parmaSet.solutionSeed;
+        }
+        solution.objectList = objectList;
+        solution.simulationId = id;
+        solution.totalMass = totalMass;
+        solution.success = true;
+    }
+
+    return solution;
 };
 
 

@@ -8,37 +8,89 @@
 
 
     <ui:define name="content">
-        <h:outputScript library='js' name='Chart.min.js' target='head'></h:outputScript>
-        <h:outputScript library="js" name="solverParams.js" target="head"></h:outputScript>
-        <h:outputScript library='js' name='solverUtil.js' target='head'></h:outputScript>
-        <h:outputScript library="js" name="solverPage.js" target="head"></h:outputScript>
+        <h:outputScript library='js/lib' name='Chart.min.js' target='head'></h:outputScript>
+        <h:outputScript library="js/solver" name="solverParams.js" target="head"></h:outputScript>
+        <h:outputScript library='js/solver' name='solverUtil.js' target='head'></h:outputScript>
+        <h:outputScript library="pages" name="solverPage.js" target="head"></h:outputScript>
 
         <h:outputStylesheet library="css" name="solver-style.css"/>
+        <h:outputStylesheet library='css' name='ajax-loader.css'/>
 
-        <p:layout fullPage="true" widgetVar="pageLayout">
-            <p:layoutUnit position="north" size="125">
-                <p:toolbar>
-                    <f:facet name="left">
-                        <p:commandButton type="button" value="Test Solver" icon="ui-icon-plus" onclick="SolverPage.testSolver()"/>
-                    </f:facet>
+        <div id='header-section'>
+            <p:toolbar>
+                <f:facet name="left">
+                    <p:commandButton type="button" value="Generate" icon="ui-icon-plus" onclick="SolverPage.generateOrbit()"/>
+                </f:facet>
 
-                    <f:facet name="right">
-                        <p:commandButton type="button" value="Settings" icon="ui-icon-gear" onclick="SolverPage.changeSettings()"/>
-                    </f:facet>
-                </p:toolbar>
-                <div id="message-section"></div>
+                <f:facet name="right">
+                    <p:commandButton type="button" value="Refresh" icon="ui-icon-arrowrefresh-1-e" onclick="SolverPage.redraw()"/>
+                    <p:commandButton type="button" value="Settings" icon="ui-icon-gear" onclick="PF('settings-dialog').show();"/>
+                </f:facet>
+            </p:toolbar>
 
-            </p:layoutUnit>
-            <p:layoutUnit id='result-layout' position="center">
-                <canvas id="orbit-display"></canvas>
-            </p:layoutUnit>
-        </p:layout>
+            <div id="message-section"></div>
+        </div>
+
+        <div id='canvas-section'>
+            <canvas id="orbit-display"></canvas>
+        </div>
+
+        <p:dialog widgetVar='settings-dialog' 
+                  header='Solver Preview Settings'
+                  resizable='false'
+                  position='top'>
+
+            <div class='input-section'>
+                <label for='n-body-count'>'n' Bodies</label>
+                <select class='input-part' id='n-body-count'>
+                    <option value='1'>One</option>
+                    <option value='2'>Two</option>
+                    <option selected="true" value='3'>Three</option>
+                    <option value='4'>Four</option>
+                    <option value='5'>Five</option>
+                    <option value='6'>Six</option>
+                    <option value='7'>Seven</option>
+                    <option value='8'>Eight</option>                    
+                </select>
+            </div>
+            <div class='input-section'>
+                <label for='time-steps'>Time Steps [1-50]</label>
+                <input class='input-part' type='text' id='time-steps' maxlength='2'/>
+            </div>
+            <div class='input-section'>
+                <label for='equal-masses'>Equal Masses</label>
+                <input class='input-part' type='checkbox' id='equal-masses'/>
+            </div>
+            <div class='input-section'>
+                <label for='maximum-mass'>Max. Mass [1-20]</label>
+                <input class='input-part' type='text' id='maximum-mass' maxlength='2'/>
+            </div>
+            <div class='input-section'>
+                <label for='solution-seed'>Solution Seed</label>
+                <input class='input-part' type='text' id='solution-seed' maxlength='15'/>
+            </div>
+            <div class='input-section'>
+                <label for='canvas-scale'>Draw scale</label>
+                <input class='input-part' type='text' id='canvas-scale' maxlength='3'/>
+            </div>
+            <div id='error-section'></div>
+            <p:commandButton type='button' value='Apply' onclick='SolverPage.applySettings()'></p:commandButton>
+        </p:dialog>
+
+        <div style='display:none'>
+            <div id='bowlG-original'>
+                <div id='bowl_ringG-original'>
+                    <div class='ball_holderG'>
+                        <div class='ballG'>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <script>
-
             $(document).ready(function () {
                 SolverPage.initialize();
-                $("#message-section").hide();
             });
         </script>
     </ui:define>

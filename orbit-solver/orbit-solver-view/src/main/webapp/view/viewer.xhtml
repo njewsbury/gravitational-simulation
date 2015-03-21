@@ -8,15 +8,11 @@
 
 
     <ui:define name="content">
-        <h:outputScript library="js" name="Chart.min.js" target="head"></h:outputScript>
-
-        <h:outputScript library="js" name="orbitalViewer.js" target="head"></h:outputScript>
-        <h:outputScript library="js" name="orbitalSolver.js" target="head"></h:outputScript>
-
-        <h:outputScript library="js" name="simulationEngine.js" target="head"></h:outputScript>
-        <h:outputScript library="js" name="spaceObject.js" target="head"></h:outputScript>
-
-        <h:outputScript library="js" name="ringBuffer.js" target="head"></h:outputScript>
+        <h:outputScript library="js/solver" name="solverParams.js" target="head"></h:outputScript>
+        <h:outputScript library='js/solver' name='solverUtil.js' target='head'></h:outputScript>
+        <h:outputScript library="pages" name="orbitalViewer.js" target="head"></h:outputScript>
+        <h:outputScript library="js/simulation" name="simulationEngine.js" target="head"></h:outputScript>
+        <h:outputScript library="js/simulation" name="spaceObject.js" target="head"></h:outputScript>
 
         <h:outputStylesheet library="css" name="viewer-style.css"/>
 
@@ -42,19 +38,6 @@
         <p:panel>
             <div id="message-output">Orbital Viewer</div>
         </p:panel>
-        <!--
-        <div id="config">
-            <p:commandButton id="new-orbit" value="New Orbit" type="button" onclick="OrbitalViewer.defaultSimulation()"/>
-            <p:commandButton id="start-orbit" value="Start" type="button" onclick="OrbitalViewer.startOrbit()"/>
-            <p:commandButton id="stop-orbit" value="Stop" type="button" onclick="OrbitalViewer.stopOrbit()"/>
-            <p:commandButton id="restart-orbit" value="Restart" type="button" onclick="OrbitalViewer.restartLastOrbit()"/>
-            <p:commandButton id="clear-trace" value="Clear trace" type="button" onclick="OrbitalViewer.clearTrace()"/>
-            <span id="start-count" style="color: white;">#<span id="start-number">0</span></span>
-        </div>
-        -->
-
-
-
         <script>
             $(document).ready(function () {
                 OrbitalViewer.pageInitialization($("#container-div"));
