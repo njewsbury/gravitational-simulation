@@ -157,17 +157,20 @@ OrbitalViewer.resize = function () {
 OrbitalViewer.defaultSimulation = function () {
     OrbitalViewer.updateContextButtontext();
     var defaultSim = {
-        "simulationId": "small-binary",
-        "nBodies": 2,
-        "totalMass": 2,
+        "simulationId": "three-body",
+        "nBodies": 3,
+        "totalMass": 3,
         "objectList": [
             {
                 "objectId": 0,
-                "objectName": "obj1",
+                "objectName": "One",
                 "objectMass": 1,
-                "objectRadius": 1,
-                "position": [-0.99, 0.00],
-                "velocity": [0.00, -0.30],
+                "position": [
+                    -0.995492, 0.0
+                ],
+                "velocity": [
+                    0.0, 0.0
+                ],
                 "render": {
                     "lineWidth": 2,
                     "strokeColour": "#FF9900",
@@ -177,16 +180,37 @@ OrbitalViewer.defaultSimulation = function () {
             },
             {
                 "objectId": 1,
-                "objectName": "obj2",
+                "objectName": "Two",
                 "objectMass": 1,
-                "objectRadius": 1,
-                "position": [0.99, 0.00],
-                "velocity": [0.00, 0.30],
+                "position": [
+                    0.995492, -0.0
+                ],
+                "velocity": [
+                    0.0, 0.0
+                ],
                 "render": {
                     "lineWidth": 2,
-                    "strokeColour": "#00CCFF",
-                    "fillColourOne": "#003300",
-                    "fillColourTwo": "#0066FF"
+                    "strokeColour": "#FF9900",
+                    "fillColourOne": "black",
+                    "fillColourTwo": "#FFFF80"
+                }
+            },
+            {
+                "objectId": 2,
+                "objectName": "Three",
+                "objectMass": 1,
+                "position": [
+                    0.0, 0.0
+                ],
+                "velocity": [
+                    0.695804,
+                    1.067860
+                ],
+                "render": {
+                    "lineWidth": 2,
+                    "strokeColour": "#FF9900",
+                    "fillColourOne": "black",
+                    "fillColourTwo": "#FFFF80"
                 }
             }
         ]
@@ -197,10 +221,10 @@ OrbitalViewer.defaultSimulation = function () {
 
 OrbitalViewer.displayNewOrbit = function () {
     var config = {
-        "nBodies": 3,
+        "nBodies": 2,
         "precision": [
             1,
-            30
+            50
         ],
         "equalMasses": true,
         "maximumMass": 1,
@@ -256,7 +280,11 @@ OrbitalViewer.initializeOrbit = function (simulationJson) {
 
             //console.log(orbitJson.objectList);
 
-            OrbitalViewer.orbit = new SimulationEngine(simName, simBodies, simMass);
+            OrbitalViewer.orbit = new OrbitalEngine(simName, {
+                "timeStep": 0.01,
+                "gravConstant": 1
+            });
+            //OrbitalViewer.orbit = new SimulationEngine(simName, simBodies, simMass);
             $.each(orbitJson.objectList, function (index, element) {
                 var orbital = new SpaceObject(element.objectId, element);
                 if (orbital.validate()) {
@@ -308,7 +336,7 @@ OrbitalViewer.startOrbit = function () {
                 OrbitalViewer.lastPotentialEnergy = OrbitalViewer.totalPotentialEnergy;
                 OrbitalViewer.totalPotentialEnergy = OrbitalViewer.orbit.getTotalPotentialEnergy();
 
-                
+
                 OrbitalViewer.redraw = true;
             }
         }, OrbitalViewer.simDelay)
@@ -467,6 +495,7 @@ OrbitalViewer.repaint = function () {
                 if (OrbitalViewer.orbit !== null && OrbitalViewer.orbit !== undefined) {
                     centerOfMass = OrbitalViewer.orbit.getCenterOfMass();
                 }
+                //centerOfMass = [0,0];
                 // Context setup
                 context.save();
                 trace.save();

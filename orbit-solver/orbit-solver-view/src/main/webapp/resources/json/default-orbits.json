@@ -1,6 +1,65 @@
 {
     "defaultList": [
         {
+            "simulationId": "three-body",
+            "nBodies": 3,
+            "totalMass": 3,
+            "objectList": [
+                {
+                    "objectId": 0,
+                    "objectName": "One",
+                    "objectMass": 1,
+                    "position": [
+                        -0.995492, 0.0
+                    ],
+                    "velocity": [
+                        0.0,0.0
+                    ],
+                    "render": {
+                        "lineWidth": 2,
+                        "strokeColour": "#FF9900",
+                        "fillColourOne": "black",
+                        "fillColourTwo": "#FFFF80"
+                    }
+                },
+                {
+                    "objectId": 1,
+                    "objectName": "Two",
+                    "objectMass": 1,
+                    "position": [
+                        0.995492, 0.0
+                    ],
+                    "velocity": [
+                        0.0,0.0
+                    ],
+                    "render": {
+                        "lineWidth": 2,
+                        "strokeColour": "#FF9900",
+                        "fillColourOne": "black",
+                        "fillColourTwo": "#FFFF80"
+                    }
+                },
+                {
+                    "objectId": 2,
+                    "objectName": "Three",
+                    "objectMass": 1,
+                    "position": [
+                        0.0,0.0
+                    ],
+                    "velocity": [
+                        0.695804,
+                        1.067860
+                    ],
+                    "render": {
+                        "lineWidth": 2,
+                        "strokeColour": "#FF9900",
+                        "fillColourOne": "black",
+                        "fillColourTwo": "#FFFF80"
+                    }
+                }
+            ]
+        },
+        {
             "simulationId": "default",
             "nBodies": 2,
             "totalMass": 6,

@@ -6,14 +6,18 @@ var SpaceObject = function (identifier, jsonDef) {
     this.radius = jsonDef.objectRadius;
 
     this.position = jsonDef.position;
-
-    this.firstDrawPos = null;
+    this.positionPrime = [0,0];
+    this.positionDoublePrime = [0,0];
 
     this.velocity = jsonDef.velocity;
-    this.acceleration = [0, 0];
-    this.lastAcceleration = null;
+    this.velocityPrime = [0,0];
+    this.velocityDoublePrime = [0,0];
+    
     this.renderOptions = jsonDef.render;
+    
     this.lastPos = null;
+    this.firstDrawPos = null;
+
     this.orbitCount = 0;
 };
 
@@ -38,11 +42,6 @@ SpaceObject.prototype.validate = function () {
     if (this.mass === undefined || this.mass <= 0) {
         isValid = false;
         console.log("Invalid mass :: " + this.mass);
-    }
-    if (this.radius === undefined || this.radius <= 0) {
-        isValid = false;
-        console.log("Invalid radius :: " + this.radius);
-        console.log(typeof (this.radius));
     }
     return isValid;
 };
@@ -90,8 +89,8 @@ SpaceObject.prototype.draw = function (context, trace, scale, pageExtent, center
      gradient.addColorStop(1, this.renderOptions.fillColourTwo);
      context.fillStyle = gradient;
      */
-    this.radius = (2/scale)*this.mass;
-    context.fillStyle = this.renderOptions.fillColourTwo;
+    this.radius = (10/scale)*(this.mass*10);
+    context.fillStyle = this.renderOptions.fillColour;
     context.beginPath();
     context.arc(
             drawPos[0],
@@ -117,23 +116,27 @@ SpaceObject.prototype.draw = function (context, trace, scale, pageExtent, center
     this.lastPos = lastDrawPos;
 };
 
-SpaceObject.prototype.translate = function (delta) {
-    this.position = numeric.add(this.position, delta);
-};
 
-SpaceObject.prototype.setAcceleration = function (newAcc) {
+SpaceObject.prototype.getPosition = function(primeCount) {
+    var primePosition = this.position;
     
-    this.acceleration = numeric.mul(1.0, newAcc);
+    if( primeCount === 1 ) {
+        primePosition = this.positionPrime;
+    } else if( primeCount === 2 ) {
+        primePosition = this.positionDoublePrime;
+    }
+    
+    return primePosition;
 };
 
-SpaceObject.prototype.getVelocity = function () {
-    return this.velocity;
-};
-
-SpaceObject.prototype.getAcceleration = function () {
-    return this.acceleration;
-};
-
-SpaceObject.prototype.changeVelocity = function (delta) {
-    this.velocity = numeric.add(this.velocity, delta);
+SpaceObject.prototype.getVelocity = function(primeCount) {
+    var primeVelocity = this.velocity;
+    
+    if( primeCount === 1 ) {
+        primeVelocity = this.velocityPrime;
+    } else if( primeCount === 2 ) {
+        primeVelocity = this.velocityDoublePrime;
+    }
+    
+    return primeVelocity;
 };

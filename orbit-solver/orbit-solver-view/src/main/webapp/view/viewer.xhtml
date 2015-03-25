@@ -11,7 +11,12 @@
         <h:outputScript library="js/solver" name="solverParams.js" target="head"></h:outputScript>
         <h:outputScript library='js/solver' name='solverUtil.js' target='head'></h:outputScript>
         <h:outputScript library="pages" name="orbitalViewer.js" target="head"></h:outputScript>
+        <!--
         <h:outputScript library="js/simulation" name="simulationEngine.js" target="head"></h:outputScript>
+        -->
+        <h:outputScript library="js/simulation" name="orbitalEngine.js" target="head"></h:outputScript>
+        <h:outputScript library="js/simulation" name="symplecticIntegrator.js" target="head"></h:outputScript>
+        
         <h:outputScript library="js/simulation" name="spaceObject.js" target="head"></h:outputScript>
 
         <h:outputStylesheet library="css" name="viewer-style.css"/>
