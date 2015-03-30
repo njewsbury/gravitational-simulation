@@ -56,3 +56,22 @@ canvas.top-layer {
 .disabled-text {
     color: #E8E8E8;
 }
+
+.input-section {
+    width: 100%;
+    height: 30px;
+    font-size: 0.9em;
+}
+.input-section label {
+    float: left;
+    width: 45%;
+}
+#error-section {
+    color: red;
+}
+
+.input-section .input-part {
+    float: right;
+    clear: right;
+    width: 45%;
+}

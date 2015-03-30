@@ -7,6 +7,9 @@ var OrbitalEngine = function (simId, config) {
     this.totalMass = 0.0;
     this.bodyCount = 0;
 
+    this.elapsedTime = 0.0;
+
+    //this.integrator = new LeapFrogIntegrator(this);
     this.integrator = new SymplecticIntegrator(this);
 };
 
@@ -23,6 +26,7 @@ OrbitalEngine.prototype.getOrbitalList = function () {
 };
 
 OrbitalEngine.prototype.moveAllObjects = function () {
+    this.elapsedTime += this.dt;
     var success = this.integrator.moveAllObjects();
     if (!success) {
         console.log("Unable to move objects...");
@@ -85,7 +89,7 @@ OrbitalEngine.prototype.getSingleAcceleration = function (active, primeCount) {
         //direction points FROM active TO reference.
         tempVal = 0.0;
         if (Math.abs(scalar) > 0) {
-            tempVal = (reference.mass) / (scalar * scalar * scalar);
+            tempVal = (reference.mass) / (numeric.norm2Squared(distance));
         }
         singleAcc = numeric.mul(distance, tempVal);
         totalAcc = numeric.add(totalAcc, singleAcc);

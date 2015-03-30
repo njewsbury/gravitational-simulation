@@ -2,10 +2,10 @@ var SolverPage = new Object();
 
 SolverPage.initialize = function () {
     //Range format [ MIN, DEFAULT, MAX ]
-    SolverPage.N_BODY_RANGE = [1, 3, 8];
+    SolverPage.N_BODY_RANGE = [2, 3, 5];
     SolverPage.SPACIAL_PRECISION_RANGE = [1, 1, 1];
-    SolverPage.TIME_PRECISION_RANGE = [1, 10, 50];
-    SolverPage.MAX_MASS_RANGE = [1, 1, 20];
+    SolverPage.TIME_PRECISION_RANGE = [1, 10, 99];
+    SolverPage.MAX_MASS_RANGE = [1, 1, 99];
 
     SolverPage.currentBodyCount = SolverPage.N_BODY_RANGE[1];
     SolverPage.currentTimePrecision = SolverPage.TIME_PRECISION_RANGE[1];

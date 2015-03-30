@@ -13,6 +13,8 @@ var SpaceObject = function (identifier, jsonDef) {
     this.velocityPrime = [0,0];
     this.velocityDoublePrime = [0,0];
     
+    this.acceleration = [0,0];
+    
     this.renderOptions = jsonDef.render;
     
     this.lastPos = null;
@@ -139,4 +141,12 @@ SpaceObject.prototype.getVelocity = function(primeCount) {
     }
     
     return primeVelocity;
+};
+
+SpaceObject.prototype.translatePosition = function(displacement) {
+    this.position = numeric.add(this.position, displacement);
+};
+
+SpaceObject.prototype.translateVelocity = function(increase ) {
+    this.velocity = numeric.add(this.velocity, increase);
 };

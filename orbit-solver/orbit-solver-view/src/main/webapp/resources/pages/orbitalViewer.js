@@ -2,6 +2,26 @@
 var OrbitalViewer = new Object();
 
 OrbitalViewer.pageInitialization = function (canvasContainer) {
+    //Range format [ MIN, DEFAULT, MAX ]
+    OrbitalViewer.N_BODY_RANGE = [2, 3, 5];
+    OrbitalViewer.SPACIAL_PRECISION_RANGE = [1, 1, 1];
+    OrbitalViewer.TIME_PRECISION_RANGE = [100, 250, 500];
+    OrbitalViewer.MAX_MASS_RANGE = [1, 1, 99];
+    //
+    OrbitalViewer.currentBodyCount = OrbitalViewer.N_BODY_RANGE[1];
+    OrbitalViewer.currentTimePrecision = OrbitalViewer.TIME_PRECISION_RANGE[1];
+    OrbitalViewer.currentMaxMass = OrbitalViewer.MAX_MASS_RANGE[1];
+    OrbitalViewer.currentEqualMass = true;
+    OrbitalViewer.solutionSeed = undefined;
+
+    OrbitalViewer.displayScale = 150;
+    //
+    $("#n-body-count").val(OrbitalViewer.currentBodyCount);
+    $("#time-steps").val(OrbitalViewer.currentTimePrecision);
+    $("#equal-masses").prop("checked", OrbitalViewer.currentEqualMass);
+    $("#maximum-mass").val(OrbitalViewer.currentMaxMass);
+    $("#canvas-scale").val(OrbitalViewer.displayScale);
+    //
     this.currentOrbit = null;
     this.drawInterval = null;
     this.simInterval = [];
@@ -218,36 +238,77 @@ OrbitalViewer.defaultSimulation = function () {
     this.initializeOrbit(JSON.stringify(defaultSim));
 };
 
+OrbitalViewer.validateInput = function () {
+    var errorMsg = "";
+
+    var nBodies = parseInt($("#n-body-count").val());
+    var timeSteps = parseInt($("#time-steps").val());
+    var areEqual = $("#equal-masses").is(":checked");
+    var maxMass = parseInt($("#maximum-mass").val());
+
+    if (nBodies >= OrbitalViewer.N_BODY_RANGE[0]
+            && nBodies <= OrbitalViewer.N_BODY_RANGE[2]) {
+        OrbitalViewer.currentBodyCount = nBodies;
+    } else {
+        errorMsg = "nBodyCount outside range!";
+    }
+
+    if (timeSteps >= OrbitalViewer.TIME_PRECISION_RANGE[0]
+            && timeSteps <= OrbitalViewer.TIME_PRECISION_RANGE[2]) {
+        OrbitalViewer.currentTimePrecision = timeSteps;
+    } else {
+        errorMsg = "Time step outside range!";
+    }
+
+    if (maxMass >= OrbitalViewer.MAX_MASS_RANGE[0]
+            && maxMass <= OrbitalViewer.MAX_MASS_RANGE[2]) {
+        OrbitalViewer.currentMaxMass = maxMass;
+    } else {
+        errorMsg = "Maximum mass outside range!";
+    }
+
+    if (errorMsg.length === 0) {
+        OrbitalViewer.currentEqualMass = areEqual;
+        if ($("#solution-seed").val().trim().length > 0) {
+            OrbitalViewer.solutionSeed = $("#solution-seed");
+        } else {
+            OrbitalViewer.solutionSeed = undefined;
+        }
+    }
+    OrbitalViewer.displayScale = parseInt($("#canvas-scale").val());
+
+    return errorMsg;
+};
+
+OrbitalViewer.applySettings = function () {
+    var err = OrbitalViewer.validateInput();
+    if (err.length === 0) {
+        PF('settings-dialog').hide();
+    } else {
+        $("#error-section").text(err);
+    }
+};
+
 
 OrbitalViewer.displayNewOrbit = function () {
     var config = {
-        "nBodies": 2,
+        "nBodies": OrbitalViewer.currentBodyCount,
         "precision": [
-            1,
-            50
+            OrbitalViewer.SPACIAL_PRECISION_RANGE[1],
+            OrbitalViewer.currentTimePrecision
         ],
-        "equalMasses": true,
-        "maximumMass": 1,
+        "equalMasses": OrbitalViewer.currentEqualMass,
+        "maximumMass": OrbitalViewer.currentMaxMass,
         "gravConst": 1.0,
-        "seedValue": undefined
+        "seedValue": OrbitalViewer.solutionSeed
     };
 
     var solverConfig = new SolverParams(config);
     SolverUtil.setParams(solverConfig);
     SolverUtil.minimizeFunction(OrbitalViewer.solverCallback);
-    /*
-     if (orbitDef) {
-     if (orbitDef.success) {
-     $("#message-output").text("Solved new orbit : " + orbitDef.simulationId);
-     OrbitalViewer.initializeOrbit(JSON.stringify(orbitDef));
-     } else {
-     var errMsg = orbitDef.errMsg || "Unknown Error";
-     $("#message-output").text("Error encountered " + errMsg);
-     }
-     } else {
-     $("#message-output").text("Unknown error encountered.");
-     }
-     */
+
+
+
 };
 
 OrbitalViewer.solverCallback = function () {
@@ -282,7 +343,7 @@ OrbitalViewer.initializeOrbit = function (simulationJson) {
 
             OrbitalViewer.orbit = new OrbitalEngine(simName, {
                 "timeStep": 0.01,
-                "gravConstant": 1
+                "gravConstant": orbitJson.gravConstant
             });
             //OrbitalViewer.orbit = new SimulationEngine(simName, simBodies, simMass);
             $.each(orbitJson.objectList, function (index, element) {
@@ -335,7 +396,6 @@ OrbitalViewer.startOrbit = function () {
 
                 OrbitalViewer.lastPotentialEnergy = OrbitalViewer.totalPotentialEnergy;
                 OrbitalViewer.totalPotentialEnergy = OrbitalViewer.orbit.getTotalPotentialEnergy();
-
 
                 OrbitalViewer.redraw = true;
             }
@@ -431,6 +491,16 @@ OrbitalViewer.writeSystemProperties = function (context) {
         linePos -= fontSize;
         context.fillText("Force Count : " + OrbitalViewer.startCount, horizOffset, linePos);
 
+        linePos -= fontSize;
+
+        sum = 0.0;
+        if (typeof this.orbit !== "undefined" && this.orbit !== null) {
+            sum = this.orbit.elapsedTime;
+        }
+        context.fillText("Time Elapsed: " +
+                (sum).toFixed(3), horizOffset, linePos);
+
+
         context.beginPath();
         context.moveTo(horizOffset, linePos - fontSize);
         context.lineTo(horizOffset + 160, linePos - fontSize);
@@ -474,6 +544,7 @@ OrbitalViewer.writeSystemProperties = function (context) {
         context.fillText("Total ENRG: " + (
                 sum
                 ).toFixed(decimalPlaces), horizOffset, linePos);
+
         context.restore();
     }
 

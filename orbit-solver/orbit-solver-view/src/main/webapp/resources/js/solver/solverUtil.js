@@ -90,6 +90,7 @@ SolverUtil.getOrbitJson = function () {
         solution.objectList = objectList;
         solution.simulationId = id;
         solution.totalMass = totalMass;
+        solution.gravConstant = SolverUtil.paramSet.gravConst;
         solution.success = true;
     }
 
