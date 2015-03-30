@@ -180,6 +180,7 @@ OrbitalViewer.defaultSimulation = function () {
         "simulationId": "three-body",
         "nBodies": 3,
         "totalMass": 3,
+        "gravConstant" : 1.0,
         "objectList": [
             {
                 "objectId": 0,
