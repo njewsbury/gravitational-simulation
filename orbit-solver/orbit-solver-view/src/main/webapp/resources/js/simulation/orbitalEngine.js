@@ -9,8 +9,8 @@ var OrbitalEngine = function (simId, config) {
 
     this.elapsedTime = 0.0;
 
-    //this.integrator = new LeapFrogIntegrator(this);
-    this.integrator = new SymplecticIntegrator(this);
+    this.integrator = new LeapFrogIntegrator(this);
+    //this.integrator = new SymplecticIntegrator(this);
 };
 
 OrbitalEngine.prototype.insertOrbital = function (spaceObject) {
@@ -85,11 +85,11 @@ OrbitalEngine.prototype.getSingleAcceleration = function (active, primeCount) {
     totalAcc = [0, 0];
     $.each(this.objectList, function (index, reference) {
         distance = numeric.sub(reference.getPosition(primeCount), active.getPosition(primeCount));
-        scalar = numeric.norm2(distance);
+        scalar = numeric.norm2Squared(distance);
         //direction points FROM active TO reference.
         tempVal = 0.0;
         if (Math.abs(scalar) > 0) {
-            tempVal = (reference.mass) / (numeric.norm2Squared(distance));
+            tempVal = (reference.mass) / (scalar);
         }
         singleAcc = numeric.mul(distance, tempVal);
         totalAcc = numeric.add(totalAcc, singleAcc);
@@ -113,7 +113,7 @@ OrbitalEngine.prototype.getSingleTotalPotential = function (active) {
     $.each(this.objectList, function (index, reference) {
         distance = _this.getDistance(active, reference);
         if (Math.abs(distance) > 0) {
-            totalPotential += (reference.mass / distance);
+            totalPotential += (active.mass * reference.mass / distance);
         }
 
     });
