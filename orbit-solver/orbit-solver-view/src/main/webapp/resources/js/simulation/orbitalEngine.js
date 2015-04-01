@@ -2,15 +2,39 @@ var OrbitalEngine = function (simId, config) {
     this.id = simId;
     this.dt = config.timeStep;
     this.gravConstant = config.gravConstant;
+    this.maximumTime = config.maxTime;
+    this.recordStep = config.recordStep;
 
     this.objectList = [];
+
     this.totalMass = 0.0;
     this.bodyCount = 0;
 
     this.elapsedTime = 0.0;
+    this.loopCount = 0;
 
-    this.integrator = new LeapFrogIntegrator(this);
-    //this.integrator = new SymplecticIntegrator(this);
+    this.recordEveryNSteps = (this.recordStep / this.dt);
+    this.totalRecordCount = this.maximumTime / this.recordStep;
+
+    this.currentRecord = 0;
+    this.kineticMap = Array.apply(null,
+            new Array(this.totalRecordCount))
+            .map(Number.prototype.valueOf, 0);
+
+    this.potentialMap = Array.apply(null,
+            new Array(this.totalRecordCount))
+            .map(Number.prototype.valueOf, 0);
+
+    this.initialized = false;
+
+    this.simulationComplete = false;
+    //this.integrator = new LeapFrogIntegrator(this);
+    this.integrator = new SymplecticIntegrator(this);
+};
+
+OrbitalEngine.prototype.initialize = function () {
+    this.updateEnergyMaps();
+    this.initialized = true;
 };
 
 OrbitalEngine.prototype.insertOrbital = function (spaceObject) {
@@ -26,111 +50,22 @@ OrbitalEngine.prototype.getOrbitalList = function () {
 };
 
 OrbitalEngine.prototype.moveAllObjects = function () {
-    this.elapsedTime += this.dt;
-    var success = this.integrator.moveAllObjects();
-    if (!success) {
-        console.log("Unable to move objects...");
+    if (!this.simulationComplete && (this.elapsedTime < (this.maximumTime))) {
+        var success = this.integrator.moveAllObjects();
+        this.elapsedTime += this.dt;
+
+        if (!success) {
+            this.simulationComplete = true;
+            console.log("Unable to move objects...");
+        } else {
+            if (this.loopCount % this.recordEveryNSteps === 0) {
+                this.updateEnergyMaps();
+            }
+            this.loopCount = (this.loopCount + 1) % this.recordEveryNSteps;
+        }
+    } else {
+        this.simulationComplete = true;
     }
-};
-
-/**
- * Get the distance between the two given objects.
- * @param {type} objOne
- * @param {type} objTwo
- * @returns {Number}
- */
-OrbitalEngine.prototype.getDistance = function (objOne, objTwo) {
-    var onePos, twoPos;
-    var rawDist;
-
-    onePos = numeric.clone(objOne.position);
-    twoPos = numeric.clone(objTwo.position);
-
-    rawDist = numeric.sub(onePos, twoPos);
-    return numeric.norm2(rawDist); // |r1 - r2|
-
-};
-
-/**
- * Get a unit vector from objOne pointing towards objTwo.
- * @param {SpaceObject} objOne
- * @param {SpaceObject} objTwo
- * @returns {Arr[Number]} Unit vector pointing TOWARDS objTwo.
- */
-OrbitalEngine.prototype.getDirection = function (objOne, objTwo) {
-    var onePos, twoPos;
-    var rawDist;
-    var distance;
-
-    onePos = numeric.clone(objOne.position);
-    twoPos = numeric.clone(objTwo.position);
-
-    rawDist = numeric.sub(twoPos, onePos);
-    distance = this.getDistance(objOne, objTwo);
-
-    return numeric.div(rawDist, distance);
-};
-
-/**
- * Get the acceleration for a single body.
- * @param {SpaceObject} active - determine force for this object.
- * @returns {Number}
- */
-OrbitalEngine.prototype.getSingleAcceleration = function (active, primeCount) {
-    var totalAcc, singleAcc;
-    var _this = this;
-    var distance, scalar;
-    var tempVal;
-
-    totalAcc = [0, 0];
-    $.each(this.objectList, function (index, reference) {
-        distance = numeric.sub(reference.getPosition(primeCount), active.getPosition(primeCount));
-        scalar = numeric.norm2Squared(distance);
-        //direction points FROM active TO reference.
-        tempVal = 0.0;
-        if (Math.abs(scalar) > 0) {
-            tempVal = (reference.mass) / (scalar);
-        }
-        singleAcc = numeric.mul(distance, tempVal);
-        totalAcc = numeric.add(totalAcc, singleAcc);
-
-    });
-    tempVal = (this.gravConstant);
-    totalAcc = numeric.mul(totalAcc, tempVal);
-    return totalAcc;
-};
-
-/**
- * Get the potential energy associated with the given object
- * @param {SpaceObject} active
- * @returns {Number}
- */
-OrbitalEngine.prototype.getSingleTotalPotential = function (active) {
-    var totalPotential = 0.0;
-    var _this = this;
-    var distance;
-
-    $.each(this.objectList, function (index, reference) {
-        distance = _this.getDistance(active, reference);
-        if (Math.abs(distance) > 0) {
-            totalPotential += (active.mass * reference.mass / distance);
-        }
-
-    });
-
-    totalPotential = totalPotential * (-this.gravConstant);
-
-    return totalPotential;
-};
-
-OrbitalEngine.prototype.getSingleKinetic = function (active) {
-    var velocity = numeric.clone(active.velocity);
-    var kinetic = 0.0;
-
-    velocity = numeric.norm2Squared(velocity); // |v|^2
-    kinetic = (1.0 / 2.0) * active.mass * velocity;
-
-    return kinetic;
 };
 
 OrbitalEngine.prototype.getCenterOfMass = function () {
@@ -151,7 +86,15 @@ OrbitalEngine.prototype.getCenterOfMass = function () {
     return com;
 };
 
-OrbitalEngine.prototype.getTotalKineticEnergy = function () {
+OrbitalEngine.prototype.updateEnergyMaps = function () {
+
+    this.kineticMap[ this.currentRecord ] = this.getKineticEnergySum();
+    this.potentialMap[ this.currentRecord ] = this.getPotentialEnergySum();
+
+    this.currentRecord += 1;
+};
+
+OrbitalEngine.prototype.getKineticEnergySum = function () {
     var totalKinetic = 0.0;
     var _this = this;
 
@@ -161,15 +104,100 @@ OrbitalEngine.prototype.getTotalKineticEnergy = function () {
 
     return totalKinetic;
 };
+OrbitalEngine.prototype.getSingleKinetic = function (active) {
+    var velocity = numeric.clone(active.velocity);
+    var kinetic = 0.0;
+    velocity = numeric.norm2Squared(velocity); // |v|^2
+    kinetic = (1.0 / 2.0) * active.mass * velocity;
+    return kinetic;
+};
 
-OrbitalEngine.prototype.getTotalPotentialEnergy = function () {
+OrbitalEngine.prototype.getPotentialEnergySum = function () {
     var totalPotential = 0.0;
-    var _this = this;
+    var singlePotential;
+    var active, reference;
+    var distance;
 
-    $.each(this.objectList, function (index, element) {
-        totalPotential += (element.mass * _this.getSingleTotalPotential(element));
-    });
-
+    for (var i = 0; i < this.objectList.length; i++) {
+        singlePotential = 0.0;
+        active = this.objectList[i];
+        //if ((i + 1) < this.objectList.length) {
+        for (var j = 0; j < this.objectList.length; j++) {
+            reference = this.objectList[j];
+            distance = this.getDistance(active, reference);
+            if (Math.abs(distance) > 0) {
+                singlePotential += (reference.mass / distance);
+            }
+        }
+        singlePotential = (-this.gravConstant * active.mass * singlePotential);
+        //}
+        totalPotential += singlePotential;
+    }
     return totalPotential;
 };
 
+OrbitalEngine.prototype.getCurrentEnergies = function () {
+    return [
+        this.kineticMap[ this.currentRecord - 1 ],
+        this.potentialMap[ this.currentRecord - 1]
+    ];
+};
+
+OrbitalEngine.prototype.getLastEnergies = function () {
+    var lastEnergies = [0, 0];
+    if (this.currentRecord >= 2) {
+        lastEnergies[0] = this.kineticMap[ this.currentRecord - 2 ];
+        lastEnergies[1] = this.potentialMap[ this.currentRecord - 2 ];
+    }
+    return lastEnergies;
+};
+
+/**
+ * Get the distance between the two given objects.
+ * @param {type} objOne
+ * @param {type} objTwo
+ * @returns {Number}
+ */
+OrbitalEngine.prototype.getDistance = function (objOne, objTwo) {
+    var onePos, twoPos;
+    var rawDist;
+
+    onePos = numeric.clone(objOne.position);
+    twoPos = numeric.clone(objTwo.position);
+
+    rawDist = numeric.sub(onePos, twoPos);
+    return numeric.norm2(rawDist); // |r1 - r2|
+
+};
+
+/* *************************************************** */
+
+/**
+ * Get the acceleration for a single body.
+ * @param {SpaceObject} active - determine force for this object.
+ * @returns {Number}
+ */
+OrbitalEngine.prototype.getSingleAcceleration = function (active, primeCount) {
+    var totalAcceleration;
+    var _this = this;
+
+    totalAcceleration = [0, 0];
+    $.each(_this.objectList, function (index, reference) {
+        var singleAcceleration = [0, 0];
+        var singleMagnitude = 0;
+        //
+        if (reference.orbitalId !== active.orbitalId) {
+            var directionVector = numeric.sub(reference.getPosition(primeCount), active.getPosition(primeCount)); //(R2-R1)
+            var distance = numeric.norm2(directionVector); // |R2-R1|
+            directionVector = numeric.div(directionVector, distance); // R-hat
+            //
+            if (Math.abs(distance) > 0) {
+                singleMagnitude = (_this.gravConstant * reference.mass) / (distance * distance); // Gm/(r^2)
+            }
+            singleAcceleration = numeric.mul(directionVector, singleMagnitude); // |a| * R-hat
+        }
+        totalAcceleration = numeric.add(totalAcceleration, singleAcceleration);  // Sum A
+    });
+
+    return totalAcceleration;
+};
