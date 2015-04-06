@@ -4,7 +4,7 @@ SolverPage.initialize = function () {
     //Range format [ MIN, DEFAULT, MAX ]
     SolverPage.N_BODY_RANGE = [2, 3, 5];
     SolverPage.SPACIAL_PRECISION_RANGE = [1, 1, 1];
-    SolverPage.TIME_PRECISION_RANGE = [1, 10, 99];
+    SolverPage.TIME_PRECISION_RANGE = [50, 250, 800];
     SolverPage.MAX_MASS_RANGE = [1, 1, 99];
 
     SolverPage.currentBodyCount = SolverPage.N_BODY_RANGE[1];
@@ -78,7 +78,7 @@ SolverPage.validateInput = function () {
     if (errorMsg.length === 0) {
         SolverPage.currentEqualMass = areEqual;
         if ($("#solution-seed").val().trim().length > 0) {
-            SolverPage.solutionSeed = $("#solution-seed");
+            SolverPage.solutionSeed = $("#solution-seed").val();
         } else {
             SolverPage.solutionSeed = undefined;
         }

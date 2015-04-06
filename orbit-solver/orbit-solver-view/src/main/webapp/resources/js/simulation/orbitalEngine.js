@@ -78,7 +78,6 @@ OrbitalEngine.prototype.getDirection = function (objOne, objTwo) {
  */
 OrbitalEngine.prototype.getSingleAcceleration = function (active, primeCount) {
     var totalAcc, singleAcc;
-    var _this = this;
     var distance, scalar;
     var tempVal;
 

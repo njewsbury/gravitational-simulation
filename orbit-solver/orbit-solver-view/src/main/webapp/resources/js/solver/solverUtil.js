@@ -85,7 +85,7 @@ SolverUtil.getOrbitJson = function () {
         }
         id += "]";
         if (typeof SolverUtil.paramSet.solutionSeed !== "undefined") {
-            id += SolverUtil.parmaSet.solutionSeed;
+            id += SolverUtil.paramSet.solutionSeed;
         }
         solution.objectList = objectList;
         solution.simulationId = id;
@@ -215,11 +215,11 @@ SolverUtil.getBodyPotential = function (body, positionMap) {
                 effective += (1.0 / numeric.norm2Squared([diffx, diffy]));
                 currentDistance = numeric.norm2([diffx, diffy]);
 
-                potential += (SolverUtil.paramSet.massValues[n]) / (currentDistance);
+                potential += (SolverUtil.paramSet.massValues[n]) / (currentDistance*currentDistance);
             }
         }
         effective = 0.0;
-        //effective = (1.0 / this.massValues[body]) * effective;
+        //effective = (1.0 / SolverUtil.paramSet.massValues[body]) * effective;
         potential = (SolverUtil.paramSet.gravConst * SolverUtil.paramSet.massValues[body]) * potential;
         potentialMap[t] = (effective - potential);
     }

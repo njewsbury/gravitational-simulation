@@ -82,7 +82,7 @@ SolverParams.prototype.getRandomizedParams = function () {
     // merge and returns
     full = asParams.concat(acParams);
     full = full.concat(bsParams);
-    full = full.concat(bcParams);
+    full = full.concat(bcParams);    
     return full;
 };
 

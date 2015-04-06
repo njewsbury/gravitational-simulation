@@ -8,6 +8,7 @@
 
 
     <ui:define name="content">
+        <h:outputScript library="js/lib" name="mousetrap.min.js" target="head"></h:outputScript>
         <h:outputScript library="js/solver" name="solverParams.js" target="head"></h:outputScript>
         <h:outputScript library='js/solver' name='solverUtil.js' target='head'></h:outputScript>
         <h:outputScript library="pages" name="orbitalViewer.js" target="head"></h:outputScript>
@@ -29,8 +30,8 @@
                                  onclick="OrbitalViewer.clearTrace()"/>
             </f:facet>
             <f:facet name="right">
-                <p:commandButton value="Load" type="button"
-                                 onclick="OrbitalViewer.defaultSimulation()"/>
+                <p:commandButton value="Save img" type="button"
+                                 onclick="OrbitalViewer.saveImage()"/>
                 <p:commandButton value="Force" type="button"
                                  onclick="OrbitalViewer.forceOrbit()"/>
                 <p:commandButton value="Settings" type="button" icon="ui-icon-gear"
@@ -81,6 +82,7 @@
 
         <p:panel>
             <div id="message-output">Orbital Viewer</div>
+            <a id="download-image" style="display:none">Image Download</a>
         </p:panel>
         <script>
             $(document).ready(function () {

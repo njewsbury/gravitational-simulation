@@ -106,6 +106,29 @@ OrbitalViewer.contextButton = function () {
     OrbitalViewer.updateContextButtontext();
 };
 
+OrbitalViewer.saveImage = function () {
+    var traceLayer = OrbitalViewer.traceCanvas;
+    var downloadLink = $("#download-image")[0];
+
+
+    var imgContext = OrbitalViewer.canvas.getContext('2d');
+
+    imgContext.drawImage(traceLayer, 0, 0);
+
+    var img = OrbitalViewer.canvas.toDataURL("image/png");
+    var currDate = new Date();
+
+    var dateString = currDate.toDateString();
+    dateString = dateString.replace(/\s+/g, '-').toLowerCase();
+    dateString += ("-" + currDate.getHours() + "-" + currDate.getMinutes() + "-" + currDate.getSeconds());
+
+    downloadLink.href = img;
+    downloadLink.download = "OrbitalImage-" + dateString + ".png";
+    
+    downloadLink.click();
+    downloadLink.href = "#";
+};
+
 OrbitalViewer.initializeCanvas = function (canvasContainer) {
     var element = $("<canvas></canvas>");
     $(element).prop('id', this.canvasName);
@@ -174,71 +197,6 @@ OrbitalViewer.resize = function () {
     }
 };
 
-OrbitalViewer.defaultSimulation = function () {
-    OrbitalViewer.updateContextButtontext();
-    var defaultSim = {
-        "simulationId": "three-body",
-        "nBodies": 3,
-        "totalMass": 3,
-        "gravConstant" : 1.0,
-        "objectList": [
-            {
-                "objectId": 0,
-                "objectName": "One",
-                "objectMass": 1,
-                "position": [
-                    -0.995492, 0.0
-                ],
-                "velocity": [
-                    0.0, 0.0
-                ],
-                "render": {
-                    "lineWidth": 2,
-                    "strokeColour": "#FF9900",
-                    "fillColourOne": "black",
-                    "fillColourTwo": "#FFFF80"
-                }
-            },
-            {
-                "objectId": 1,
-                "objectName": "Two",
-                "objectMass": 1,
-                "position": [
-                    0.995492, -0.0
-                ],
-                "velocity": [
-                    0.0, 0.0
-                ],
-                "render": {
-                    "lineWidth": 2,
-                    "strokeColour": "#FF9900",
-                    "fillColourOne": "black",
-                    "fillColourTwo": "#FFFF80"
-                }
-            },
-            {
-                "objectId": 2,
-                "objectName": "Three",
-                "objectMass": 1,
-                "position": [
-                    0.0, 0.0
-                ],
-                "velocity": [
-                    0.695804,
-                    1.067860
-                ],
-                "render": {
-                    "lineWidth": 2,
-                    "strokeColour": "#FF9900",
-                    "fillColourOne": "black",
-                    "fillColourTwo": "#FFFF80"
-                }
-            }
-        ]
-    };
-    this.initializeOrbit(JSON.stringify(defaultSim));
-};
-
 OrbitalViewer.validateInput = function () {
     var errorMsg = "";
 
@@ -271,7 +229,7 @@ OrbitalViewer.validateInput = function () {
     if (errorMsg.length === 0) {
         OrbitalViewer.currentEqualMass = areEqual;
         if ($("#solution-seed").val().trim().length > 0) {
-            OrbitalViewer.solutionSeed = $("#solution-seed");
+            OrbitalViewer.solutionSeed = $("#solution-seed").val();
         } else {
             OrbitalViewer.solutionSeed = undefined;
         }
@@ -317,7 +275,6 @@ OrbitalViewer.solverCallback = function () {
     if (typeof SolverUtil !== "undefined" && SolverUtil.solved) {
         jsonRes = SolverUtil.getOrbitJson();
         if (typeof jsonRes !== "undefined" && jsonRes.success) {
-            //console.log(jsonRes);
             OrbitalViewer.initializeOrbit(JSON.stringify(jsonRes));
         } else {
             $("#message-output").text("Unable to solve for orbit.");
