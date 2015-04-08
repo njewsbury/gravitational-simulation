@@ -23,6 +23,7 @@
                 </f:facet>
 
                 <f:facet name="right">
+                    <p:commandButton type="button" value="Save Img" onclick="SolverPage.saveImage()"/>
                     <p:commandButton type="button" value="Refresh" icon="ui-icon-arrowrefresh-1-e" onclick="SolverPage.redraw()"/>
                     <p:commandButton type="button" value="Settings" icon="ui-icon-gear" onclick="PF('settings-dialog').show();"/>
                 </f:facet>
@@ -33,6 +34,7 @@
 
         <div id='canvas-section'>
             <canvas id="orbit-display"></canvas>
+            <a id='download-image' style='display: none'>Download Image</a>
         </div>
 
         <p:dialog widgetVar='settings-dialog' 

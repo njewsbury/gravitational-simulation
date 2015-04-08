@@ -535,12 +535,18 @@ OrbitalViewer.repaint = function () {
                 trace.translate(pageExtent[0], pageExtent[1]);
                 context.scale(OrbitalViewer.globalScale, -OrbitalViewer.globalScale);
                 trace.scale(OrbitalViewer.globalScale, -OrbitalViewer.globalScale);
+                
                 // Axis Setup
                 context.clearRect(-pageExtent[0], -pageExtent[1], 2.0 * pageExtent[0], 2.0 * pageExtent[1]);
                 OrbitalViewer.drawGridSystem(context);
                 OrbitalViewer.writeSystemProperties(context);
                 //
                 if (OrbitalViewer.orbit !== null && OrbitalViewer.orbit !== undefined) {
+                    /*
+                    var rotateSpeed = -(2) * Math.PI * OrbitalViewer.orbit.elapsedTime;
+                    context.rotate( rotateSpeed);
+                    trace.rotate( rotateSpeed);
+                    */
                     // Orbital Object Draw
                     $.each(OrbitalViewer.orbit.getOrbitalList(), function (index, element) {
                         element.draw(context, trace, OrbitalViewer.globalScale, pageExtent, centerOfMass);

@@ -15,7 +15,7 @@ SolverPage.initialize = function () {
 
     SolverPage.displayScale = 150;
 
-    this.resultCanvas = $("#orbit-display")[0];
+    SolverPage.resultCanvas = $("#orbit-display")[0];
 
     /**/
     window.addEventListener('resize', SolverPage.resize, false);
@@ -86,6 +86,22 @@ SolverPage.validateInput = function () {
     SolverPage.displayScale = parseInt($("#canvas-scale").val());
 
     return errorMsg;
+};
+
+SolverPage.saveImage = function () {
+    var downloadLink = $("#download-image")[0];
+    var img = SolverPage.resultCanvas.toDataURL("image/png");
+    var currDate = new Date();
+
+    var dateString = currDate.toDateString();
+    dateString = dateString.replace(/\s+/g, '-').toLowerCase();
+    dateString += ("-" + currDate.getHours() + "-" + currDate.getMinutes() + "-" + currDate.getSeconds());
+
+    downloadLink.href = img;
+    downloadLink.download = "OrbitalSolver-" + dateString + ".png";
+    
+    downloadLink.click();
+    downloadLink.href = "#";
 };
 
 SolverPage.applySettings = function () {
