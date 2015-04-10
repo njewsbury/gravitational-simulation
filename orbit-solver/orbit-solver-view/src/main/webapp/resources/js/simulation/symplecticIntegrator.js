@@ -21,11 +21,6 @@ SymplecticIntegrator.prototype.moveAllObjects = function () {
     var success = false;
     var stageCount = 0;
     if (typeof objects !== "undefined") {
-        
-        $.each(objects, function (index, element) {
-            stageCount += _this.stageZeroMotion(_this, element);
-        });
-
         $.each(objects, function (index, element) {
             stageCount += _this.stageOneMotion(_this, element);
         });
@@ -36,22 +31,17 @@ SymplecticIntegrator.prototype.moveAllObjects = function () {
             stageCount += _this.stageThreeMotion(_this, element);
         });
 
-        success = (stageCount === (_this.parent.bodyCount * 4));
+        success = (stageCount === (_this.parent.bodyCount * 3));
     }
 
     return success;
-};
-SymplecticIntegrator.prototype.stageZeroMotion = function (_this, active) {
-    var acc = _this.parent.getSingleAcceleration(active, 0);
-    active.acceleration = numeric.clone(acc);
-    return 1;
 };
 
 SymplecticIntegrator.prototype.stageOneMotion = function (_this, active) {
     var velPrime = numeric.clone(active.getVelocity(0));
     var qPrime = numeric.clone(active.getPosition(0));
 
-    var acc = active.acceleration;
+    var acc = _this.parent.getSingleAcceleration(active, 0);
     var multiplier = (_this.params.c.one * _this.parent.dt);
 
     acc = numeric.mul(acc, multiplier); // C1 * a * dt
@@ -70,7 +60,7 @@ SymplecticIntegrator.prototype.stageTwoMotion = function (_this, active) {
     var q2Prime = numeric.clone(active.getPosition(1)); // gets qPrime
 
     var acc = _this.parent.getSingleAcceleration(active, 1); //AccPrime
-
+    
     var multiplier = (_this.params.c.two * _this.parent.dt);
 
     acc = numeric.mul(acc, multiplier); // C2 * a` * dt
@@ -81,7 +71,7 @@ SymplecticIntegrator.prototype.stageTwoMotion = function (_this, active) {
     vel2Prime = numeric.mul(vel2Prime, multiplier); // D2*v``*dt
     q2Prime = numeric.add(q2Prime, vel2Prime); // Q2 = Q1(t) + D2*v``*dt
     active.positionDoublePrime = numeric.clone(q2Prime);
-
+    
     return 1;
 };
 
@@ -99,7 +89,7 @@ SymplecticIntegrator.prototype.stageThreeMotion = function (_this, active) {
     multiplier = (_this.params.d.three * _this.parent.dt);
     velNew = numeric.mul(velNew, multiplier); // D3*vNew*dt
     qNew = numeric.add(qNew, velNew); // QNew = Q2(t) + D3*vNew*dt
-
+    
     active.position = numeric.clone(qNew);
     return 1;
 };

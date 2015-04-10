@@ -13,24 +13,32 @@
     <ui:define name="content">
         <h:outputStylesheet library="css" name="landing-style.css"/>
         <link href='http://fonts.googleapis.com/css?family=Dosis:400,800' rel='stylesheet' type='text/css'/>
-        
-        
+
+
         <div id="landing-header">
             <div id="inner-container">
                 <h1>Orbital Solver &amp; Display</h1>
                 <div id="buttons">
-                    <p:button id="viewer" value="Orbital Viewer" outcome="viewer.xhtml"/>
-                    <p:button id="solver" value="Orbital Solver" outcome="solver.xhtml"/>
-                </div>
+                    <p:commandButton value="Orbital Simulation" type="button"
+                                     onclick="viewSimulation()"/>
+                    <p:commandButton value="Orbital Solver" type="button" id="orbit-button"
+                                     onclick="viewSolver()"/>                </div>
                 <span>A Physics 4250 Final Project by Nathan Jewsbury &amp; Scott Osadchuk</span>
             </div>
         </div>
 
         <script>
+            function viewSolver() {
+                window.location = "${request.contextPath}/view/solver.xhtml";
+            }
+            function viewSimulation() {
+                window.location = "${request.contextPath}/static/simulation.html";
+            }
+
             function resize() {
                 var windowHeight = $(window).height();
                 var divHeight = $("#landing-header").height();
-                
+
                 $("#landing-header").css("margin-top", (windowHeight - divHeight) / 2.0);
                 $("#landing-header").css("height", ($("#inner-container").height()));
             }
@@ -40,15 +48,15 @@
                     resize();
                 });
                 resize();
-                
+
                 $("#landing-header").animate({
-                    opacity:0.8
-                }, 900 );
+                    opacity: 0.8
+                }, 900);
                 $("#inner-container").animate({
                     opacity: 1
-                }, 1000 );
+                }, 1000);
                 $("#inner-container h1").animate({
-                    marginTop:'0.2em'
+                    marginTop: '0.2em'
                 }, 1500);
             });
         </script>

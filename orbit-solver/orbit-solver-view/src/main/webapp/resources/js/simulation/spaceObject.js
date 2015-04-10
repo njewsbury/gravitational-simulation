@@ -61,7 +61,7 @@ SpaceObject.prototype.checkCompleteOrbit = function (drawPos) {
     }
 };
 
-SpaceObject.prototype.draw = function (context, trace, scale, pageExtent, centerOfMass, maximumMass) {
+SpaceObject.prototype.draw = function (context, trace, scale, pageExtent, centerOfMass) {
     var gradient;
     var drawPos = this.position;
     var lastDrawPos = [];
@@ -77,7 +77,21 @@ SpaceObject.prototype.draw = function (context, trace, scale, pageExtent, center
         this.checkCompleteOrbit(drawPos);
     }
     lastDrawPos = numeric.clone(drawPos);
-    this.radius = (10/scale)*(20*(this.mass/maximumMass));
+    
+    /*
+     gradient = context.createRadialGradient(
+     drawPos[0],
+     drawPos[1],
+     this.radius / (10 * scale),
+     drawPos[0],
+     drawPos[1],
+     (10 * this.radius) / scale);
+     
+     gradient.addColorStop(0, this.renderOptions.fillColourOne);
+     gradient.addColorStop(1, this.renderOptions.fillColourTwo);
+     context.fillStyle = gradient;
+     */
+    this.radius = (10/scale)*(this.mass*10);
     context.fillStyle = this.renderOptions.fillColour;
     context.beginPath();
     context.arc(
@@ -88,19 +102,6 @@ SpaceObject.prototype.draw = function (context, trace, scale, pageExtent, center
 
     context.fill();
     context.stroke();
-    
-    context.beginPath();
-    context.moveTo(drawPos[0], drawPos[1] );
-    context.lineTo((drawPos[0]+this.velocity[0]), (drawPos[1]+this.velocity[1]));
-    context.strokeStyle = 'blue';
-    context.stroke();
-    
-    context.beginPath();
-    context.moveTo(drawPos[0], drawPos[1] );
-    context.lineTo((drawPos[0]+this.acceleration[0]), (drawPos[1]+this.acceleration[1]));
-    context.strokeStyle = 'yellow';
-    context.stroke();
-    
     context.restore();
 
     if (this.lastPos !== undefined && this.lastPos !== null) {

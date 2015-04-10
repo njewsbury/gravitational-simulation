@@ -24,11 +24,27 @@ body, html {
 
 #simulation-header {
     border-bottom: 3px solid #FF9900;
-
 }
+
+canvas {
+    border-radius: 15px;
+    position: absolute;
+    left: 0;
+}
+
+canvas#simulation-canvas {
+    /*background: rgba(40, 0, 120, 0.3 );*/
+    z-index: 50;
+}
+
+canvas#trace-canvas {
+    /*background: rgba(120, 0, 40, 0.8 );*/
+    z-index: 40;
+}
+
 #simulation-view {
     background: transparent;
-    border: 1px dashed rgba(255, 102, 0, 0.25);
+    border: 1px dashed rgba(255, 102, 0, 0.75);
     border-radius: 15px;
     margin: 10px;
     align-self: center;
