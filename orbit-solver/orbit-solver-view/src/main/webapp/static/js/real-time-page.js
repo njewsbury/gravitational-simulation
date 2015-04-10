@@ -4,7 +4,7 @@ window.requestAnimFrame = (function () {
             window.webkitRequestAnimationFrame ||
             window.mozRequestAnimationFrame ||
             function (callback) {
-                window.setTimeout(callback, 1000 / 30); //default 30fps
+                window.setTimeout(callback, 1000 / 60); //default 60fps
             };
 })();
 
@@ -34,9 +34,6 @@ RealTimePage.initialize = function () {
     RealTimePage.simCanvas = $("#simulation-canvas")[0];
     RealTimePage.traceCanvas = $("#trace-canvas")[0];
     RealTimePage.initialized = false;
-    RealTimePage.forwardStepCount = 0;
-    RealTimePage.elapsedTime = 0;
-
     RealTimePage.universe = null;
 
     if (typeof RealTimePage.simCanvas !== "undefined"
@@ -131,15 +128,13 @@ RealTimePage.simulationSingleStep = function () {
 };
 
 RealTimePage.doSingleStep = function (direction) {
-    var rotation;
-
-    RealTimePage.elapsedTime += RealTimePage.currentSettings.getTimeStepParam();
-    rotation = RealTimePage.elapsedTime / 10;
-
-    RealTimePage.universe[0] = (Math.cos(rotation));
-    RealTimePage.universe[1] = (Math.sin(rotation));
-
-    RealTimePage.redrawCanvasElements();
+    if (typeof RealTimePage.universe !== "undefined"
+            && RealTimePage.universe.doTimeStep(direction)) {
+        RealTimePage.redrawCanvasElements();
+    } else {
+        console.log("Simulation Complete. Report is available for viewing.");
+        RealTimePage.simulationRunning = false;
+    }
 };
 
 
@@ -152,27 +147,35 @@ RealTimePage.runSimulation = function () {
             RealTimePage.redrawCanvasElements();
         }
     }, (1000 / RealTimePage.fps));
-
-
 };
 
 
 RealTimePage.solveNewChoreograph = function () {
     RealTimePage.universe = new SpaceTimeContainer({
-        "timeStep" : RealTimePage.currentSettings.getTimeStepParam(),
-        "gravConstant" : 1,
-        "objectList" : [
+        "timeStep": RealTimePage.currentSettings.getTimeStepParam(),
+        "gravConstant": 1,
+        "maximumTime": RealTimePage.currentSettings.getMaximumTime(),
+        "objectList": [
             {
-                "id" : 0,
-                "name" : "body-one",
-                "initialPos" : [1, 0],
+                "id": 1,
+                "name": "body-one",
+                "initialPos": [1, 0],
+                "initialVel": [0, 0],
+                "mass": 1,
+                "colour": "#FF6600",
+                "traceColour": "#FF6600"
+            },
+            {
+                "id" : 2,
+                "name" : "body-two",
+                "initialPos" : [-1, 0],
                 "initialVel" : [0, 0],
-                "mass" : 1,
-                "colour" : "#FF6600",
-                "traceColour" : "#FF6600"
+                "mass" : 0.75,
+                "colour" : "#0A0AFF",
+                "traceColour" : "#0B0BFF"
             }
         ]
-    });    
+    });
 };
 
 
@@ -191,6 +194,9 @@ RealTimePage.contextButtonPress = function () {
             $("#simulation-force").prop('disabled', false);
             $("#simulation-report").prop("disabled", true);
             // Solve for new orbit
+            RealTimePage.clearAllCanvas();
+            RealTimePage.redrawCanvasElements();
+            
             RealTimePage.solveNewChoreograph();
             RealTimePage.redrawCanvasElements();
             //New state is 'Start Orbit'
@@ -233,6 +239,7 @@ RealTimePage.applySettings = function () {
         "timeStep": $("#time-steps").val(),
         "equalMasses": $("#equal-masses").is(":checked"),
         "maximumMass": $("#maximum-mass").val(),
+        "maximumTime": $("#maximum-time").val(),
         "solutionSeed": $("#solution-seed").val()
     };
 
@@ -250,10 +257,10 @@ RealTimePage.applySettings = function () {
  * **************** */
 
 RealTimePage.redrawCanvasElements = function () {
-    var canvasExtent = NumericUtil.div(2, [
+    var canvasExtent = numeric.div([
         RealTimePage.simCanvas.width,
         RealTimePage.simCanvas.height
-    ]);
+    ], 2);
 
     var simContext = RealTimePage.simCanvas.getContext('2d');
     var traceContext = RealTimePage.traceCanvas.getContext('2d');
@@ -286,6 +293,38 @@ RealTimePage.redrawCanvasElements = function () {
     traceContext.restore();
     simContext.restore();
 
+};
+
+RealTimePage.clearAllCanvas = function () {
+    var simContext = RealTimePage.simCanvas.getContext('2d');
+    var traceContext = RealTimePage.traceCanvas.getContext('2d');
+    var canvasExtent = numeric.div([
+        RealTimePage.simCanvas.width,
+        RealTimePage.simCanvas.height
+    ], 2);
+
+    simContext.save();
+    traceContext.save();
+    //
+    simContext.setTransform(1, 0, 0, 1, 0, 0);
+    traceContext.setTransform(1, 0, 0, 1, 0, 0);
+    //
+    simContext.translate(canvasExtent[0], canvasExtent[1]);
+    traceContext.translate(canvasExtent[0], canvasExtent[1]);
+    //
+    simContext.scale(RealTimePage.renderScale[0],
+            -RealTimePage.renderScale[1]);
+    traceContext.scale(RealTimePage.renderScale[0],
+            -RealTimePage.renderScale[1]);
+    //
+    simContext.clearRect(-canvasExtent[0], -canvasExtent[1],
+            2.0 * canvasExtent[0], 2.0 * canvasExtent[1]);
+        
+    traceContext.clearRect(-canvasExtent[0], -canvasExtent[1],
+            2.0 * canvasExtent[0], 2.0*canvasExtent[1]);
+    //            
+    simContext.restore();
+    traceContext.restore();
 };
 
 RealTimePage.redrawCoordinateAxis = function (context, extent) {
@@ -338,10 +377,18 @@ RealTimePage.redrawDetails = function (context, extent) {
     var horizontalOffset = 10;
     var textGap = 3;
     var linePosition;
-
-
+    //
+    var elapsedTime = 0;
+    var totalEnergy = 0;
+    //
     if (typeof context !== "undefined"
             && typeof extent !== "undefined") {
+        if (typeof RealTimePage.universe !== "undefined" &&
+                RealTimePage.universe !== null) {
+            elapsedTime = RealTimePage.universe.getElapsedTime();
+            totalEnergy = RealTimePage.universe.getTotalEnergy();
+        }
+
         linePosition = (2.0 * extent[1] - fontSize);
         context.save();
         //
@@ -352,11 +399,11 @@ RealTimePage.redrawDetails = function (context, extent) {
         context.lineWidth = 2;
 
         linePosition -= fontSize;
-        context.fillText("Time Elapsed : " + RealTimePage.elapsedTime,
+        context.fillText("Time Elapsed : " + elapsedTime.toFixed(4),
                 horizontalOffset, linePosition);
 
         linePosition -= (fontSize + textGap);
-        context.fillText("Total Energy : " + 100,
+        context.fillText("Total Energy : " + totalEnergy.toFixed(4),
                 horizontalOffset, linePosition);
         //
         context.restore();

@@ -7,11 +7,11 @@ var OrbitalParams = function( jsonDef ) {
     this.TIME_PRECISION = 250;
     this.SPACIAL_PRECISION = 1;
     //
-    this.givenNBody = jsonDef.nBodies;
-    this.givenTimeStep = jsonDef.timeStep;
+    this.givenNBody = parseInt(jsonDef.nBodies);
+    this.givenTimeStep = parseFloat(jsonDef.timeStep);
     this.equalMasses = jsonDef.equalMasses;
-    this.givenMaxMass = jsonDef.maximumMass;
-    this.givenMaxTime = jsonDef.maximumTime;
+    this.givenMaxMass = parseFloat(jsonDef.maximumMass);
+    this.givenMaxTime = parseFloat(jsonDef.maximumTime);
     this.givenSeed = jsonDef.solutionSeed;
         
 };
