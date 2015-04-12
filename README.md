@@ -13,7 +13,7 @@ The engine will be the workhorse for the renderer. Once the selected orbit is di
 
 
 ##Choreographed Orbit Solver
-The solver will be the root part of this project. ~~Through the use of a genetic algorithm a variety of control points will be generated and a cubic spline run through them to create a smooth curve.~~  An attempt will be made to find the minimum action of an n-bodies system by using numeric optimization. Once a minimum is found a JSON string will be produced to pass off to the render page for viewing.
+The solver will be the root part of this project. ~~Through the use of a genetic algorithm a variety of control points will be generated and a cubic spline run through them to create a smooth curve.~~  An attempt will be made to find the minimum action of an n-body system by using numeric optimization. Once a minimum is found a JSON string will be produced to pass off to the render page for viewing.
 
 ##Project References
 
