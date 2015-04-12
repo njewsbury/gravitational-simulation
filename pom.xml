@@ -8,8 +8,6 @@
     <name>Gravitational Simulation</name>
     
     <modules>
-        <module>space-time</module>
-        <module>space-time-render</module>
         <module>orbit-solver</module>
     </modules>
     

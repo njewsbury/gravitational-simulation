@@ -10,9 +10,13 @@ var OrbitalParams = function( jsonDef ) {
     this.givenNBody = parseInt(jsonDef.nBodies);
     this.givenTimeStep = parseFloat(jsonDef.timeStep);
     this.equalMasses = jsonDef.equalMasses;
+    this.symplectic = jsonDef.symplectic;
     this.givenMaxMass = parseFloat(jsonDef.maximumMass);
     this.givenMaxTime = parseFloat(jsonDef.maximumTime);
     this.givenSeed = jsonDef.solutionSeed;
+    //
+    this.givenTimePrecision = parseInt(jsonDef.timePrecision);
+    this.givenFourierPrecision = parseInt(jsonDef.fourierPrecision);
         
 };
 /* UTIL FUNCTIONS */
@@ -36,6 +40,10 @@ OrbitalParams.prototype.getTimeStepParam = function() {
 OrbitalParams.prototype.isEqualMass = function() {
     return this.equalMasses;
 };
+OrbitalParams.prototype.isSymplectic = function() {
+    return this.symplectic;
+};
+
 OrbitalParams.prototype.getMaximumMass = function() {
     return this.givenMaxMass;
 };
@@ -46,4 +54,11 @@ OrbitalParams.prototype.getSolutionSeed = function() {
     return this.givenSeed;
 };
 
+OrbitalParams.prototype.getTimePrecision = function() {
+    return this.givenTimePrecision;
+};
+
+OrbitalParams.prototype.getFourierPrecision = function() {
+    return this.givenFourierPrecision;
+};
 

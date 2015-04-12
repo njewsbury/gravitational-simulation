@@ -1,3 +1,4 @@
+/*global numeric */
 var SpaceObject = function (jsonDef, universe) {
 
     this.id = -1;
@@ -52,22 +53,83 @@ SpaceObject.prototype.drawObject = function (context, trace, com, maxMass) {
     context.fillStyle = this.colour;
     trace.strokeStyle = this.traceColour;
 
-    drawPosition = numeric.clone( this.position);
+    drawPosition = numeric.sub(this.position, com);
+    
     context.beginPath();
     context.arc(drawPosition[0], drawPosition[1], radius, 2.0 * Math.PI, false);
-    context.fill();
-    context.strokeStyle = '#FF6600';
-    context.lineWidth = 2/100;
-    context.strokeStyle = 'black';
-    context.lineWidth = 1/100;
-    context.stroke();
+    //context.clip();
     
-    if( this.lastDrawPosition !== null ) {
+    /*
+    imgObj.onload = function() {
+        var pattern = context.createPattern(imgObj, 'no-repeat');
+        context.rect(0, 0, 85, 85);
+        context.fillStyle = pattern;
+        context.fill();
+        context.beginPath();
+        context.arc(42.5, 42.5, 42.5,2*Math.PI, false);
+        context.fillStyle ='rgba(10, 90, 150, 0.4)';
+        context.fill();
+    };
+    */
+    
+    
+    context.save();
+    
+    var imgObj = new Image();
+    imgObj.src = 'css/images/orbital-body.png';
+    var pattern = context.createPattern(imgObj, 'no-repeat');
+    context.scale( radius / 42.5, radius / 42.5 );
+    context.rect(drawPosition[0], drawPosition[1], 85, 85 );
+    console.log( pattern );
+    console.log(drawPosition);
+    
+    context.fillStyle = pattern;
+    if( imgObj !== null ) {
+        context.fill();
+    } 
+    context.restore();
+    
+    context.beginPath();
+    context.arc(drawPosition[0], drawPosition[1], radius, 2.0 * Math.PI, false);
+    //context.fill();
+    context.strokeStyle = '#FF6600';
+    context.lineWidth = 2 / 100;
+    context.strokeStyle = 'black';
+    context.lineWidth = 1 / 100;
+    context.stroke();
+
+    //
+    // Draw Acceleration, normalized to radius of sphere...
+    if (typeof this.parent !== "undefined") {
+        var acc = this.calculateGravitationalForce(this.parent.getGravitationalConstant(),
+                this.parent.getObjectList());
+        acc = numeric.div(acc, this.mass);
+        context.beginPath();
+        context.moveTo(drawPosition[0], drawPosition[1]);
+
+        var unitDir = numeric.sub(acc, drawPosition);
+        var mult = numeric.norm2(acc);
+        var mag = this.getDrawRadius(maxMass);
+        unitDir = numeric.div(unitDir, numeric.norm2(unitDir));
+
+
+        if (mult < 1) {
+            mag = mag * mult;
+        } else {
+            mag = mag * 20;
+        }
+        unitDir = numeric.mul(unitDir, mag);
+        unitDir = numeric.add(drawPosition, unitDir);
+        context.lineTo(unitDir[0], unitDir[1]);
+        context.strokeStyle = 'white';
+        context.stroke();
+    }
+    if (this.lastDrawPosition !== null) {
         trace.strokeStyle = this.traceColour;
-        trace.lineWidth = 1/100;
+        trace.lineWidth = 1 / 100;
         trace.beginPath();
-        trace.moveTo( this.lastDrawPosition[0], this.lastDrawPosition[1] );
-        trace.lineTo( drawPosition[0], drawPosition[1] );
+        trace.moveTo(this.lastDrawPosition[0], this.lastDrawPosition[1]);
+        trace.lineTo(drawPosition[0], drawPosition[1]);
         trace.stroke();
     }
     this.lastDrawPosition = numeric.clone(drawPosition);
@@ -76,8 +138,8 @@ SpaceObject.prototype.drawObject = function (context, trace, com, maxMass) {
     trace.restore();
 };
 
-SpaceObject.prototype.getId = function() {
-    return this.id-1;
+SpaceObject.prototype.getId = function () {
+    return this.id - 1;
 };
 
 SpaceObject.prototype.increaseStepCount = function (timestep) {
@@ -88,35 +150,136 @@ SpaceObject.prototype.getTotalStepCount = function () {
     return this.totalStepCount;
 };
 
-SpaceObject.prototype.moveObject = function (delta) {
-    if (typeof delta !== "undefined") {
-        this.lastPosition = numeric.clone(this.position);
-        this.position = numeric.add(this.position, delta);
-    }
-};
-
 SpaceObject.prototype.setPosition = function (newPosition) {
     if (typeof newPosition !== "undefined") {
         this.lastPosition = numeric.clone(this.position);
         this.position = numeric.clone(newPosition);
     }
 };
-SpaceObject.prototype.getPosition = function() {
-    return numeric.clone(this.position);
+SpaceObject.prototype.getPosition = function (prime) {
+    var pos = numeric.clone(this.position);
+
+    if (typeof prime !== "undefined") {
+        if (prime === 1) {
+            pos = numeric.clone(this.interPosition[0]);
+        } else if (prime === 2) {
+            pos = numeric.clone(this.interPosition[1]);
+        } else if (prime === -1) {
+            pos = numeric.clone(this.lastPosition);
+        }
+    }
+    return pos;
 };
 
-SpaceObject.prototype.getMass = function() {
+SpaceObject.prototype.addPosition = function (toAdd) {
+    if (typeof toAdd !== "undefined") {
+        this.lastPosition = numeric.clone(this.position);
+        this.position = numeric.add(this.position, toAdd);
+    }
+};
+
+SpaceObject.prototype.setIntermPosition = function (interm, prime) {
+    if (typeof interm !== "undefined"
+            && typeof prime !== "undefined") {
+        if (prime === 1) {
+            this.interPosition[0] = numeric.clone(interm);
+        } else if (prime === 2) {
+            this.interPosition[1] = numeric.clone(interm);
+        }
+    }
+};
+
+SpaceObject.prototype.getMass = function () {
     return this.mass;
 };
 
-SpaceObject.prototype.addMass = function(toAdd) {
+SpaceObject.prototype.addMass = function (toAdd) {
     this.mass += toAdd;
 };
 
-SpaceObject.prototype.getDrawRadius = function(maxMass) {
-    //A maximum mass obj at 100 scale should be 15 px...
-    
-    var radius = (15/100) * (this.mass/maxMass);
+SpaceObject.prototype.setAcceleration = function (newAcceleration) {
+    if (typeof newAcceleration !== "undefined") {
+        this.lastAcceleration = numeric.clone(this.acceleration);
+        this.acceleration = numeric.clone(newAcceleration);
+    }
+};
+
+SpaceObject.prototype.getAcceleration = function (prime) {
+    var acc = numeric.clone(this.acceleration);
+
+    if (typeof prime !== "undefined") {
+        if (prime === 1) {
+            acc = numeric.clone(this.interAcceleration[0]);
+        } else if (prime === 2) {
+            acc = numeric.clone(this.interAcceleration[1]);
+        } else if (prime === -1) {
+            acc = numeric.clone(this.lastAcceleration);
+        }
+    }
+    return acc;
+};
+
+SpaceObject.prototype.addAcceleration = function (toAdd) {
+    if (typeof toAdd !== "undefined") {
+        this.lastAcceleration = numeric.clone(this.acceleration);
+        this.acceleration = numeric.add(this.acceleration, toAdd);
+    }
+};
+
+SpaceObject.prototype.setIntermAcceleration = function (interm, prime) {
+    if (typeof interm !== "undefined"
+            && typeof prime !== "undefined") {
+        if (prime === 1) {
+            this.interAcceleration[0] = numeric.clone(interm);
+        } else if (prime === 2) {
+            this.interAcceleration[1] = numeric.clone(interm);
+        }
+    }
+};
+
+SpaceObject.prototype.setVelocity = function (newVelocity) {
+    if (typeof newVelocity !== "undefined") {
+        this.lastVelocity = numeric.clone(this.velocity);
+        this.velocity = numeric.clone(newVelocity);
+    }
+};
+
+SpaceObject.prototype.getVelocity = function (prime) {
+    var vel = numeric.clone(this.velocity);
+
+    if (typeof prime !== "undefined") {
+        if (prime === 1) {
+            vel = numeric.clone(this.interVelocity[0]);
+        } else if (prime === 2) {
+            vel = numeric.clone(this.interVelocity[1]);
+        } else if (prime === -1) {
+            vel = numeric.clone(this.lastVelocity);
+        }
+    }
+    return vel;
+};
+
+SpaceObject.prototype.addVelocity = function (toAdd) {
+    if (typeof toAdd !== "undefined") {
+        this.lastVelocity = numeric.clone(this.velocity);
+        this.velocity = numeric.add(this.velocity, toAdd);
+    }
+};
+
+SpaceObject.prototype.setIntermVelocity = function (interm, prime) {
+    if (typeof interm !== "undefined"
+            && typeof prime !== "undefined") {
+        if (prime === 1) {
+            this.interVelocity[0] = numeric.clone(interm);
+        } else if (prime === 2) {
+            this.interVelocity[1] = numeric.clone(interm);
+        }
+    }
+};
+
+SpaceObject.prototype.getDrawRadius = function (maxMass) {
+    //A maximum mass obj at 100 scale should be 15 px...    
+    var radius = (15 / 100) * (this.mass / maxMass);
     return radius;
 };
 
@@ -124,17 +287,77 @@ SpaceObject.prototype.getDrawRadius = function(maxMass) {
  * MOTION FUNCTIONS
  ******************************************************* */
 
-SpaceObject.prototype.calculateGravitationalForce = function( gravConst, others, prime ) {
+SpaceObject.prototype.calculateGravitationalForce = function (gravConst, others, prime) {
     var totalInteraction = [0, 0];
-    
-    
-    
+    var singleInteraction;
+    var activePosition = this.getPosition(prime);
+    var thisActive = this.getId();
+    if (typeof others !== "undefined" && others.length > 0) {
+        $.each(others, function (i, other) {
+            if (other.getId() !== thisActive) {
+
+                singleInteraction = other.getGravitationalField(gravConst, activePosition, prime);
+                singleInteraction = numeric.mul(singleInteraction, 1);
+
+                if (typeof singleInteraction !== "undefined") {
+                    totalInteraction = numeric.add(totalInteraction, singleInteraction);
+                }
+            }
+        });
+        totalInteraction = numeric.mul(totalInteraction, this.mass);
+    }
     return totalInteraction;
 };
 
-SpaceObject.prototype.calculateGravitationalInteraction = function( gravConst, other, prime ) {
-    var singleInteraction = [0, 0];
-    
-    
-    return singleInteraction;
+
+SpaceObject.prototype.calculateKineticEnergy = function () {
+    var kineticEnergy = 0;
+
+    var currVel = numeric.norm2Squared(this.getVelocity());
+    kineticEnergy = (1.0 / 1.0) * (this.mass) * (currVel);
+
+    //console.log(kineticEnergy);
+    return kineticEnergy;
+};
+
+SpaceObject.prototype.calculateGravitationalPotential = function (gravConstant, other) {
+    var singlePotential = 0;
+    var activePosition = this.getPosition();
+    var thisActive = this.getId();
+
+    var vector, distance;
+
+    if (typeof other !== "undefined") {
+        if (other.getId() !== thisActive) {
+            vector = numeric.sub(other.getPosition(), activePosition);
+            distance = numeric.norm2(vector);
+
+            singlePotential = (-gravConstant * other.getMass());
+            singlePotential = (singlePotential / distance);
+        }
+    }
+    return singlePotential;
+};
+
+SpaceObject.prototype.getGravitationalField = function (gravConstant, point, prime) {
+    var gravField = (-gravConstant * this.mass);
+    var vector, distance;
+    var hat;
+
+    vector = [0, 0];
+    if (typeof point !== "undefined") {
+        //Vector points from THIS to POINT
+        vector = numeric.sub(point, this.getPosition(prime));
+        //Distance between THIS POSITION and POINT.
+        distance = numeric.norm2(vector);
+        hat = numeric.div(vector, distance);
+
+        if (this.parent.getBodyCount() > 2) {
+            gravField = (gravField / (distance)); //?
+        } else {
+            gravField = (gravField / (numeric.norm2Squared(vector))); // |g| = (-GM/(r^2))
+        }
+        vector = numeric.mul(hat, gravField); // g = (-GM/|r|^2) * r-hat
+    }
+    return vector;
 };

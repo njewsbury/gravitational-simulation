@@ -1,16 +1,16 @@
 
 body {
     background-image: url(#{resource['images/earth-bg-min.jpg']});
-    background-size: cover;
-    background-position: center center;
-    background-repeat: no-repeat;
-    background-attachment: fixed;
-    
-    overflow: hidden;    
-    padding: 0;
-    margin: 0;
-    
-    height: 100%;
+background-size: cover;
+background-position: center center;
+background-repeat: no-repeat;
+background-attachment: fixed;
+
+overflow: hidden;    
+padding: 0;
+margin: 0;
+
+height: 100%;
 }
 
 #inner-container {
@@ -22,14 +22,14 @@ body {
 #landing-header {
     padding: 0;
     margin: 0;
-    
+
     background: #202020;
     opacity: 0.1;
-    
+
     border-top: 3px solid #FF9900;
     border-bottom: 3px solid #FF9900;
     text-align:center;
-    
+
     height: 7em;
 }
 
@@ -39,4 +39,29 @@ body {
 
 button {
     width: 205px;
+}
+
+.ribbon {
+    background-color: #CC6600;
+    overflow: hidden;
+    white-space: nowrap;
+    position: absolute;
+    right: -50px;
+    top: 40px;
+    -webkit-transform: rotate(45deg);
+    -moz-transform: rotate(45deg);
+    -ms-transform: rotate(45deg);
+    -o-transform: rotate(45deg);
+    transform: rotate(45deg);
+
+}
+.ribbon a {
+    border: 1px solid #291400;
+    color: #fff;
+    display: block;
+    font: bold 81.25% 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    margin: 1px 0;
+    padding: 10px 50px;
+    text-align: center;
+    text-decoration: none;
 }
