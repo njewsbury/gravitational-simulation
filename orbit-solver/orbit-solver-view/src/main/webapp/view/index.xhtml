@@ -11,6 +11,7 @@
     </ui:define>
 
     <ui:define name="content">
+        <link rel="shortcut icon" type="image/x-icon" href="#{resource['images/favicon.ico']}"/>
         <h:outputStylesheet library="css" name="landing-style.css"/>
         <link href='http://fonts.googleapis.com/css?family=Dosis:400,800' rel='stylesheet' type='text/css'/>
 
@@ -32,7 +33,7 @@
 
         <script>
             function viewSolver() {
-                window.location = "${request.contextPath}/view/solver.xhtml";
+                window.location = "${request.contextPath}/static/preview.html";
             }
             function viewSimulation() {
                 window.location = "${request.contextPath}/static/simulation.html";
@@ -47,6 +48,8 @@
             }
 
             $(document).ready(function () {
+                
+                console.log("#{request.contextPath}");
                 $(window).resize(function () {
                     resize();
                 });

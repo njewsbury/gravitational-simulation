@@ -60,7 +60,9 @@ RealTimePage.initialize = function () {
     $("#simulation-force").on('click', RealTimePage.forceSimulation);
     $("#simulation-report").on('click', RealTimePage.viewReport);
     $("#simulation-download").on('click', RealTimePage.downloadImage);
-
+    $("#back-home").on('click', function () {
+        window.location = "/orbit-solver-view";
+    });
 
     $("#simulation-download").prop('disabled', true);
     $("#simulation-report").prop('disabled', true);
@@ -177,8 +179,8 @@ RealTimePage.solveNewChoreograph = function () {
                         "initialPos": [-1, 0],
                         "initialVel": [0, 2.5],
                         "mass": 1,
-                        "colour": "#FF6600",
-                        "traceColour": "#FF6600"
+                        "colour": "rgba(255,102,0,0.5)",
+                        "traceColour": "rgba(255,102,0,1)"
                     },
                     {
                         "id": 2,
@@ -204,8 +206,8 @@ RealTimePage.solveNewChoreograph = function () {
                         "initialPos": [-1.0476468689142076, -0.23909615329193726],
                         "initialVel": [-0.22590654649660127, 1.0505409928011857],
                         "mass": 1,
-                        "colour": "#FF6600",
-                        "traceColour": "#FF6600"
+                        "colour": "rgba(255,102,0,0.3)",
+                        "traceColour": "rgba(255,102,0,0.8)"
                     },
                     {
                         "id": 2,
@@ -213,8 +215,8 @@ RealTimePage.solveNewChoreograph = function () {
                         "initialPos": [0.3167601013003253, 1.0268368721249914],
                         "initialVel": [1.0227484621390825, -0.3296296887855502],
                         "mass": 1,
-                        "colour": "#0A0AFF",
-                        "traceColour": "#0B0BFF"
+                        "colour": "rgba(50,10,255,0.3)",
+                        "traceColour": "rgba(50,10,255,1)"
                     },
                     {
                         "id": 3,
@@ -222,8 +224,8 @@ RealTimePage.solveNewChoreograph = function () {
                         "initialPos": [0.7308867739598754, -0.7877407255617989],
                         "initialVel": [-0.7968419174405968, -0.7209113096472372],
                         "mass": 1,
-                        "colour": "#01AA01",
-                        "traceColour": "#01AA01"
+                        "colour": "rgba(10,180,65,0.3)",
+                        "traceColour": "rgba(10,180,65,1)"
                     }
                 ]
             });

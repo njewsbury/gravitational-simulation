@@ -41,10 +41,11 @@ var SpaceObject = function (jsonDef, universe) {
     this.acceleration = [0, 0];
     this.interAcceleration = [this.acceleration, this.acceleration];
 
+    this.imgIsntLoaded = true;
 };
 
 SpaceObject.prototype.drawObject = function (context, trace, com, maxMass) {
-
+    var _this = this;
     var drawPosition = [0, 0];
     var radius = this.getDrawRadius(maxMass);
     context.save();
@@ -54,44 +55,26 @@ SpaceObject.prototype.drawObject = function (context, trace, com, maxMass) {
     trace.strokeStyle = this.traceColour;
 
     drawPosition = numeric.sub(this.position, com);
-    
-    context.beginPath();
-    context.arc(drawPosition[0], drawPosition[1], radius, 2.0 * Math.PI, false);
-    //context.clip();
-    
-    /*
-    imgObj.onload = function() {
-        var pattern = context.createPattern(imgObj, 'no-repeat');
-        context.rect(0, 0, 85, 85);
-        context.fillStyle = pattern;
-        context.fill();
-        context.beginPath();
-        context.arc(42.5, 42.5, 42.5,2*Math.PI, false);
-        context.fillStyle ='rgba(10, 90, 150, 0.4)';
-        context.fill();
-    };
-    */
-    
-    
+
     context.save();
-    
     var imgObj = new Image();
     imgObj.src = 'css/images/orbital-body.png';
-    var pattern = context.createPattern(imgObj, 'no-repeat');
-    context.scale( radius / 42.5, radius / 42.5 );
-    context.rect(drawPosition[0], drawPosition[1], 85, 85 );
-    console.log( pattern );
-    console.log(drawPosition);
-    
-    context.fillStyle = pattern;
-    if( imgObj !== null ) {
-        context.fill();
-    } 
+    if (this.imgIsntLoaded) {
+        imgObj.onload = function () {
+            _this.imgIsntLoaded = false;
+            _this.drawObject(context, trace, com, maxMass);
+        };
+    }
+    context.createPattern(imgObj, 'repeat');
+    context.scale(radius / 42.5, radius / 42.5); // image source is 85x85, cue magic math..
+    var drawx = (drawPosition[0] * (42.5 / radius)) - radius * 85 * 3.5;
+    var drawy = (drawPosition[1] * (42.5 / radius)) - radius * 85 * 3.5;
+    context.drawImage(imgObj, drawx, drawy);
     context.restore();
-    
+
     context.beginPath();
     context.arc(drawPosition[0], drawPosition[1], radius, 2.0 * Math.PI, false);
-    //context.fill();
+    context.fill();
     context.strokeStyle = '#FF6600';
     context.lineWidth = 2 / 100;
     context.strokeStyle = 'black';

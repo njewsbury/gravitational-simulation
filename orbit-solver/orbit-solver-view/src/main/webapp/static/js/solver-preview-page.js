@@ -31,8 +31,11 @@ PreviewPage.initialize = function () {
     //$("#preview-tabs").tabs("disable", 1);
     PreviewPage.resize();
     $("#preview-tabs").tabs({active: 1});
-    
+
     $("#preview-context-button").on('click', PreviewPage.solveChoreography);
+    $("#back-home").on('click', function () {
+        window.location = "/orbit-solver-view";
+    });
 };
 
 PreviewPage.resize = function () {
@@ -89,10 +92,10 @@ PreviewPage.solveChoreography = function () {
     if (typeof PreviewPage.currentSettings !== "undefined"
             && PreviewPage.currentSettings !== null) {
         var orbitalSolver = new OrbitalSolver(PreviewPage.currentSettings);
-        
-        if( orbitalSolver.isReady() ) {
+
+        if (orbitalSolver.isReady()) {
             var success = orbitalSolver.findSolutions();
-            if( success > 0 ) {
+            if (success > 0) {
                 alertify.success("Solved!");
             } else {
                 alertify.error(orbitalSolver.getErrorMessage());
