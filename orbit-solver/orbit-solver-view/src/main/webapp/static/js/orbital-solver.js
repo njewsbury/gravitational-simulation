@@ -1,4 +1,4 @@
-/* global numeric, ActionFunction */
+/* global numeric, ActionFunction, alertify, Infinity */
 
 var OrbitalSolver = function (settings) {
 
@@ -40,8 +40,6 @@ OrbitalSolver.prototype.generateRandomVariables = function () {
                 .map(Number.prototype.valueOf, 1);
         eachRequired = nBodies * this.settings.getFourierPrecision();
 
-        console.log("Solving requires :: " + eachRequired * 4 + " params. [[" + eachRequired + "]] each.");
-
         if (!this.settings.isEqualMass()) {
             if (typeof this.settings.getMaximumMass() !== "undefined") {
                 maxMass = this.settings.getMaximumMass();
@@ -56,7 +54,7 @@ OrbitalSolver.prototype.generateRandomVariables = function () {
         this.alphaCosParams = {};
         this.betaSinParams = {};
         this.betaCosParams = {};
-        
+
         var ALPHA_MULTIPLIER = 1.0;
         var BETA_MULTIPLIER = 0.01;
         var ALPHA_MODIFIER = 0.5;
@@ -75,16 +73,16 @@ OrbitalSolver.prototype.generateRandomVariables = function () {
             }
             // Modify random params to fit required distribution.
             asParams = numeric.sub(asParams, ALPHA_MODIFIER);
-            this.alphaSinParams.n = numeric.mul(ALPHA_MULTIPLIER, asParams);
+            this.alphaSinParams[n] = numeric.mul(ALPHA_MULTIPLIER, asParams);
 
             acParams = numeric.sub(acParams, ALPHA_MODIFIER);
-            this.alphaCosParams.n = numeric.mul(ALPHA_MULTIPLIER, acParams);
+            this.alphaCosParams[n] = numeric.mul(ALPHA_MULTIPLIER, acParams);
 
             bsParams = numeric.sub(bsParams, BETA_MODIFIER);
-            this.betaSinParams.n = numeric.mul(BETA_MULTIPLIER, bsParams);
+            this.betaSinParams[n] = numeric.mul(BETA_MULTIPLIER, bsParams);
 
             bcParams = numeric.sub(bcParams, BETA_MODIFIER);
-            this.betaCosParams.n = numeric.mul(BETA_MULTIPLIER, bcParams);
+            this.betaCosParams[n] = numeric.mul(BETA_MULTIPLIER, bcParams);
         }
     }
 };
@@ -94,34 +92,46 @@ OrbitalSolver.prototype.isReady = function () {
 };
 
 OrbitalSolver.prototype.findSolutions = function () {
-
-    var asPrime = numeric.clone(this.alphaSinParams);
-    var acPrime = numeric.clone(this.alphaCosParams);
-    var bsPrime = numeric.clone(this.betaSinParams);
-    var bcPrime = numeric.clone(this.betaCosParams);
-
     var bodies = this.settings.getBodyParam();
     var timePrecision = this.settings.getTimePrecision();
     var spacePrecision = this.settings.getFourierPrecision();
     var dt = this.dt;
-    
+    var actionMap = null;
+
     ActionFunction.initialize({
         "bodies": bodies,
         "timePrec": timePrecision,
         "spacePrec": spacePrecision,
-        "dt" : dt 
+        "dt": dt,
+        "gravConst": this.settings.getGravitationalConstant()
     });
 
-    var result = ActionFunction.evaluate({
-        "as": asPrime,
-        "ac": acPrime,
-        "bs": bsPrime,
-        "bc": bcPrime
-    });
+    var concatArray = [];
 
-    console.log(result);
+    for (var n = 0; n < bodies; n++) {
+        concatArray = concatArray.concat(this.alphaSinParams[n]);
+        concatArray = concatArray.concat(this.alphaCosParams[n]);
+        concatArray = concatArray.concat(this.betaSinParams[n]);
+        concatArray = concatArray.concat(this.betaCosParams[n]);
+    }
+    //var result = ActionFunction.evaluate(concatArray);
 
-    return 1;
+    try {
+        var sol = numeric.uncmin(ActionFunction.evaluate, concatArray);
+        console.log( sol );
+        if (typeof sol.f !== "undefined" && Math.abs(sol.f) !== (Infinity)) {
+            console.log( sol.f );
+            if (typeof sol.solution !== "undefined") {
+                ActionFunction.evaluate(sol.solution);
+                actionMap = ActionFunction.getActionMap();
+            }
+        } else {
+            alertify.error("Infinity encountered.");
+        }
+    } catch (Err) {
+        console.log(Err);
+    }
+    return actionMap;
 };
 
 

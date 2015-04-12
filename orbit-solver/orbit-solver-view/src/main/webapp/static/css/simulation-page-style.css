@@ -11,6 +11,11 @@ body, html {
     height: 100%;
 }
 
+#preload {
+    background: url('css/orbital-body.png') no-repeat;
+    display: none;
+}
+
 #realtime-container {
     position: absolute;
     width: 100%;

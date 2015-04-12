@@ -1,5 +1,5 @@
 
-/* global numeric */
+/* global numeric, t */
 
 var ActionFunction = new Object();
 
@@ -9,6 +9,7 @@ ActionFunction.initialize = function (params) {
     ActionFunction.maxTime = params.maxTime || 2.0 * Math.PI;
     ActionFunction.timePrecision = params.timePrec || 1;
     ActionFunction.spacialPrecision = params.spacePrec || 1;
+    ActionFunction.gravConstant = params.gravConst || 1;
     ActionFunction.dt = params.dt || 1;
     ActionFunction.massValues = params.massValues || Array.apply(null,
             new Array(ActionFunction.bodyCount))
@@ -16,21 +17,45 @@ ActionFunction.initialize = function (params) {
 };
 
 ActionFunction.evaluate = function (values) {
-    ActionFunction.as = values.as || null;
-    ActionFunction.ac = values.ac || null;
-    ActionFunction.bs = values.bs || null;
-    ActionFunction.bc = values.bc || null;
+    var totalAction = 0;
+    var cloned;
+    if (typeof values !== "undefined" && values !== null) {
+        cloned = numeric.clone(values);
+        ActionFunction.as = new Array(ActionFunction.bodyCount);
+        ActionFunction.ac = new Array(ActionFunction.bodyCount);
+        ActionFunction.bs = new Array(ActionFunction.bodyCount);
+        ActionFunction.bc = new Array(ActionFunction.bodyCount);
 
-    ActionFunction.positionMap = new Array(ActionFunction.bodyCount);
-    ActionFunction.velocityMap = new Array(ActionFunction.bodyCount);
+        for (var n = 0; n < ActionFunction.bodyCount; n++) {
+            ActionFunction.as[n] = cloned.splice(0, ActionFunction.spacialPrecision);
+            ActionFunction.ac[n] = cloned.splice(0, ActionFunction.spacialPrecision);
+            ActionFunction.bs[n] = cloned.splice(0, ActionFunction.spacialPrecision);
+            ActionFunction.bc[n] = cloned.splice(0, ActionFunction.spacialPrecision);
+        }
 
-    ActionFunction.potentialMap = new Array(ActionFunction.bodyCount);
-    ActionFunction.kineticMap = new Array(ActionFunction.bodyCount);
+        ActionFunction.positionMap = new Array(ActionFunction.bodyCount);
+        ActionFunction.velocityMap = new Array(ActionFunction.bodyCount);
 
-    ActionFunction.solveSystemDetails();
-    ActionFunction.solveSystemEnergy();
+        ActionFunction.potentialMap = new Array(ActionFunction.bodyCount);
+        ActionFunction.kineticMap = new Array(ActionFunction.bodyCount);
+        ActionFunction.actionMap = new Array(ActionFunction.bodyCount);
 
-    return 1;
+        ActionFunction.solveSystemDetails();
+        ActionFunction.solveSystemEnergy();
+
+        totalAction = ActionFunction.integrate();
+    } else {
+        console.log( "ERR");
+    }
+    return totalAction;
+};
+
+ActionFunction.integrate = function () {
+    var action = 0;
+    for (var t = 0; t < ActionFunction.timePrecision; t++) {
+        action += (ActionFunction.actionMap[t] * ActionFunction.dt);
+    }
+    return action;
 };
 
 ActionFunction.getThetaValue = function (atTime) {
@@ -46,7 +71,14 @@ ActionFunction.solveSystemDetails = function () {
 ActionFunction.solveSystemEnergy = function () {
     ActionFunction.calculateKineticEnergy();
     ActionFunction.calculatePotentialEnergy();
-    
+
+
+    for (var t = 0; t < ActionFunction.timePrecision; t++) {
+        ActionFunction.actionMap[t] = (
+                ActionFunction.kineticMap[t] - ActionFunction.potentialMap[t]
+                );
+    }
+
 };
 
 ActionFunction.calculateKineticEnergy = function () {
@@ -73,8 +105,42 @@ ActionFunction.calculateKineticEnergy = function () {
     ActionFunction.kineticMap = kineticMap;
 };
 
-ActionFunction.calculatePotentialEnergy = function() {
-    
+ActionFunction.calculatePotentialEnergy = function () {
+    var potentialMap = Array.apply(null,
+            new Array(ActionFunction.timePrecision))
+            .map(Number.prototype.valueOf, 0);
+
+    var ax, ay, ox, oy;
+    var diffx, diffy;
+    var singleTimePotential = 0, singleBodyPotential;
+    var dist;
+    for (var t = 0; t < ActionFunction.timePrecision; t++) {
+        singleTimePotential = 0;
+        for (var active = 0; active < ActionFunction.bodyCount; active++) {
+            ax = ((ActionFunction.positionMap[active])[0])[t];
+            ay = ((ActionFunction.positionMap[active])[1])[t];
+
+            singleBodyPotential = 0;
+            for (var other = 0; other < ActionFunction.bodyCount; other++) {
+                if (active !== other) {
+                    ox = ((ActionFunction.positionMap[other])[0])[t];
+                    oy = ((ActionFunction.positionMap[other])[1])[t];
+
+                    diffx = ax - ox;
+                    diffy = ay - oy;
+
+                    dist = numeric.norm2([diffx, diffy]);
+                    if (Math.abs(dist) > 0) {
+                        singleBodyPotential += (ActionFunction.massValues[other] / (dist * dist));
+                    }
+                }
+            }
+            singleBodyPotential *= (ActionFunction.gravConstant * ActionFunction.massValues[active]);
+            singleTimePotential += singleBodyPotential;
+        }
+        potentialMap[t] = singleTimePotential;
+    }
+    ActionFunction.potentialMap = potentialMap;
 };
 
 ActionFunction.calculateBodyDetails = function (nBody) {
@@ -94,25 +160,11 @@ ActionFunction.calculateBodyDetails = function (nBody) {
 
     for (var t = 0; t < ActionFunction.timePrecision; t++) {
         for (var k = 1; k < ActionFunction.spacialPrecision; k++) {
-            xPos[t] += (
-                    ActionFunction.as[ nBody ][k]
-                    * Math.sin(k * ActionFunction.getTheta(t))
-                    );
-            xPos[t] += (
-                    ActionFunction.ac[nBody][k]
-                    * Math.cos(k * ActionFunction.getTheta(t))
-                    );
-            yPos[t] += (
-                    ActionFunction.bs[nBody][k]
-                    * Math.sin(k * ActionFunction.getTheta(t))
-                    );
-            yPos[t] += (
-                    ActionFunction.bc[nBody][k]
-                    * Math.cos(k * ActionFunction.getTheta(t))
-                    );
+            xPos[t] += ActionFunction.cyclicXFunction(nBody, k, t);
+            yPos[t] += ActionFunction.cyclicYFunction(nBody, k, t);
 
         }
-        if (t > 0 && t < (ActionFunction.timePrecision - 1)) {
+        if (t > 0 && t < (ActionFunction.timePrecision)) {
             dxPos[t - 1] = (xPos[t] - xPos[t - 1]) / ActionFunction.dt;
             dyPos[t - 1] = (yPos[t] - yPos[t - 1]) / ActionFunction.dt;
         }
@@ -123,13 +175,42 @@ ActionFunction.calculateBodyDetails = function (nBody) {
                     (yPos[0] - yPos[ActionFunction.timePrecision - 1]) / ActionFunction.dt;
         }
     }
+
     ActionFunction.positionMap[nBody] = [xPos, yPos];
     ActionFunction.velocityMap[nBody] = [dxPos, dyPos];
 };
 
+ActionFunction.cyclicXFunction = function (nBody, k, t) {
+
+    var sinPart = (
+            ActionFunction.as[ nBody ][k]
+            * Math.sin(k * ActionFunction.getThetaValue(t))
+            );
+    var cosPart = (
+            ActionFunction.ac[nBody][k]
+            * Math.cos(k * ActionFunction.getThetaValue(t))
+            );
+    return (sinPart + cosPart);
+};
+
+ActionFunction.cyclicYFunction = function (nBody, k, t) {
+    var sinPart = (
+            ActionFunction.bs[nBody][k]
+            * Math.sin(k * ActionFunction.getThetaValue(t))
+            );
+    var cosPart = (
+            ActionFunction.bc[nBody][k]
+            * Math.cos(k * ActionFunction.getThetaValue(t))
+            );
+    return (sinPart + cosPart);
+};
 
 /*************************************/
 
 ActionFunction.getPositionMap = function () {
     return ActionFunction.positionMap;
+};
+
+ActionFunction.getActionMap = function () {
+    return ActionFunction.actionMap;
 };

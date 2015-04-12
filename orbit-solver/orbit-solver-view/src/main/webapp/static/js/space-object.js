@@ -42,6 +42,8 @@ var SpaceObject = function (jsonDef, universe) {
     this.interAcceleration = [this.acceleration, this.acceleration];
 
     this.imgIsntLoaded = true;
+    this.imgObj = new Image();
+    this.imgObj.src = 'css/images/orbital-body.png';
 };
 
 SpaceObject.prototype.drawObject = function (context, trace, com, maxMass) {
@@ -57,19 +59,13 @@ SpaceObject.prototype.drawObject = function (context, trace, com, maxMass) {
     drawPosition = numeric.sub(this.position, com);
 
     context.save();
-    var imgObj = new Image();
-    imgObj.src = 'css/images/orbital-body.png';
-    if (this.imgIsntLoaded) {
-        imgObj.onload = function () {
-            _this.imgIsntLoaded = false;
-            _this.drawObject(context, trace, com, maxMass);
-        };
-    }
-    context.createPattern(imgObj, 'repeat');
+    
+    context.createPattern(this.imgObj, 'no-repeat');
     context.scale(radius / 42.5, radius / 42.5); // image source is 85x85, cue magic math..
     var drawx = (drawPosition[0] * (42.5 / radius)) - radius * 85 * 3.5;
     var drawy = (drawPosition[1] * (42.5 / radius)) - radius * 85 * 3.5;
-    context.drawImage(imgObj, drawx, drawy);
+
+    context.drawImage(this.imgObj, drawx, drawy);
     context.restore();
 
     context.beginPath();

@@ -14,6 +14,7 @@ var OrbitalParams = function( jsonDef ) {
     this.givenMaxMass = parseFloat(jsonDef.maximumMass);
     this.givenMaxTime = parseFloat(jsonDef.maximumTime);
     this.givenSeed = jsonDef.solutionSeed;
+    this.givenGravConst = jsonDef.gravConstant || 1;
     //
     this.givenTimePrecision = parseInt(jsonDef.timePrecision);
     this.givenFourierPrecision = parseInt(jsonDef.fourierPrecision);
@@ -52,6 +53,10 @@ OrbitalParams.prototype.getMaximumTime = function() {
 };
 OrbitalParams.prototype.getSolutionSeed = function() {
     return this.givenSeed;
+};
+
+OrbitalParams.prototype.getGravitationalConstant = function() {
+    return this.givenGravConst;
 };
 
 OrbitalParams.prototype.getTimePrecision = function() {

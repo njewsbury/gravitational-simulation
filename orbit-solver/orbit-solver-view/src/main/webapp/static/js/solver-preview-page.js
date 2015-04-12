@@ -1,4 +1,4 @@
-/* global alertify, numeric */
+/* global alertify, numeric, SolverUtil */
 
 var PreviewPage = new Object();
 
@@ -15,11 +15,12 @@ PreviewPage.initialize = function () {
     PreviewPage.currentSettings = new OrbitalParams({
         "nBodies": 3,
         "timePrecision": 100,
-        "fourierPrecision": 15,
+        "fourierPrecision": 1,
         "equalMasses": true,
         "maximumMass": 1,
         "maximumTime": 100,
-        "solutionSeed": "${THREE}"
+        //"solutionSeed": "${THREE}",
+        "gravConstant": 1
     });
 
     window.addEventListener('resize', PreviewPage.resize, false);
@@ -53,9 +54,6 @@ PreviewPage.resize = function () {
         $("#preview-tabs").tabs("refresh");
         $("#orbit-preview").css("overflow", "hidden");
         $("#orbit-action").css("overflow", "hidden");
-
-        PreviewPage.redrawCanvasElements();
-
     }
 };
 
@@ -91,31 +89,84 @@ PreviewPage.createSettingsDialog = function (defaultValues) {
 PreviewPage.solveChoreography = function () {
     if (typeof PreviewPage.currentSettings !== "undefined"
             && PreviewPage.currentSettings !== null) {
-        var orbitalSolver = new OrbitalSolver(PreviewPage.currentSettings);
-
-        if (orbitalSolver.isReady()) {
-            var success = orbitalSolver.findSolutions();
-            if (success > 0) {
-                alertify.success("Solved!");
-            } else {
-                alertify.error(orbitalSolver.getErrorMessage());
-            }
-        }
+        var config = {
+            "nBodies" : 3,
+            "precision" : [
+                1, 100
+            ],
+            "equalMasses" : true,
+            "maximumMass" : 1,
+            "gravConst" : 1,
+            "seedValue" : "${THREE}"
+        };
+        
+        var solverConfig = new SolverParams(config);
+        SolverUtil.setParams(solverConfig);
+        SolverUtil.minimizeFunction(PreviewPage.solvedChoreography);
+        /*
+         var orbitalSolver = new OrbitalSolver(PreviewPage.currentSettings);
+         
+         if (orbitalSolver.isReady()) {
+         var success = orbitalSolver.findSolutions();
+         if (typeof success !== "undefined" && success !== null) {
+         var labels = [];
+         for (var i = 0, sz = success.length; i < sz; i++) {
+         labels.push("");
+         }
+         var actionDataset = {
+         label: "Total Energy",
+         fillColor: "rgba(220,220,220,0.2)",
+         strokeColor: "rgba(220,220,220,1)",
+         pointColor: "rgba(220,220,220,1)",
+         pointStrokeColor: "#fff",
+         pointHighlightFill: "#fff",
+         pointHighlightStroke: "rgba(220,220,220,1)",
+         data: success
+         };
+         PreviewPage.drawActionReport({
+         labels: labels,
+         datasets: [actionDataset]
+         });
+         alertify.success("Solved!");
+         } else {
+         alertify.error(orbitalSolver.getErrorMessage());
+         }
+         }
+         */
     } else {
         alertify.error("Unable to solve for choreography!");
     }
+
 };
 
+PreviewPage.solvedChoreography = function() {
+    console.log("Heyo!");
+};
 PreviewPage.applySettings = function () {
     console.log("Aww Yea.");
 };
-
 /* **************
  * RENDERING FUNCTIONS
  */
-PreviewPage.redrawCanvasElements = function () {
+PreviewPage.drawChoreograph = function (positionMap) {
     var canvasExtent = numeric.div([
         PreviewPage.orbitCanvas.width,
         PreviewPage.orbitCanvas.height
     ], 2);
+};
+PreviewPage.drawActionReport = function (dataset) {
+    var cntx = PreviewPage.actionCanvas.getContext('2d');
+    cntx.save();
+    //
+    var chart = new Chart(cntx).Line(dataset, {
+        showTooltips: false,
+        scaleFontColor: 'white',
+        animation: false,
+        pointDot: false,
+        scaleShowHorizontalLines: true,
+        scaleShowVerticalLines: true
+
+    });
+    //
+    cntx.restore();
 };
