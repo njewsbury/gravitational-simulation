@@ -58,6 +58,8 @@ canvas#trace-canvas {
 }
 #simulation-footer {
     border-top: 3px solid #FF9900;
+    display: flex;
+    justify-content: space-between;
 }
 
 div.bar-display {
@@ -105,6 +107,12 @@ div.dialog-input select {
 button:disabled {
     color: grey;
     cursor: default;
+}
+
+#seed-section {
+    color: white;
+    display: inline-block;
+    font-size: 0.9em;
 }
 
 /* Allow Font Awesome Icons in lieu of jQuery UI and only apply when using a FA icon */

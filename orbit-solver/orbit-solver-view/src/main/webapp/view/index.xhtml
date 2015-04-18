@@ -11,60 +11,14 @@
     </ui:define>
 
     <ui:define name="content">
-        <link rel="shortcut icon" type="image/x-icon" href="#{resource['images/favicon.ico']}"/>
-        <h:outputStylesheet library="css" name="landing-style.css"/>
-        <link href='http://fonts.googleapis.com/css?family=Dosis:400,800' rel='stylesheet' type='text/css'/>
-
-        <div class="ribbon">
-            <a href="https://github.com/njewsbury/gravitational-simulation">Available on GitHub</a>
-        </div>
-
-        <div id="landing-header">
-            <div id="inner-container">
-                <h1>Orbital Solver &amp; Display</h1>
-                <div id="buttons">
-                    <p:commandButton value="Orbital Simulation" type="button"
-                                     onclick="viewSimulation()"/>
-                    <p:commandButton value="Orbital Solver" type="button" id="orbit-button"
-                                     onclick="viewSolver()"/>                </div>
-                <span>A Physics 4250 Final Project by Nathan Jewsbury &amp; Scott Osadchuk</span>
-            </div>
-        </div>
+        <!--
+            Physics 4250 : Computational Physics
+            Final Project : Choreographed Orbits
+            Authors: Nathan Jewsbury, Scott Osadchuk        
+        -->
 
         <script>
-            function viewSolver() {
-                window.location = "${request.contextPath}/static/preview.html";
-            }
-            function viewSimulation() {
-                window.location = "${request.contextPath}/static/simulation.html";
-            }
-
-            function resize() {
-                var windowHeight = $(window).height();
-                var divHeight = $("#landing-header").height();
-
-                $("#landing-header").css("margin-top", (windowHeight - divHeight) / 2.0);
-                $("#landing-header").css("height", ($("#inner-container").height()));
-            }
-
-            $(document).ready(function () {
-                
-                console.log("#{request.contextPath}");
-                $(window).resize(function () {
-                    resize();
-                });
-                resize();
-
-                $("#landing-header").animate({
-                    opacity: 0.8
-                }, 900);
-                $("#inner-container").animate({
-                    opacity: 1
-                }, 1000);
-                $("#inner-container h1").animate({
-                    marginTop: '0.2em'
-                }, 1500);
-            });
+            window.location = "${request.contextPath}/static/landing.html";            
         </script>
     </ui:define>
 </ui:composition>

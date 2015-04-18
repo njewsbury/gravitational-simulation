@@ -4,7 +4,7 @@
         <title>PHYS 4250 : Real Time Simulation</title>
         <meta content='text/html; charset=UTF-8' http-equiv="Content-Type"/>
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
-
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" /> <!-- IE compat -->
         <link rel='shortcut icon' type='image/x-icon' href='css/images/favicon.ico'/>
 
 
@@ -26,10 +26,10 @@
 
 
         <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+        <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.3/themes/ui-darkness/jquery-ui.css" />
+
         <link rel="stylesheet" href="css/alertify.core.css" />
         <link rel="stylesheet" href="css/alertify.default.css" />
-
-        <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.3/themes/ui-darkness/jquery-ui.css" />
         <link rel="stylesheet" href="css/sky-animation.css" />
         <link rel="stylesheet" href="css/simulation-page-style.css" />
     </head>
@@ -43,9 +43,9 @@
         <div id='realtime-container'>
             <div id="simulation-header" class='bar-display'>
                 <div>
-                    <button id='back-home' style='align-self:flex-start'>
+                    <a href='landing.html' style='align-self:flex-start'>
                         <span class='iconButton fa fa-home fa-lg'></span>
-                    </button>
+                    </a>
                     <button id="simulation-context-button">New Orbit</button>
                     <button id="simulation-step-forward">&gt;</button>
                 </div>
@@ -64,15 +64,17 @@
                     </button>
                     <button id="simulation-download">
                         <span class="iconButton fa fa-download fa-lg"></span>
-                        <a id='download-image' style='display:none' href='#'></a>
                     </button>
+                    <a id='download-image' style='display:none' href='#'></a>
                     <button id="simulation-settings">
                         <span class="iconButton fa fa-cog fa-lg"></span>
                     </button>
                     <button id="simulation-report">
                         Report
                     </button>
+                    
                 </div>
+                <div id='seed-section'></div>
             </div>
             <div id="simulation-settings-dialog" 
                  title="Simulation Settings" style="display: none">
@@ -119,6 +121,7 @@
              * PAGE READY
              * **************** */
             $(document).ready(function () {
+                /*global RealTimePage */
                 RealTimePage.initialize();
             });
 

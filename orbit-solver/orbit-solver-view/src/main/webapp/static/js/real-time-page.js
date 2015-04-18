@@ -1,5 +1,5 @@
 /*global numeric,alertify,Base64*/
-// shim layer with setTimeout fallback
+// shim requestAnimFrame with setTimeout fallback
 window.requestAnimFrame = (function () {
     return  window.requestAnimationFrame ||
             window.webkitRequestAnimationFrame ||
@@ -8,6 +8,26 @@ window.requestAnimFrame = (function () {
                 window.setTimeout(callback, 1000 / 60); //default 60fps
             };
 })();
+
+/*
+ * http://stackoverflow.com/a/3855394
+ * jQuery plugin to allow easy query string parsing.
+ */
+(function ($) {
+    $.QueryString = (function (a) {
+        if (a === "")
+            return {};
+        var b = {};
+        for (var i = 0; i < a.length; ++i)
+        {
+            var p = a[i].split('=');
+            if (p.length !== 2)
+                continue;
+            b[p[0]] = decodeURIComponent(p[1].replace(/\+/g, " "));
+        }
+        return b;
+    })(window.location.search.substr(1).split('&'));
+})(jQuery);
 
 var RealTimePage = new Object();
 /* ****************
@@ -19,6 +39,7 @@ RealTimePage.initialize = function () {
     RealTimePage.contextButtonState = 0;
     RealTimePage.canvasOffset = 0;
 
+    RealTimePage.queryParam = $.QueryString["seed"];
     // Input Value Ranges
     RealTimePage.currentSettings = new OrbitalParams({
         "nBodies": 3,
@@ -27,7 +48,7 @@ RealTimePage.initialize = function () {
         "symplectic": true,
         "maximumMass": 1,
         "maximumTime": 100,
-        "solutionSeed": "${THREE}"
+        "solutionSeed": RealTimePage.queryParam
     });
 
     RealTimePage.fps = 60;
@@ -49,6 +70,7 @@ RealTimePage.initialize = function () {
     RealTimePage.createSettingsDialog(RealTimePage.currentSettings);
     //FUNCTION SETUP
     $("button").button();
+    $("a").button();
     window.addEventListener('resize', RealTimePage.resize, false);
     $("#simulation-settings").on('click', RealTimePage.showSettings);
     $("#simulation-clear-trace").on('click', function () {
@@ -57,16 +79,11 @@ RealTimePage.initialize = function () {
     $("#simulation-step-forward").on('click', RealTimePage.simulationSingleStep);
     $("#simulation-context-button").on('click', RealTimePage.contextButtonPress);
 
-    $("#simulation-force").on('click', RealTimePage.forceSimulation);
     $("#simulation-report").on('click', RealTimePage.viewReport);
     $("#simulation-download").on('click', RealTimePage.downloadImage);
-    $("#back-home").on('click', function () {
-        window.location = "/orbit-solver-view";
-    });
 
     $("#simulation-download").prop('disabled', true);
     $("#simulation-report").prop('disabled', true);
-    $("#simulation-force").prop('disabled', true);
     $("#simulation-step-forward").prop('disabled', true);
 
     //alertify.success( Base64.encode(new Date().toDateString()));
@@ -166,6 +183,7 @@ RealTimePage.solveNewChoreograph = function () {
     var solutionSeed = RealTimePage.currentSettings.getSolutionSeed();
 
     if (typeof solutionSeed !== "undefined" && (solutionSeed.trim()).length > 0) {
+        $("#seed-section").text("Using seed '" + solutionSeed + "'");
         if (solutionSeed === "${DEFAULT}") {
             RealTimePage.universe = new SpaceTimeContainer({
                 "timeStep": RealTimePage.currentSettings.getTimeStepParam(),
@@ -274,10 +292,14 @@ RealTimePage.solveNewChoreograph = function () {
                     }
                 ]
             });
-        } else {
+        } else {            
+            solutionSeed = Base64.decode(solutionSeed);
             RealTimePage.universe = null;
         }
     } else {
+        
+        solutionSeed = Date.now();
+        $("#seed-section").text("Seed '" + Base64.encode(solutionSeed.toString()) + "' generated.");
         RealTimePage.universe = null;
     }
 };
@@ -342,7 +364,6 @@ RealTimePage.contextButtonPress = function () {
             $("#simulation-report").prop("disabled", false);
             $("#simulation-download").prop('disabled', false);
 
-            $("#simulation-force").prop("disabled", true);
             //End the orbit
             RealTimePage.simulationRunning = false;
             clearTimeout(RealTimePage.currentTimeoutId);
@@ -359,6 +380,10 @@ RealTimePage.showSettings = function () {
 };
 
 RealTimePage.applySettings = function () {
+    var solutionSeed = $("#solution-seed").val();
+    if (typeof solutionSeed === "undefined" || solutionSeed.trim().length <= 0) {
+        solutionSeed = undefined;
+    }
     var jsonParams = {
         "nBodies": $("#n-bodies").val(),
         "timeStep": $("#time-steps").val(),
@@ -366,7 +391,7 @@ RealTimePage.applySettings = function () {
         "symplectic": $("#symplectic").is(":checked"),
         "maximumMass": $("#maximum-mass").val(),
         "maximumTime": $("#maximum-time").val(),
-        "solutionSeed": $("#solution-seed").val()
+        "solutionSeed": solutionSeed
     };
 
     var orbitalParams = new OrbitalParams(jsonParams);

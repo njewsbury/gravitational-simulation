@@ -1,3 +1,5 @@
+/* global numeric */
+
 var SolverUtil = new Object();
 
 SolverUtil.setParams = function (paramSet) {
@@ -14,12 +16,21 @@ SolverUtil.getActionValue = function () {
 SolverUtil.minimizeFunction = function (callback) {
     SolverUtil.solved = false;
     var solutionSet;
-
+    var actionEvals = [];
+    var catchEval = function( i, x, f, g, H ) {
+        actionEvals.push(f);
+    };
     try {
-        solutionSet = numeric.uncmin(SolverUtil.solveActionFunction, SolverUtil.paramSet.initialSet);
-        console.log( solutionSet );
+        solutionSet = numeric.uncmin(
+                SolverUtil.solveActionFunction, 
+                SolverUtil.paramSet.initialSet,
+                undefined, undefined, undefined,
+                catchEval);
+        //console.log( solutionSet );
         SolverUtil.solution = (solutionSet.solution);
+        SolverUtil.solutionSet = solutionSet;
         SolverUtil.solved = true;
+        SolverUtil.actionEvals = actionEvals;
     } catch (err) {
         console.log(err);
     }
@@ -101,17 +112,19 @@ SolverUtil.getOrbitJson = function () {
 
 SolverUtil.solveActionFunction = function (params) {
     var actionValue = 0.0;
-    var kineticMap, potentialMap;
+    var kineticMap, potentialMap, actionMap;
     var diff;
 
     kineticMap = SolverUtil.getKineticEnergy(params);
     potentialMap = SolverUtil.getPotentialEnergy(params);
+    actionMap = new Array( SolverUtil.paramSet.timePrecision);
 
     for (var t = 0; t < SolverUtil.paramSet.timePrecision; t++) {
         diff = kineticMap[t] - potentialMap[t];
+        actionMap[t] = diff;
         actionValue += (diff * SolverUtil.paramSet.dt);
     }
-
+    SolverUtil.actionMap = actionMap;
     return actionValue;
 };
 
