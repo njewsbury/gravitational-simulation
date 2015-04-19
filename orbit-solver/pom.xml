@@ -4,20 +4,22 @@
     <parent>
         <artifactId>gravitational-simulation</artifactId>
         <groupId>ca.jewsbury.gravity.spacetime</groupId>
-        <version>0.5-SNAPSHOT</version>
+        <version>1.0</version>
     </parent>
     
     <groupId>ca.jewsbury.gravity.spacetime</groupId>
     <artifactId>orbit-solver</artifactId>
-    <version>0.5-SNAPSHOT</version>
+    <version>1.0</version>
     <packaging>pom</packaging>
     
     <name>Orbital Solver Web Project</name>
     
     <modules>
+        
         <module>orbit-solver-ear</module>
         <module>orbit-solver-view</module>
         <module>orbit-solver-dao</module>
+        
     </modules>
     
     <properties>

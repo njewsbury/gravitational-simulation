@@ -4,12 +4,12 @@
     <parent>
         <artifactId>orbit-solver</artifactId>
         <groupId>ca.jewsbury.gravity.spacetime</groupId>
-        <version>0.5-SNAPSHOT</version>
+        <version>1.0</version>
     </parent>
 
     <groupId>ca.jewsbury.gravity.spacetime</groupId>
     <artifactId>orbit-solver-dao</artifactId>
-    <version>0.5-SNAPSHOT</version>
+    <version>1.0</version>
     <packaging>ejb</packaging>
 
     <name>orbit-solver-dao</name>

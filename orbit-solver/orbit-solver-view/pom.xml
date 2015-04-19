@@ -4,12 +4,12 @@
     <parent>
         <artifactId>orbit-solver</artifactId>
         <groupId>ca.jewsbury.gravity.spacetime</groupId>
-        <version>0.5-SNAPSHOT</version>
+        <version>1.0</version>
     </parent>
 
     <groupId>ca.jewsbury.gravity.spacetime</groupId>
     <artifactId>orbit-solver-view</artifactId>
-    <version>0.5-SNAPSHOT</version>
+    <version>1.0</version>
     <packaging>war</packaging>
 
     <name>orbit-solver-view</name>
