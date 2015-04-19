@@ -109,11 +109,18 @@ button:disabled {
     cursor: default;
 }
 
+@media only screen and (min-device-width: 480px) {
+    #seed-section {
+        display:inline-block;
+    }
+}
+
 #seed-section {
+    display:none;
     color: white;
-    display: inline-block;
     font-size: 0.9em;
 }
+
 
 /* Allow Font Awesome Icons in lieu of jQuery UI and only apply when using a FA icon */
 .ui-icon[class*=" fa-"] {
