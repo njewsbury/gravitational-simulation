@@ -54,13 +54,13 @@
         <dependency>
             <groupId>ca.jewsbury.gravity.spacetime</groupId>
             <artifactId>orbit-solver-dao</artifactId>
-            <version>0.5-SNAPSHOT</version>
+            <version>1.0</version>
             <type>ejb</type>
         </dependency>
         <dependency>
             <groupId>ca.jewsbury.gravity.spacetime</groupId>
             <artifactId>orbit-solver-view</artifactId>
-            <version>0.5-SNAPSHOT</version>
+            <version>1.0</version>
             <type>war</type>
         </dependency>
         
