@@ -1,3 +1,5 @@
+/* global numeric */
+
 var SolverParams = function (config) {
     //set params
     this.nBodies = config.nBodies;

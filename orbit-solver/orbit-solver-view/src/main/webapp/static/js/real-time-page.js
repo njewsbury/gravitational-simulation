@@ -1,4 +1,4 @@
-/*global numeric,alertify,Base64*/
+/*global numeric,alertify,Base64, SolverUtil*/
 // shim requestAnimFrame with setTimeout fallback
 window.requestAnimFrame = (function () {
     return  window.requestAnimationFrame ||
@@ -40,10 +40,13 @@ RealTimePage.initialize = function () {
     RealTimePage.canvasOffset = 0;
 
     RealTimePage.queryParam = $.QueryString["seed"];
+    RealTimePage.bodyParam = $.QueryString["bodyCount"];
+
     // Input Value Ranges
     RealTimePage.currentSettings = new OrbitalParams({
-        "nBodies": 3,
+        "nBodies": RealTimePage.bodyParam || 3,
         "timeStep": 0.05,
+        "timePrecision": 250,
         "equalMasses": true,
         "symplectic": true,
         "maximumMass": 1,
@@ -137,12 +140,13 @@ RealTimePage.createSettingsDialog = function (defaultValues) {
             }
         ]
     });
-
+    $("select#n-bodies").val(defaultValues.getBodyParam().toString());
     $("input#time-steps").val(defaultValues.getTimeStepParam());
     $("input#equal-masses").prop('checked', defaultValues.isEqualMass());
     $("input#symplectic").prop("checked", defaultValues.isSymplectic());
     $("input#maximum-mass").val(defaultValues.getMaximumMass());
     $("input#maximum-time").val(defaultValues.getMaximumTime());
+    $("input#time-precision").val(defaultValues.getTimePrecision());
     if (typeof defaultValues.getSolutionSeed() !== "undefined") {
         $("input#solution-seed").val(defaultValues.getSolutionSeed());
     }
@@ -183,13 +187,13 @@ RealTimePage.solveNewChoreograph = function () {
     var solutionSeed = RealTimePage.currentSettings.getSolutionSeed();
 
     if (typeof solutionSeed !== "undefined" && (solutionSeed.trim()).length > 0) {
-        $("#seed-section").text("Using seed '" + solutionSeed + "'");
         if (solutionSeed === "${DEFAULT}") {
             RealTimePage.universe = new SpaceTimeContainer({
                 "timeStep": RealTimePage.currentSettings.getTimeStepParam(),
                 "gravConstant": 1,
                 "maximumTime": RealTimePage.currentSettings.getMaximumTime(),
                 "useSymplectic": RealTimePage.currentSettings.isSymplectic(),
+                "simulationType": "manual",
                 "objectList": [
                     {
                         "id": 1,
@@ -217,6 +221,7 @@ RealTimePage.solveNewChoreograph = function () {
                 "gravConstant": 1,
                 "maximumTime": RealTimePage.currentSettings.getMaximumTime(),
                 "useSymplectic": RealTimePage.currentSettings.isSymplectic(),
+                "simulationType": "solved",
                 "objectList": [
                     {
                         "id": 1,
@@ -253,6 +258,7 @@ RealTimePage.solveNewChoreograph = function () {
                 "gravConstant": 1,
                 "maximumTime": RealTimePage.currentSettings.getMaximumTime(),
                 "useSymplectic": RealTimePage.currentSettings.isSymplectic(),
+                "simulationType": "solved",
                 "objectList": [
                     {
                         "id": 1,
@@ -292,16 +298,52 @@ RealTimePage.solveNewChoreograph = function () {
                     }
                 ]
             });
-        } else {            
-            solutionSeed = Base64.decode(solutionSeed);
-            RealTimePage.universe = null;
+        } else {
+            RealTimePage.solveChoreography(solutionSeed);
         }
     } else {
-        
-        solutionSeed = Date.now();
-        $("#seed-section").text("Seed '" + Base64.encode(solutionSeed.toString()) + "' generated.");
-        RealTimePage.universe = null;
+        RealTimePage.solveChoreography("");
     }
+};
+
+RealTimePage.solveChoreography = function (seedvalue) {
+    if (typeof RealTimePage.currentSettings !== "undefined"
+            && RealTimePage.currentSettings !== null) {
+        var solutionSeed = seedvalue;
+
+        if (typeof solutionSeed !== "undefined" && (solutionSeed.trim()).length > 0) {
+            $("#seed-section").text(solutionSeed);
+            solutionSeed = Base64.decode(solutionSeed.replace(/-/g, "="));
+        } else {
+            solutionSeed = Date.now().toString();
+            $("#seed-section").text(Base64.encode(solutionSeed).replace(/=/g, "-"));
+        }
+        var config = {
+            "nBodies": RealTimePage.currentSettings.getBodyParam(),
+            "precision": [
+                1, RealTimePage.currentSettings.getTimePrecision()
+            ],
+            "equalMasses": RealTimePage.currentSettings.isEqualMass(),
+            "maximumMass": RealTimePage.currentSettings.getMaximumMass(),
+            "gravConst": 1,
+            "seedValue": solutionSeed
+        };
+
+        var solverConfig = new SolverParams(config);
+        SolverUtil.setParams(solverConfig);
+        SolverUtil.minimizeFunction(RealTimePage.solvedChoreography);
+    } else {
+        alertify.error("Unable to solve for choreography!");
+    }
+};
+
+RealTimePage.solvedChoreography = function () {
+    var choreographJson = SolverUtil.getOrbitJson();
+    choreographJson.timeStep = RealTimePage.currentSettings.getTimeStepParam();
+    choreographJson.maximumTime = RealTimePage.currentSettings.getMaximumTime();
+    choreographJson.useSymplectic = RealTimePage.currentSettings.isSymplectic();
+
+    RealTimePage.universe = new SpaceTimeContainer(choreographJson);
 };
 /* ****************
  * PAGE ACTION FUNCTIONS 
@@ -387,6 +429,7 @@ RealTimePage.applySettings = function () {
     var jsonParams = {
         "nBodies": $("#n-bodies").val(),
         "timeStep": $("#time-steps").val(),
+        "timePrecision": $("#time-precision").val(),
         "equalMasses": $("#equal-masses").is(":checked"),
         "symplectic": $("#symplectic").is(":checked"),
         "maximumMass": $("#maximum-mass").val(),

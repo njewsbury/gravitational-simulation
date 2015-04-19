@@ -22,6 +22,9 @@
         <script src="js/space-time-container.js"></script>
         <script src="js/space-object.js"></script>
 
+        <script src='js/old/solver-params.js'></script>
+        <script src='js/old/solver-util.js'></script>
+
         <script src="js/real-time-page.js"></script>
 
 
@@ -72,7 +75,7 @@
                     <button id="simulation-report">
                         Report
                     </button>
-                    
+                    <img id='planet-img' src='css/images/orbital-body.png' alt='...' style='display:none'/>
                 </div>
                 <div id='seed-section'></div>
             </div>
@@ -92,6 +95,10 @@
                     <input type='text' id='time-steps' maxlength='5'/>
                 </div>
                 <div class='dialog-input'>
+                    <label for='time-precision'>Solver Precision</label>
+                    <input type='text' id='time-precision' maxlength='3'/>
+                </div>
+                <div class='dialog-input'>
                     <label for='equal-masses'>Equal Masses</label>
                     <input type='checkbox' id='equal-masses'/>
                 </div>
@@ -109,7 +116,7 @@
                 </div>
                 <div class='dialog-input'>
                     <label for='solution-seed'>Solution Seed</label>
-                    <input type='text' id='solution-seed' maxlength='15'/>
+                    <input type='text' id='solution-seed' maxlength='50'/>
                 </div>
                 <div class="dialog-input">
                     <span id="error-text"></span>

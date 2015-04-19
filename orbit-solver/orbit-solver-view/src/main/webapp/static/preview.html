@@ -11,9 +11,9 @@
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
         <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.3/jquery-ui.min.js"></script>
         <script src="js/lib/alertify.min.js"></script>
-        <script src='js/lib/Chart.min.js'></script>
+        <script src='js/lib/Chart.js'></script>
         <script src='js/lib/numeric-1.2.6.js'></script>
-        <script src="js/numeric-util.js"></script>
+        <script src='js/lib/js-encode.js'></script>
         <script src="js/orbital-params.js"></script>
 
         <script src='js/old/solver-params.js'></script>
@@ -40,9 +40,9 @@
             <div id='preload'></div>
             <div id="preview-header" class='bar-display'>
                 <div>
-                    <button id='back-home' style='align-self:flex-start'>
+                    <a class='navigation' href='landing.html' style='align-self:flex-start'>
                         <span class='iconButton fa fa-home fa-lg'></span>
-                    </button>
+                    </a>
                     <button id="preview-context-button">Solve new choreography</button>
                 </div>
             </div>
@@ -68,10 +68,12 @@
                     <button id="preview-download">
                         <span class="iconButton fa fa-download fa-lg"></span>
                     </button>
+                    <a id='download-image' style='display:none' href='#'></a>
                     <button id="preview-settings">
                         <span class="iconButton fa fa-cog fa-lg"></span>
                     </button>
                 </div>
+                <a id='seed-section' href='#'></a>
             </div>
             <div id="preview-settings-dialog" 
                  title="Preview Settings" style="display: none">
@@ -85,7 +87,7 @@
                     </select>
                 </div>
                 <div class='dialog-input'>
-                    <label for='time-steps'>Time Step</label>
+                    <label for='time-steps'>Time Precision</label>
                     <input type='text' id='time-steps' maxlength='5'/>
                 </div>
                 <div class='dialog-input'>
@@ -102,7 +104,7 @@
                 </div>
                 <div class='dialog-input'>
                     <label for='solution-seed'>Solution Seed</label>
-                    <input type='text' id='solution-seed' maxlength='15'/>
+                    <input type='text' id='solution-seed' maxlength='50'/>
                 </div>
                 <div class="dialog-input">
                     <span id="error-text"></span>
@@ -111,6 +113,7 @@
         </div>
         <script>
             $(document).ready(function () {
+                /*global PreviewPage*/
                 PreviewPage.initialize();
             });
 

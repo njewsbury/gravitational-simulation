@@ -56,6 +56,14 @@ div#preview-tabs div.ui-tabs-panel.ui-widget-content {
 #preview-footer {
     margin-top: 15px;
     border-top: 3px solid #FF9900;
+    display:flex;
+    justify-content: space-between;
+}
+
+
+#seed-section {
+    color: white;
+    font-size: 0.9em;
 }
 
 div.bar-display {

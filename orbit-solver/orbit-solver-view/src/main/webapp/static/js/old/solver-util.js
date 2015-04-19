@@ -1,4 +1,4 @@
-/* global numeric */
+/* global numeric, Base64 */
 
 var SolverUtil = new Object();
 
@@ -17,12 +17,12 @@ SolverUtil.minimizeFunction = function (callback) {
     SolverUtil.solved = false;
     var solutionSet;
     var actionEvals = [];
-    var catchEval = function( i, x, f, g, H ) {
+    var catchEval = function (i, x, f, g, H) {
         actionEvals.push(f);
     };
-    try {
+    //try {
         solutionSet = numeric.uncmin(
-                SolverUtil.solveActionFunction, 
+                SolverUtil.solveActionFunction,
                 SolverUtil.paramSet.initialSet,
                 undefined, undefined, undefined,
                 catchEval);
@@ -31,9 +31,9 @@ SolverUtil.minimizeFunction = function (callback) {
         SolverUtil.solutionSet = solutionSet;
         SolverUtil.solved = true;
         SolverUtil.actionEvals = actionEvals;
-    } catch (err) {
-        console.log(err);
-    }
+    //} catch (err) {
+    //    console.log(err);
+    //}
     callback();
 };
 
@@ -70,28 +70,24 @@ SolverUtil.getOrbitJson = function () {
             id += SolverUtil.paramSet.massValues[i].toFixed(3).toString();
             totalMass += SolverUtil.paramSet.massValues[i];
             colour = SolverUtil.getPastelColour();
-
+            colour = SolverUtil.hexToRGB(colour);
             if (i < nBodies - 1) {
                 id += ",";
             }
             spaceObject = {
-                "objectId": i,
-                "objectName": "SpaceObject-" + i.toString(),
-                "objectMass": SolverUtil.paramSet.massValues[i],
-                "objectRadius" : 1,
-                "position": [
+                "id": i,
+                "name": "SpaceObject-" + i.toString(),
+                "mass": SolverUtil.paramSet.massValues[i],
+                "initialPos": [
                     ((positionMap[i])[0])[0], //Xo
                     ((positionMap[i])[1])[0] //Yo
                 ],
-                "velocity": [
+                "initialVel": [
                     ((velocityMap[i])[0])[0], //VXo
                     ((velocityMap[i])[1])[0] //VYo
                 ],
-                "render": {
-                    "lineWidth": 2,
-                    "strokeColour": colour,
-                    "fillColour": colour
-                }
+                "traceColour": "rgba(" + colour.r +","+colour.g+","+colour.b+","+1+")",
+                "colour": "rgba(" + colour.r +","+colour.g+","+colour.b+","+0.5+")"
             };
             objectList.push(spaceObject);
         }
@@ -100,13 +96,23 @@ SolverUtil.getOrbitJson = function () {
             id += SolverUtil.paramSet.solutionSeed;
         }
         solution.objectList = objectList;
-        solution.simulationId = id;
-        solution.totalMass = totalMass;
+        solution.simulationType = "solved";
+        solution.simulationId = Base64.encode(SolverUtil.paramSet.solutionSeed).replace(/=/g, '-');
         solution.gravConstant = SolverUtil.paramSet.gravConst;
         solution.success = true;
     }
 
     return solution;
+};
+
+SolverUtil.hexToRGB = function(hex) {
+    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    result = result ? {
+        r: parseInt(result[1], 16),
+        g: parseInt(result[2], 16),
+        b: parseInt(result[3], 16)
+    } : null;
+    return result;
 };
 
 
@@ -117,7 +123,7 @@ SolverUtil.solveActionFunction = function (params) {
 
     kineticMap = SolverUtil.getKineticEnergy(params);
     potentialMap = SolverUtil.getPotentialEnergy(params);
-    actionMap = new Array( SolverUtil.paramSet.timePrecision);
+    actionMap = new Array(SolverUtil.paramSet.timePrecision);
 
     for (var t = 0; t < SolverUtil.paramSet.timePrecision; t++) {
         diff = kineticMap[t] - potentialMap[t];
@@ -229,7 +235,7 @@ SolverUtil.getBodyPotential = function (body, positionMap) {
                 effective += (1.0 / numeric.norm2Squared([diffx, diffy]));
                 currentDistance = numeric.norm2([diffx, diffy]);
 
-                potential += (SolverUtil.paramSet.massValues[n]) / (currentDistance*currentDistance);
+                potential += (SolverUtil.paramSet.massValues[n]) / (currentDistance * currentDistance);
             }
         }
         effective = 0.0;

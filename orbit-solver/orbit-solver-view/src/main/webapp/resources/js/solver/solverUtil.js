@@ -1,3 +1,5 @@
+/* global numeric */
+
 var SolverUtil = new Object();
 
 SolverUtil.setParams = function (paramSet) {

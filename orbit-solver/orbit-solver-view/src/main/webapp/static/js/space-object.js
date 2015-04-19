@@ -42,8 +42,8 @@ var SpaceObject = function (jsonDef, universe) {
     this.interAcceleration = [this.acceleration, this.acceleration];
 
     this.imgIsntLoaded = true;
-    this.imgObj = new Image();
-    this.imgObj.src = 'css/images/orbital-body.png';
+    this.imgObj = $("#planet-img")[0];
+    //this.imgObj.src = 'css/images/orbital-body.png';
 };
 
 SpaceObject.prototype.drawObject = function (context, trace, com, maxMass) {
@@ -95,7 +95,7 @@ SpaceObject.prototype.drawObject = function (context, trace, com, maxMass) {
         if (mult < 1) {
             mag = mag * mult;
         } else {
-            mag = mag * 20;
+            //mag = mag * 20;
         }
         unitDir = numeric.mul(unitDir, mag);
         unitDir = numeric.add(drawPosition, unitDir);
