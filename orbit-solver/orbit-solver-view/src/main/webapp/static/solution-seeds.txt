@@ -15,17 +15,58 @@ MTQyOTM5MjMyOTU3Mw--
 ####################################
 ====== Circle
 RW1tYVN0b25l
+MTQyOTQ1NTMwNTc4MA--
 
 ====== Figure X
 MTQyOTM5ODQ5MTY1Mw--
 
+====== Criss Cross
+MTQyOTQ1NDQzODY4OQ--
+MTQyOTQ1NTI1NTk2Nw--
+
+====== Atom
+MTQyOTQ1NDczNDQ3NQ--
+MTQyOTQ1NDgxMjQzMg--
+MTQyOTQ1NTM2Mzk4MQ--
+MTQyOTQ1NTY1MTY3Mg--
+
+====== Star
+MTQyOTQ1NDg0MDUyMw--
+MTQyOTQ1NTYwMjc5MQ--
+
+====== IDK
+MTQyOTQ1NTA0NjYwOQ--
+
 ####################################
 ############## 5-Body ##############
 ####################################
-====== CrissCross
+====== 3-CrissCross
+MTQyOTQ1NjM1NDQzMA--
+MTQyOTQ1NzA4ODAxNg--
+
+====== 4-CrissCross
+MTQyOTQ1NjkzNzg0OA--
 S2F0ZUJlY2tpbnNhbGU-
+MTQyOTQ1ODAzNzM3Nw--
 
+====== Circle
+TmF0bGllRG9ybWVy
 
+====== Neat Circle
+MTQyOTQ1ODIwMTQ5OQ--
+
+====== Atom
+MTQyOTQ1NjY2NTExMw--
+
+====== Double Circle, Figure X
+MTQyOTQ1NzI1MjM3MQ--
+
+====== Something, good
+MTQyOTQ1NjQ0MTg5MA--
+
+====== IDK
+UmFjaGVsTWNBZGFtcw--
+MTQyOTQ1NjI5NTY5Mg--
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ~~~~~~~~ ORBITAL SIMULATION ~~~~~~~~
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -49,5 +90,11 @@ MTQyOTM5ODQ5MTY1Mw--
 ####################################
 ############## 5-Body ##############
 ####################################
-====== CrissCross
+====== 4-CrissCross
 S2F0ZUJlY2tpbnNhbGU-
+
+====== Neat Circle
+MTQyOTQ1ODIwMTQ5OQ--
+
+====== Something, good
+MTQyOTQ1NjQ0MTg5MA--

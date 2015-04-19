@@ -329,7 +329,7 @@ PreviewPage.drawChoreograph = function (positionMap) {
             var yPos = ((positionMap[n])[1]);
             var colour = PreviewPage.colourArray[n];
             cntx.beginPath();
-            cntx.arc(xPos[0], yPos[0], 10 / 100, Math.PI * 2, false);
+            cntx.arc(xPos[0], yPos[0], (10*SolverUtil.paramSet.massValues[n]) / 100, Math.PI * 2, false);
             cntx.fillStyle = colour;
             cntx.strokeStyle = 'black';
             cntx.lineWidth = 2 / 100;
