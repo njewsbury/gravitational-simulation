@@ -3,7 +3,7 @@
 var SolverParams = function (config) {
     //set params
     this.nBodies = config.nBodies;
-    this.spacialPrecision = config.precision[0];
+    this.spatialPrecision = config.precision[0];
     this.timePrecision = config.precision[1];
     this.equalMasses = config.equalMasses;
     this.maximumMass = config.maximumMass;
@@ -12,7 +12,7 @@ var SolverParams = function (config) {
 
     //setup calculated params
     this.asOffset = 0;
-    this.acOffset = (this.nBodies * this.spacialPrecision);
+    this.acOffset = (this.nBodies * this.spatialPrecision);
     this.bsOffset = 2.0 * this.acOffset;
     this.bcOffset = 3.0 * this.acOffset;
 
@@ -52,7 +52,7 @@ SolverParams.prototype.getRandomizedMasses = function () {
 };
 
 SolverParams.prototype.getRandomizedParams = function () {
-    var eachRequired = this.nBodies * this.spacialPrecision;
+    var eachRequired = this.nBodies * this.spatialPrecision;
     var asParams, acParams;
     var bsParams, bcParams;
     var full;

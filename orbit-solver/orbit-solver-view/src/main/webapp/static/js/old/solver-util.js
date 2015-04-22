@@ -300,21 +300,21 @@ SolverUtil.getBodyPositionMap = function (nBody, paramSet) {
             .map(Number.prototype.valueOf, 0);
 
     for (var t = 0; t < SolverUtil.paramSet.timePrecision; t++) {
-        for (var k = 1; k <= SolverUtil.paramSet.spacialPrecision; k++) {
+        for (var k = 1; k <= SolverUtil.paramSet.spatialPrecision; k++) {
             xPos[t] += (
-                    paramSet[ SolverUtil.paramSet.asOffset + (nBody * SolverUtil.paramSet.spacialPrecision) + (k - 1) ]
+                    paramSet[ SolverUtil.paramSet.asOffset + (nBody * SolverUtil.paramSet.spatialPrecision) + (k - 1) ]
                     * Math.sin(k * SolverUtil.getTheta(t))
                     );
             xPos[t] += (
-                    paramSet[ SolverUtil.paramSet.acOffset + (nBody * SolverUtil.paramSet.spacialPrecision) + (k - 1) ]
+                    paramSet[ SolverUtil.paramSet.acOffset + (nBody * SolverUtil.paramSet.spatialPrecision) + (k - 1) ]
                     * Math.cos(k * SolverUtil.getTheta(t))
                     );
             yPos[t] += (
-                    paramSet[ SolverUtil.paramSet.bsOffset + (nBody * SolverUtil.paramSet.spacialPrecision) + (k - 1) ]
+                    paramSet[ SolverUtil.paramSet.bsOffset + (nBody * SolverUtil.paramSet.spatialPrecision) + (k - 1) ]
                     * Math.sin(k * SolverUtil.getTheta(t))
                     );
             yPos[t] += (
-                    paramSet[ SolverUtil.paramSet.bcOffset + (nBody * SolverUtil.paramSet.spacialPrecision) + (k - 1) ]
+                    paramSet[ SolverUtil.paramSet.bcOffset + (nBody * SolverUtil.paramSet.spatialPrecision) + (k - 1) ]
                     * Math.cos(k * SolverUtil.getTheta(t))
                     );
         }

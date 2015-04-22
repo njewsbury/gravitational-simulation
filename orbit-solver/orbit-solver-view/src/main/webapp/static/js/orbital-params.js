@@ -5,7 +5,7 @@ var OrbitalParams = function( jsonDef ) {
     this.TIME_RANGE = [-1, 999999];
     //
     this.TIME_PRECISION = 250;
-    this.SPACIAL_PRECISION = 1;
+    this.SPATIAL_PRECISION = 1;
     //
     this.givenNBody = parseInt(jsonDef.nBodies);
     this.givenTimeStep = parseFloat(jsonDef.timeStep);
