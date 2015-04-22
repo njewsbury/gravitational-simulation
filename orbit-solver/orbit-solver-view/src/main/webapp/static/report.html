@@ -1,9 +1,4 @@
 <!DOCTYPE html>
-<!--
-To change this license header, choose License Headers in Project Properties.
-To change this template file, choose Tools | Templates
-and open the template in the editor.
--->
 <html>
     <head>
         <title>PHYS 4250 : Choreographed Orbits</title>
@@ -19,8 +14,359 @@ and open the template in the editor.
         <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.3/themes/ui-darkness/jquery-ui.css" />
         <link rel='stylesheet' href='http://fonts.googleapis.com/css?family=Dosis:400,800'/>
 
+        <style>
+            body {
+                font-family: Arial;
+            }
+            div.item div.simulation, div.item div.preview {
+                display: inline-block;
+            }
+
+            div.item {
+                text-align: center;
+                width: 300px;
+                border: 1px solid black;
+                background: white;
+            }
+
+            div.item div.item-label {
+                background: black;
+                color: white;
+                margin-bottom: 5px;
+            }
+
+            div.item div.link-container {
+                display: flex;
+                justify-content: space-between;
+                margin: 0 0.5em 0.5em 0.5em;
+            }
+
+            div.body-container {
+                display: inline-table;
+                width: 15%;
+            }
+
+            div.body-header {
+                text-align: center;                
+            }
+
+            div.body-container:nth-child(even) {
+                background: rgba(205, 150, 50, 0.2 );
+            }
+
+        </style>
     </head>
     <body>
-        <div>TODO write content</div>
+        <div id='2-body' class='body-container'>
+            <div class='body-header'><h2>Two Body</h2></div>
+            <div>
+                <div class='item'>
+                    <div class="item-label">DEFAULT</div>
+                    <div class='link-container'>
+                        <div class='simulation'>
+                            <a href='simulation.html?bodyCount=2&seed=${DEFAULT}'>SIMULATION</a>
+                        </div>
+                        <span>|</span>
+                        <div class='preview'>
+                            <a href='preview.html?bodyCount=2&seed=${DEFAULT}'>PREVIEW</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id='3-body' class='body-container'>
+            <div class='body-header'><h2>Three Body</h2></div>
+            <div>
+                <div class='item'>
+                    <div class="item-label">CIRCLE</div>
+                    <div class='link-container'>
+                        <div class='simulation'>
+                            <a href='simulation.html?bodyCount=3&seed=MTQyOTQwMDU0MTE1NA--'>SIMULATION</a>
+                        </div>
+                        <span>|  equal  |</span>
+                        <div class='preview'>
+                            <a href='preview.html?bodyCount=3&seed=MTQyOTQwMDU0MTE1NA--'>PREVIEW</a>
+                        </div>
+                    </div>
+                    <div class='link-container'>
+                        <div class='simulation'>
+                            <a href='simulation.html?bodyCount=3&seed=MTQyOTQ1OTc3MTY1OA--'>SIMULATION</a>
+                        </div>
+                        <span>|unequal|</span>
+                        <div class='preview'>
+                            <a href='preview.html?bodyCount=3&seed=MTQyOTQ1OTc3MTY1OA--'>PREVIEW</a>
+                        </div>
+                    </div>
+                </div>
+                <div class='item'>
+                    <div class="item-label">CROSS</div>
+                    <div class='link-container'>
+                        <div class='simulation'>
+                            <a href='simulation.html?bodyCount=3&seed=MTQyOTM5NzQwMTc4NA--'>SIMULATION</a>
+                        </div>
+                        <span>|</span>
+                        <div class='preview'>
+                            <a href='preview.html?bodyCount=3&seed=MTQyOTM5NzQwMTc4NA--'>PREVIEW</a>
+                        </div>
+                    </div>
+                    <div class='link-container'>
+                        <div class='simulation'>
+                            <a href='simulation.html?bodyCount=3&seed=MTQyOTM5Nzg2NTg3Mw--'>SIMULATION</a>
+                        </div>
+                        <span>|</span>
+                        <div class='preview'>
+                            <a href='preview.html?bodyCount=3&seed=MTQyOTM5Nzg2NTg3Mw--'>PREVIEW</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id='4-body' class='body-container'>
+            <div class='body-header'><h2>Four Body</h2></div>
+            <div>
+                <div class='item'>
+                    <div class="item-label">CIRCLE</div>
+                    <div class='link-container'>
+                        <div class='simulation'>
+                            <a href='simulation.html?bodyCount=4&seed=MTQyOTQ1NTMwNTc4MA--'>SIMULATION</a>
+                        </div>
+                        <span>|</span>
+                        <div class='preview'>
+                            <a href='preview.html?bodyCount=4&seed=MTQyOTQ1NTMwNTc4MA--'>PREVIEW</a>
+                        </div>
+                    </div>                    
+                </div>
+                <div class='item'>
+                    <div class="item-label">Figure X</div>
+                    <div class='link-container'>
+                        <div class='simulation'>
+                            <a href='simulation.html?bodyCount=4&seed=MTQyOTM5ODQ5MTY1Mw--'>SIMULATION</a>
+                        </div>
+                        <span>|</span>
+                        <div class='preview'>
+                            <a href='preview.html?bodyCount=4&seed=MTQyOTM5ODQ5MTY1Mw--'>PREVIEW</a>
+                        </div>
+                    </div>                    
+                </div>
+                <div class='item'>
+                    <div class="item-label">Cross</div>
+                    <div class='link-container'>
+                        <div class='simulation'>
+                            <a href='simulation.html?bodyCount=4&seed=MTQyOTQ1NDQzODY4OQ--'>SIMULATION</a>
+                        </div>
+                        <span>|</span>
+                        <div class='preview'>
+                            <a href='preview.html?bodyCount=4&seed=MTQyOTQ1NDQzODY4OQ--'>PREVIEW</a>
+                        </div>
+                    </div> 
+                    <div class='link-container'>
+                        <div class='simulation'>
+                            <a href='simulation.html?bodyCount=4&seed=MTQyOTQ1NTI1NTk2Nw--'>SIMULATION</a>
+                        </div>
+                        <span>|</span>
+                        <div class='preview'>
+                            <a href='preview.html?bodyCount=4&seed=MTQyOTQ1NTI1NTk2Nw--'>PREVIEW</a>
+                        </div>
+                    </div> 
+                </div>
+                <div class='item'>
+                    <div class="item-label">Atom</div>
+                    <div class='link-container'>
+                        <div class='simulation'>
+                            <a href='simulation.html?bodyCount=4&seed=MTQyOTQ1NDczNDQ3NQ--'>SIMULATION</a>
+                        </div>
+                        <span>|</span>
+                        <div class='preview'>
+                            <a href='preview.html?bodyCount=4&seed=MTQyOTQ1NDczNDQ3NQ--'>PREVIEW</a>
+                        </div>
+                    </div> 
+                    <div class='link-container'>
+                        <div class='simulation'>
+                            <a href='simulation.html?bodyCount=4&seed=MTQyOTQ1NDgxMjQzMg--'>SIMULATION</a>
+                        </div>
+                        <span>|</span>
+                        <div class='preview'>
+                            <a href='preview.html?bodyCount=4&seed=MTQyOTQ1NDgxMjQzMg--'>PREVIEW</a>
+                        </div>
+                    </div> 
+                    <div class='link-container'>
+                        <div class='simulation'>
+                            <a href='simulation.html?bodyCount=4&seed=MTQyOTQ1NTM2Mzk4MQ--'>SIMULATION</a>
+                        </div>
+                        <span>|</span>
+                        <div class='preview'>
+                            <a href='preview.html?bodyCount=4&seed=MTQyOTQ1NTM2Mzk4MQ--'>PREVIEW</a>
+                        </div>
+                    </div>
+                    <div class='link-container'>
+                        <div class='simulation'>
+                            <a href='simulation.html?bodyCount=4&seed=MTQyOTQ1NTY1MTY3Mg--'>SIMULATION</a>
+                        </div>
+                        <span>|</span>
+                        <div class='preview'>
+                            <a href='preview.html?bodyCount=4&seed=MTQyOTQ1NTY1MTY3Mg--'>PREVIEW</a>
+                        </div>
+                    </div>
+                </div>
+                <div class='item'>
+                    <div class="item-label">Star</div>
+                    <div class='link-container'>
+                        <div class='simulation'>
+                            <a href='simulation.html?bodyCount=4&seed=MTQyOTQ1NDg0MDUyMw--'>SIMULATION</a>
+                        </div>
+                        <span>|</span>
+                        <div class='preview'>
+                            <a href='preview.html?bodyCount=4&seed=MTQyOTQ1NDg0MDUyMw--'>PREVIEW</a>
+                        </div>
+                    </div> 
+                    <div class='link-container'>
+                        <div class='simulation'>
+                            <a href='simulation.html?bodyCount=4&seed=MTQyOTQ1NTYwMjc5MQ--'>SIMULATION</a>
+                        </div>
+                        <span>|</span>
+                        <div class='preview'>
+                            <a href='preview.html?bodyCount=4&seed=MTQyOTQ1NTYwMjc5MQ--'>PREVIEW</a>
+                        </div>
+                    </div> 
+                </div>
+                <div class='item'>
+                    <div class="item-label">Misc Choreograph</div>
+                    <div class='link-container'>
+                        <div class='simulation'>
+                            <a href='simulation.html?bodyCount=4&seed=MTQyOTQ1NTA0NjYwOQ--'>SIMULATION</a>
+                        </div>
+                        <span>|</span>
+                        <div class='preview'>
+                            <a href='preview.html?bodyCount=4&seed=MTQyOTQ1NTA0NjYwOQ--'>PREVIEW</a>
+                        </div>
+                    </div>                    
+                </div>
+            </div>
+        </div>
+        <div id='5-body' class='body-container'>
+            <div class='body-header'><h2>Five Body</h2></div>
+            <div>
+                <div class='item'>
+                    <div class="item-label">CIRCLE</div>
+                    <div class='link-container'>
+                        <div class='simulation'>
+                            <a href='simulation.html?bodyCount=5&seed=MTQyOTQ1ODg4MTk5Mw--'>SIMULATION</a>
+                        </div>
+                        <span>|</span>
+                        <div class='preview'>
+                            <a href='preview.html?bodyCount=5&seed=MTQyOTQ1ODg4MTk5Mw--'>PREVIEW</a>
+                        </div>
+                    </div>
+                </div>
+                <div class='item'>
+                    <div class="item-label">FOUR-CIRCLE</div>
+                    <div class='link-container'>
+                        <div class='simulation'>
+                            <a href='simulation.html?bodyCount=5&seed=MTQyOTQ1ODIwMTQ5OQ--'>SIMULATION</a>
+                        </div>
+                        <span>|</span>
+                        <div class='preview'>
+                            <a href='preview.html?bodyCount=5&seed=MTQyOTQ1ODIwMTQ5OQ--'>PREVIEW</a>
+                        </div>
+                    </div>
+                </div>
+                <div class='item'>
+                    <div class="item-label">3-CROSS</div>
+                    <div class='link-container'>
+                        <div class='simulation'>
+                            <a href='simulation.html?bodyCount=5&seed=MTQyOTQ1NzA4ODAxNg--'>SIMULATION</a>
+                        </div>
+                        <span>|</span>
+                        <div class='preview'>
+                            <a href='preview.html?bodyCount=5&seed=MTQyOTQ1NzA4ODAxNg--'>PREVIEW</a>
+                        </div>
+                    </div>
+                </div>
+                <div class='item'>
+                    <div class="item-label">4-CROSS</div>
+                    <div class='link-container'>
+                        <div class='simulation'>
+                            <a href='simulation.html?bodyCount=5&seed=MTQyOTQ1NjkzNzg0OA--'>SIMULATION</a>
+                        </div>
+                        <span>|</span>
+                        <div class='preview'>
+                            <a href='preview.html?bodyCount=5&seed=MTQyOTQ1NjkzNzg0OA--'>PREVIEW</a>
+                        </div>
+                    </div>
+                    <div class='link-container'>
+                        <div class='simulation'>
+                            <a href='simulation.html?bodyCount=5&seed=S2F0ZUJlY2tpbnNhbGU-'>SIMULATION</a>
+                        </div>
+                        <span>|</span>
+                        <div class='preview'>
+                            <a href='preview.html?bodyCount=5&seed=S2F0ZUJlY2tpbnNhbGU-'>PREVIEW</a>
+                        </div>
+                    </div>
+                    <div class='link-container'>
+                        <div class='simulation'>
+                            <a href='simulation.html?bodyCount=5&seed=MTQyOTQ1ODAzNzM3Nw--'>SIMULATION</a>
+                        </div>
+                        <span>|</span>
+                        <div class='preview'>
+                            <a href='preview.html?bodyCount=5&seed=MTQyOTQ1ODAzNzM3Nw--'>PREVIEW</a>
+                        </div>
+                    </div>
+                </div>
+                <div class='item'>
+                    <div class="item-label">Atom</div>
+                    <div class='link-container'>
+                        <div class='simulation'>
+                            <a href='simulation.html?bodyCount=5&seed=MTQyOTQ1NjY2NTExMw--'>SIMULATION</a>
+                        </div>
+                        <span>|</span>
+                        <div class='preview'>
+                            <a href='preview.html?bodyCount=5&seed=MTQyOTQ1NjY2NTExMw--'>PREVIEW</a>
+                        </div>
+                    </div>
+                </div>
+                <div class='item'>
+                    <div class="item-label">Figure X w/ Circle</div>
+                    <div class='link-container'>
+                        <div class='simulation'>
+                            <a href='simulation.html?bodyCount=5&seed=MTQyOTQ1NzI1MjM3MQ--'>SIMULATION</a>
+                        </div>
+                        <span>|</span>
+                        <div class='preview'>
+                            <a href='preview.html?bodyCount=5&seed=MTQyOTQ1NzI1MjM3MQ--'>PREVIEW</a>
+                        </div>
+                    </div>
+                </div>
+                <div class='item'>
+                    <div class="item-label">Misc Choreograph</div>
+                    <div class='link-container'>
+                        <div class='simulation'>
+                            <a href='simulation.html?bodyCount=5&seed=MTQyOTQ1NjQ0MTg5MA--'>SIMULATION</a>
+                        </div>
+                        <span>|</span>
+                        <div class='preview'>
+                            <a href='preview.html?bodyCount=5&seed=MTQyOTQ1NjQ0MTg5MA--'>PREVIEW</a>
+                        </div>
+                    </div>   
+                    <div class='link-container'>
+                        <div class='simulation'>
+                            <a href='simulation.html?bodyCount=5&seed=UmFjaGVsTWNBZGFtcw--'>SIMULATION</a>
+                        </div>
+                        <span>|</span>
+                        <div class='preview'>
+                            <a href='preview.html?bodyCount=5&seed=UmFjaGVsTWNBZGFtcw--'>PREVIEW</a>
+                        </div>
+                    </div>
+                    <div class='link-container'>
+                        <div class='simulation'>
+                            <a href='simulation.html?bodyCount=5&seed=MTQyOTQ1NjI5NTY5Mg--'>SIMULATION</a>
+                        </div>
+                        <span>|</span>
+                        <div class='preview'>
+                            <a href='preview.html?bodyCount=5&seed=MTQyOTQ1NjI5NTY5Mg--'>PREVIEW</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>        
     </body>
 </html>
