@@ -7,9 +7,7 @@
     <packaging>pom</packaging>
     <name>Gravitational Simulation</name>
     
-    <modules>
-        <module>orbit-solver</module>
-    </modules>
+    <modules></modules>
     
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

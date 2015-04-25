@@ -1,110 +1,94 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>PHYS 4250 : Real Time Simulation</title>
+        <title>PHYS 4250 : Choreograph Orbit Preview</title>
         <meta content='text/html; charset=UTF-8' http-equiv="Content-Type"/>
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
         <meta http-equiv="X-UA-Compatible" content="IE=edge" /> <!-- IE compat -->
-        <link rel='shortcut icon' type='image/x-icon' href='css/images/favicon.ico'/>
 
+        <link rel='shortcut icon' type='image/x-icon' href='css/images/favicon.ico'/>
 
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
         <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.3/jquery-ui.min.js"></script>
         <script src="js/lib/alertify.min.js"></script>
+        <script src='js/lib/Chart.js'></script>
         <script src='js/lib/numeric-1.2.6.js'></script>
-        <script src='js/lib/Chart.min.js'></script>
         <script src='js/lib/js-encode.js'></script>
-        <script src="js/numeric-util.js"></script>
-        <script src="js/orbital-params.js"></script>   
-
-        <script src="js/leapfrog-integrator.js"></script>
-        <script src="js/symplectic-integrator.js"></script>
-        <script src="js/space-time-container.js"></script>
-        <script src="js/space-object.js"></script>
+        <script src="js/orbital-params.js"></script>
 
         <script src='js/old/solver-params.js'></script>
         <script src='js/old/solver-util.js'></script>
 
-        <script src="js/real-time-page.js"></script>
+        <script src="js/space-time-container.js"></script>
+        <script src="js/space-object.js"></script>
+
+        <script src="js/solver-preview-page.js"></script>
 
 
         <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
-        <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.3/themes/ui-darkness/jquery-ui.css" />
-
         <link rel="stylesheet" href="css/alertify.core.css" />
         <link rel="stylesheet" href="css/alertify.default.css" />
-        <link rel="stylesheet" href="css/sky-animation.css" />
-        <link rel="stylesheet" href="css/simulation-page-style.css" />
-    </head>
 
+        <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.3/themes/ui-darkness/jquery-ui.css" />
+        <link rel="stylesheet" href="css/preview-page-style.css" />
+    </head>
     <body>
-        <div>
-            <div class='stars'></div>
-            <div class='twinkling'></div>
-            <div class='clouds'></div>
-        </div>
-        <div id='realtime-container'>
-            <div id="simulation-header" class='bar-display'>
+        <div id='preview-container'>
+            <div id='preload'></div>
+            <div id="preview-header" class='bar-display'>
                 <div>
-                    <a href='landing.html' style='align-self:flex-start'>
+                    <a class='navigation' href='index.html' style='align-self:flex-start'>
                         <span class='iconButton fa fa-home fa-lg'></span>
                     </a>
-                    <button id="simulation-context-button">New Orbit</button>
-                    <button id="simulation-step-forward">&gt;</button>
+                    <button id="preview-context-button">Solve new choreography</button>
                 </div>
             </div>
 
-            <div id='simulation-view'>
-                <canvas id="simulation-canvas"></canvas>
-                <canvas id="trace-canvas"></canvas>
+            <div id='preview-content'>
+                <div id='preview-tabs'>
+                    <ul>
+                        <li><a href='#orbit-preview'>Orbital Preview</a></li>
+                        <li><a href='#orbit-action'>Orbital Action</a></li>
+                    </ul>
+
+                    <div id='orbit-preview'>
+                        <canvas id='preview-canvas'></canvas>
+                    </div>
+                    <div id='orbit-action'>
+                        <canvas id='action-canvas'></canvas>
+                    </div>
+                </div>                
             </div>
 
-            <div id='simulation-footer' class='bar-display'>
+            <div id='preview-footer' class='bar-display'>
                 <div>
-                    <button id="simulation-clear-trace">
-                        <span class="iconButton fa fa-eraser fa-lg"></span>
-
-                    </button>
-                    <button id="simulation-download">
+                    <button id="preview-download">
                         <span class="iconButton fa fa-download fa-lg"></span>
                     </button>
                     <a id='download-image' style='display:none' href='#'></a>
-                    <button id="simulation-settings">
+                    <button id="preview-settings">
                         <span class="iconButton fa fa-cog fa-lg"></span>
                     </button>
-                    <button id="simulation-report">
-                        Report
-                    </button>
-                    <img id='planet-img' src='css/images/orbital-body.png' alt='...' style='display:none'/>
                 </div>
-                <div id='seed-section'></div>
+                <a id='seed-section' href='#'></a>
             </div>
-            <div id="simulation-settings-dialog" 
-                 title="Simulation Settings" style="display: none">
+            <div id="preview-settings-dialog" 
+                 title="Preview Settings" style="display: none">
                 <div class="dialog-input">
                     <label for="n-bodies">Bodies</label>
                     <select id='n-bodies'>
-                        <!-- <option value='2'>Two</option> -->
                         <option selected="selected" value='3'>Three</option>
                         <option value='4'>Four</option>
                         <option value='5'>Five</option>
                     </select>
                 </div>
                 <div class='dialog-input'>
-                    <label for='time-steps'>Time Step</label>
+                    <label for='time-steps'>Time Precision</label>
                     <input type='text' id='time-steps' maxlength='5'/>
-                </div>
-                <div class='dialog-input'>
-                    <label for='time-precision'>Solver Precision</label>
-                    <input type='text' id='time-precision' maxlength='3'/>
                 </div>
                 <div class='dialog-input'>
                     <label for='equal-masses'>Equal Masses</label>
                     <input type='checkbox' id='equal-masses'/>
-                </div>
-                <div class='dialog-input'>
-                    <label for='symplectic'>Symplectic</label>
-                    <input type='checkbox' id='symplectic'/>
                 </div>
                 <div class='dialog-input'>
                     <label for='maximum-mass'>Max. Mass [1-99]</label>
@@ -124,15 +108,11 @@
             </div>
         </div>
         <script>
-            /* **************** 
-             * PAGE READY
-             * **************** */
             $(document).ready(function () {
-                /*global RealTimePage */
-                RealTimePage.initialize();
+                /*global PreviewPage*/
+                PreviewPage.initialize();
             });
 
         </script>
     </body>
-
 </html>
