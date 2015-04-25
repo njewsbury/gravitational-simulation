@@ -1,19 +1,29 @@
 #The Stability of n-Body Choreographed Orbits
-###PHYS 4250 Project Proposal by Nathan Jewsbury and Scott Osadchuk
+####PHYS 4250 Project by Nathan Jewsbury and Scott Osadchuk
 
-In an effort to better understand exoctic choreographies of celestial objects, a simulation will be created to find, solve and display various stable orbits with n-bodies.  The proposed project will consist of three parts:
+This project was created to solve and classify a series of n-body choreographies while investigateing their stability.  HTML and JavaScript was chosen as a chance to explore modern browsers as computation/simulation sources and due to trivial visualization options.  
+
+###Choreograph Orbit Solver
+The choreograph solver is the root portion of this project.  Through the use of numeric.js the 'Action Function', which is defined as the total energy of the system over a single period, will be minimized to give initial conditions for a choreography.  The solver utility will return a JSON object outlining the solved choreograph for rendering and simulation.
+
+###Choreograph Orbit Simulation
+Simulating the solved choreography will provide a better understanding of the interaction between all present bodies and the stability of the choreograph.  After receiving the JSON initial conditions from the solver utility the simulation engine will use the selected integrator (Second or third order Symplectic) calculate updated positions for each body.  After reaching the maximum time (or being stopped) a report of the energy over the time range will be displayed.
+
+##Project Use
+
+* Each page has a settings dialog available (Gear button at the bottom of the page) that allows changing the solver parameters.  
+* Once a choreograph is solved the seed value used is available in the bottom right side (unless on mobile).  This seed value can be recorded allowing a specific choreograph to be recreated.
+  * The choreograph preview page seed value includes a link to the simulation page with the proper n-body value and seed set.
+* Images can be downloaded by clicking the 'download' icon on each page.
+* The orbital trace can be cleared on the simulation page by clicking the 'eraser' button.
 
 
-##Choreographed Orbit Renderer 
-This will be a very simple project that will take an input set of initial conditions of n-bodies and display them.  Users will be allowed to modify the display to view the selected orbit and various properties of the orbit will be displayed as the simulation is played through.
+##Project Dependencies
 
-
-##Choreographed Orbit Engine
-The engine will be the workhorse for the renderer. Once the selected orbit is displayed and the user requests to watch the orbit, the engine steps in to calculate all the required positions of each body. The overall energy of the solution will also be displayed to prove that the given solution conserves energy.  The only set of energies that will be considered are potential energy and kinetic energy.  The engine will have two different integration methods available; Euler steps and Symplectic integration. A comparison of the two methods will be included in the final report, but is not the focus of this study.
-
-
-##Choreographed Orbit Solver
-The solver will be the root part of this project. ~~Through the use of a genetic algorithm a variety of control points will be generated and a cubic spline run through them to create a smooth curve.~~  An attempt will be made to find the minimum action of an n-body system by using numeric optimization. Once a minimum is found a JSON string will be produced to pass off to the render page for viewing.
+1. NumericJS - http://numericjs.com
+2. ChartJS - http://www.chartjs.org
+3. Alertify - http://fabien-d.github.io/alertify.js
+4. jQuery, jQueryUI - http://www.jquery.com
 
 ##Project References
 
