@@ -330,12 +330,10 @@ SpaceObject.prototype.getGravitationalField = function (gravConstant, point, pri
         //Distance between THIS POSITION and POINT.
         distance = numeric.norm2(vector);
         hat = numeric.div(vector, distance);
-
-        if (this.parent.getBodyCount() > 2) {
-            gravField = (gravField / (distance)); //?
-        } else {
-            gravField = (gravField / (numeric.norm2Squared(vector))); // |g| = (-GM/(r^2))
-        }
+        if (this.parent.getBodyCount() <= 2) {
+            distance = numeric.norm2Squared(vector);
+        }          
+        gravField = (gravField / distance ); // |g| = (-GM/(r^2))
         vector = numeric.mul(hat, gravField); // g = (-GM/|r|^2) * r-hat
     }
     return vector;
