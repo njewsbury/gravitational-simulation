@@ -1,5 +1,15 @@
 /*global numeric */
 
+/*
+ *  LEAP FROG INTEGRATOR JS
+ * 
+ *  SECOND ORDER Symplectic Integrator for updating 'space-object' positions and
+ *  velocities. Commonly referred to as the Leap Frog Integrator.
+ *  
+ *  @author Nathan Jewsbury
+ */
+
+
 var LeapFrogIntegrator = function (parent) {
     this.parent = parent;
     this.timestep = this.parent.getTimeStep();

@@ -1,5 +1,15 @@
 /* global numeric, Base64 */
 
+/*
+ *  SOLVER UTIL JS
+ * 
+ *  Choreograph solver, JavaScript implementation of Action
+ *  function minimzation.
+ *  
+ *  @author Nathan Jewsbury
+ */
+
+
 var SolverUtil = new Object();
 
 SolverUtil.setParams = function (paramSet) {
@@ -21,6 +31,7 @@ SolverUtil.minimizeFunction = function (callback) {
         actionEvals.push(f);
     };
     //try {
+    // Use numericjs minimzation to minimize the action function and get solution set.
         solutionSet = numeric.uncmin(
                 SolverUtil.solveActionFunction,
                 SolverUtil.paramSet.initialSet,
@@ -44,6 +55,10 @@ SolverUtil.getPastelColour = function () {
     return '#' + r + g + b;
 };
 
+/*
+ * Convert the solved choreograph into a JSON object
+ * that can be 'read' by the simulation page.
+ */
 SolverUtil.getOrbitJson = function () {
     var positionMap, velocityMap;
     var solutionVals, nBodies, id;
@@ -115,7 +130,10 @@ SolverUtil.hexToRGB = function(hex) {
     return result;
 };
 
-
+/**
+ * Using the random coefficients, solve for the kinetic and potential energy
+ * of the system throughout a single period then solve for the total action.
+ */
 SolverUtil.solveActionFunction = function (params) {
     var actionValue = 0.0;
     var kineticMap, potentialMap, actionMap;
@@ -204,6 +222,11 @@ SolverUtil.getPotentialMap = function (paramSet) {
  * the equation :
  *  Uf(r) = [( L^2 ) / (2M[i]*|r|^2 )] - (GM[i]m[j] / |r|)
  *  for all i != j.
+ *  
+ *  ************************ 
+ *  Current implementation does not use effective potential,
+ *  just regular potential! (effective is set to zero before use)
+ *  ************************
  * 
  * @param {Number} body
  * @param {n-Array} positionMap

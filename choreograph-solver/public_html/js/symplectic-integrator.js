@@ -1,5 +1,15 @@
 /*global numeric*/
 
+/*
+ *  SYMPLECTIC INTEGRATOR JS
+ * 
+ *  THIRD ORDER Symplectic Integrator for updating 'space-object' positions and
+ *  velocities.  Coefficients available through reference papers and wikipedia.
+ *  
+ *  @author Nathan Jewsbury
+ */
+
+
 var SymplecticIntegrator = function (parent) {
     this.parent = parent;
     this.timestep = this.parent.getTimeStep();

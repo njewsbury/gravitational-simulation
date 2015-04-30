@@ -1,5 +1,14 @@
 /* global numeric */
 
+/*
+ *  SOLVER PARAMS JS
+ * 
+ *  Container object for all choreograph solving properties.
+ *  (Precision, nBodies, masses, variable coefficients)
+ *  
+ *  @author Nathan Jewsbury
+ */
+
 var SolverParams = function (config) {
     //set params
     this.nBodies = config.nBodies;

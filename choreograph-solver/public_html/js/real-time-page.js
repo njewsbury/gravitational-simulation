@@ -1,4 +1,14 @@
 /*global numeric,alertify,Base64, SolverUtil*/
+
+
+/*
+ *  REAL TIME PAGE JS
+ * 
+ *  UI Interaction functions and Gravitational simulation
+ *  control (and rendering)
+ *  
+ *  @author Nathan Jewsbury
+ */
 // shim requestAnimFrame with setTimeout fallback
 window.requestAnimFrame = (function () {
     return  window.requestAnimationFrame ||
@@ -159,6 +169,9 @@ RealTimePage.simulationSingleStep = function () {
     RealTimePage.doSingleStep(1);
 };
 
+/**
+ * Force the simulation to take a single time step.
+ */
 RealTimePage.doSingleStep = function (direction) {
     if (typeof RealTimePage.universe !== "undefined"
             && RealTimePage.universe.doTimeStep(direction)) {
@@ -171,7 +184,10 @@ RealTimePage.doSingleStep = function (direction) {
 };
 
 
-
+/**
+ * Force the simulation to run at 60fps until the simulation
+ * is complete.
+ */
 RealTimePage.runSimulation = function () {
     RealTimePage.currentTimeoutId = setTimeout(function () {
         if (RealTimePage.simulationRunning) {
@@ -182,7 +198,11 @@ RealTimePage.runSimulation = function () {
     }, (1000 / RealTimePage.fps));
 };
 
-
+/**
+ * Using defined properties, solve for a new choreograph, if
+ * the user defines a seed matching a predefined one, load up
+ * those particular properties.  
+ */
 RealTimePage.solveNewChoreograph = function () {
     var solutionSeed = RealTimePage.currentSettings.getSolutionSeed();
 
@@ -306,6 +326,9 @@ RealTimePage.solveNewChoreograph = function () {
     }
 };
 
+/**
+ * Using the given seed value, solve for a new choreograph.
+ */
 RealTimePage.solveChoreography = function (seedvalue) {
     if (typeof RealTimePage.currentSettings !== "undefined"
             && RealTimePage.currentSettings !== null) {
@@ -337,6 +360,10 @@ RealTimePage.solveChoreography = function (seedvalue) {
     }
 };
 
+/**
+ * Callback function, this is called AFTER the solver is done minimizing the action,
+ * initializes the simulation properties and creates a new SpaceTimeContainer.
+ */
 RealTimePage.solvedChoreography = function () {
     var choreographJson = SolverUtil.getOrbitJson();
     choreographJson.timeStep = RealTimePage.currentSettings.getTimeStepParam();
@@ -445,7 +472,10 @@ RealTimePage.applySettings = function () {
     }
 };
 
-
+/**
+ * Loads up the energy report for the last run simulation and displays it
+ * using ChartJS
+ */
 RealTimePage.viewReport = function () {
     var labelArray = [];
     var energyReport, kinetic, potential, smoothed;

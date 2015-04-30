@@ -1,3 +1,12 @@
+
+/*
+ *  ORBITAL PARAMS JS
+ * 
+ *  Container object for simulation properties (timesteps, nbodies etc)
+ *  
+ *  @author Nathan Jewsbury
+ */
+
 var OrbitalParams = function( jsonDef ) {
     this.N_BODY_RANGE = [ 2, 5];
     this.TIME_STEP_RANGE = [0, 2];

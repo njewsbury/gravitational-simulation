@@ -1,4 +1,13 @@
 /* global alertify, numeric, SolverUtil, Base64 */
+
+/*
+ *  SOLVER PREVIEW PAGE JS
+ * 
+ *  UI Interaction functions for preview.html, controller object for
+ *  the choreograph solver.
+ *  
+ *  @author Nathan Jewsbury
+ */
 /*
  * http://stackoverflow.com/a/3855394
  * jQuery plugin to allow easy query string parsing.
@@ -21,6 +30,9 @@
 
 var PreviewPage = new Object();
 
+/**
+ * Initialization function, setup the preview page.
+ */
 PreviewPage.initialize = function () {
     PreviewPage.initialized = true;
     PreviewPage.orbitCanvas = $("#preview-canvas")[0];
@@ -32,6 +44,7 @@ PreviewPage.initialize = function () {
     }
     PreviewPage.queryParam = $.QueryString["seed"];
     PreviewPage.bodyParam = $.QueryString["bodyCount"];
+    //initialize default choreograph params.
     PreviewPage.currentSettings = new OrbitalParams({
         "nBodies": PreviewPage.bodyParam || 3,
         "timePrecision": 250,
@@ -69,6 +82,9 @@ PreviewPage.initialize = function () {
 
 };
 
+/**
+ * Allows users to download an image of the current choreograph
+ */
 PreviewPage.downloadImage = function () {
     var downloadLink = $("#download-image")[0];
 
@@ -97,6 +113,10 @@ PreviewPage.downloadImage = function () {
     }, 100);
 };
 
+/**
+ * Resize event, when user resizes the browser
+ * this event resizes the current display.
+ */
 PreviewPage.resize = function () {
     var canvasWidth, canvasHeight;
 
@@ -115,6 +135,11 @@ PreviewPage.resize = function () {
     }
 };
 
+/**
+ * Initializes the settings dialog so that users can alter the current
+ * param set used to solve the choreograph.
+ * @param {OrbitalParams} defaultValues - Default choreograph settings.
+ */
 PreviewPage.createSettingsDialog = function (defaultValues) {
     $("#preview-settings-dialog").dialog({
         autoOpen: false,
@@ -144,6 +169,9 @@ PreviewPage.createSettingsDialog = function (defaultValues) {
     }
 };
 
+/**
+ * Working function that initializes the choreograph solver parameters 
+ */
 PreviewPage.solveChoreography = function () {
     if (typeof PreviewPage.currentSettings !== "undefined"
             && PreviewPage.currentSettings !== null) {
@@ -180,6 +208,10 @@ PreviewPage.solveChoreography = function () {
     }
 };
 
+/**
+ * Callback function, called when the Solver Util finishes minimizing the action.
+ * This function draws the choreograph preview and sets up the chart of energies.
+ */
 PreviewPage.solvedChoreography = function () {
     var solution = SolverUtil.solution;
     var actionMap, kineticMap, potentialMap;
@@ -247,6 +279,10 @@ PreviewPage.solvedChoreography = function () {
         }
     }
 };
+
+/**
+ * Function called after user attempts to apply settings.
+ */
 PreviewPage.applySettings = function () {
     var solutionSeed = $("#solution-seed").val();
     if (typeof solutionSeed === "undefined" || solutionSeed.trim().length <= 0) {
@@ -271,7 +307,7 @@ PreviewPage.applySettings = function () {
 };
 /* **************
  * RENDERING FUNCTIONS
- */
+ * **************/
 
 PreviewPage.redrawActionPanel = function () {
     if (typeof PreviewPage.actionReport !== "undefined"
@@ -329,7 +365,7 @@ PreviewPage.drawChoreograph = function (positionMap) {
             var yPos = ((positionMap[n])[1]);
             var colour = PreviewPage.colourArray[n];
             cntx.beginPath();
-            cntx.arc(xPos[0], yPos[0], (10*SolverUtil.paramSet.massValues[n]) / 100, Math.PI * 2, false);
+            cntx.arc(xPos[0], yPos[0], (10 * SolverUtil.paramSet.massValues[n]) / 100, Math.PI * 2, false);
             cntx.fillStyle = colour;
             cntx.strokeStyle = 'black';
             cntx.lineWidth = 2 / 100;

@@ -1,4 +1,15 @@
 /* global alertify, numeric */
+
+/*
+ *  SPACE TIME CONTAINER JS
+ * 
+ *  Container for all interacting bodies and associated 
+ *  system energies.  Forces the bodies to compute time
+ *  steps.  Integrator controller.
+ *  
+ *  @author Nathan Jewsbury
+ */
+
 var SpaceTimeContainer = function (jsonDef) {
     this.timeStep = 0.001;
     this.gravConstant = 1;

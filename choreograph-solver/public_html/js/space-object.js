@@ -1,4 +1,14 @@
 /*global numeric */
+
+/*
+ *  SPACE OBJECT JS
+ * 
+ *  Container object for orbital object properties
+ *  and acceleration calculations. (Motion functions @ bottom)
+ *  
+ *  @author Nathan Jewsbury
+ */
+
 var SpaceObject = function (jsonDef, universe) {
 
     this.id = -1;
